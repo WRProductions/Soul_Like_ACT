@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
+#include "TargetableActor.h"
 #include "MobBasic.generated.h"
 
 UCLASS()
-class SOUL_LIKE_ACT_API AMobBasic : public APawn
+class SOUL_LIKE_ACT_API AMobBasic : public ATargetableActor
 {
 	GENERATED_BODY()
 

@@ -47,6 +47,8 @@ ASoul_Like_ACTCharacter::ASoul_Like_ACTCharacter()
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 
 	AnimManager = CreateDefaultSubobject<UAnimManager>(TEXT("AnimManager"));
+
+	Faction = EActorFaction::Player;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -58,7 +60,7 @@ void ASoul_Like_ACTCharacter::SetupPlayerInputComponent(class UInputComponent* P
 	check(PlayerInputComponent);
 	//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	PlayerInputComponent->BindAction("LBM", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseLMB);
+	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseLMB);
 	PlayerInputComponent->BindAction("RMB", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseRMB);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASoul_Like_ACTCharacter::MoveForward);
@@ -90,6 +92,10 @@ void ASoul_Like_ACTCharacter::UseLMB()
 		FString DebugMessage;
 		AnimManager->TryAttack(0, DebugMessage);
 		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, DebugMessage);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "No Weapon");
 	}
 }
 

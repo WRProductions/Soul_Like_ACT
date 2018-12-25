@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "TargetableActor.h"
 #include "Soul_Like_ACTCharacter.generated.h"
 
 UCLASS(config=Game)
-class ASoul_Like_ACTCharacter : public ACharacter
+class ASoul_Like_ACTCharacter : public ATargetableActor
 {
 	GENERATED_BODY()
 
@@ -19,7 +19,7 @@ class ASoul_Like_ACTCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UAnimManager* AnimManager;
 public:
 	ASoul_Like_ACTCharacter();

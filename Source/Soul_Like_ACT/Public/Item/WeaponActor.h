@@ -33,9 +33,9 @@ protected:
 	FTimerHandle SwingHandle, TracingHandle;
 
 	UPROPERTY(BlueprintReadWrite)
-		float BladeStartLength = 20.f;
+		int32 BladeStartLength = 20;
 	UPROPERTY(BlueprintReadWrite)
-		float BladeTail = 120.f;
+		int32 BladeTail = 120;
 
 	TArray<FVector>PrevVecs;
 	TArray<FVector>CurrVecs;
@@ -51,6 +51,9 @@ protected:
 	bool TryExcludeActor(AActor *HitActor);
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ShowDrawTraceLine, meta = (ExposeOnSpawn = 1))
+		bool bEnableDrawTraceLine;
+
 	UFUNCTION(BlueprintCallable)
 		void StartSwing();
 	UFUNCTION(BlueprintCallable)

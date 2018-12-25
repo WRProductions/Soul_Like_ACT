@@ -27,13 +27,13 @@ void AWeaponActor::BeginPlay()
 void AWeaponActor::CheckCollision()
 {
 	PrevVecs = CurrVecs;
-	for (int i = BladeStartLength; i <= BladeTail; i += 10)
+	for (int i = BladeStartLength; i <= BladeTail; i += 20)
 	{
 		int32 size_ = (i - BladeStartLength) / 10;
 
 		CurrVecs[size_] = GetActorLocation() + i * GetActorUpVector();
 
-		DrawTraceLine(PrevVecs[size_], CurrVecs[size_], 0);
+		DrawTraceLine(PrevVecs[size_], CurrVecs[size_], bEnableDrawTraceLine);
 	}
 }
 
@@ -44,10 +44,12 @@ void AWeaponActor::DrawTraceLine_Implementation(FVector prevVec_, FVector currVe
 	QueryParams.AddIgnoredActor(this);
 	QueryParams.AddIgnoredActor(GetInstigator());
 
-	bool bIsHit = GetWorld()->LineTraceMultiByChannel(Hits, prevVec_, currVec_, ECC_Camera, QueryParams);
+	bool bIsHit = GetWorld()->LineTraceMultiByChannel(Hits, prevVec_, currVec_, ECC_Pawn, QueryParams);
 	if (bIsHit)
 	{
-		if (bDrawTraceLine) DrawDebugLine(GetWorld(), prevVec_, currVec_, FColor::Green, 0, 2.f, 0, 1.f);
+		if (bDrawTraceLine)  
+			DrawDebugLine(GetWorld(), prevVec_, currVec_, FColor::Green, 0, 2.f, 0, 1.f);
+
 		for (const auto &Hit : Hits)
 		{
 			APawn * tempChar = Cast<APawn>(Hit.GetActor());
@@ -65,7 +67,8 @@ void AWeaponActor::DrawTraceLine_Implementation(FVector prevVec_, FVector currVe
 	}
 	else
 	{
-		if (bDrawTraceLine) DrawDebugLine(GetWorld(), prevVec_, currVec_, FColor::Red, 0, 2.f, 0, 1.f);
+		if (bDrawTraceLine) 
+			DrawDebugLine(GetWorld(), prevVec_, currVec_, FColor::Red, 0, 2.f, 0, 1.f);
 	}
 }
 
@@ -101,5 +104,7 @@ void AWeaponActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if(bIsTracingCollision)
+		CheckCollision();
 }
 
