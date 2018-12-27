@@ -56,7 +56,9 @@ void AWeaponActor::DrawTraceLine_Implementation(FVector prevVec_, FVector currVe
 			if (tempChar && TryExcludeActor(Hit.GetActor()))
 			{
 				UE_LOG(LogTemp, Warning, TEXT("%s"), *Hit.GetActor()->GetName());
-
+				
+				OnSlowMotionTrigger.Broadcast(1.f, tempChar);
+				
 				UGameplayStatics::ApplyDamage(Hit.GetActor(), 30.f, GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
 				if (HitSound)
 					UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, Hit.Location);

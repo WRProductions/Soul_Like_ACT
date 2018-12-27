@@ -2,6 +2,8 @@
 
 #include "TargetableActor.h"
 #include "StatusComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
 
 // Sets default values
 ATargetableActor::ATargetableActor()
@@ -10,12 +12,37 @@ ATargetableActor::ATargetableActor()
 	PrimaryActorTick.bCanEverTick = true;
 
 	StatusComponent = CreateDefaultSubobject<UStatusComponent>(TEXT("StatusComponent"));
+
+	GetCapsuleComponent()->SetCapsuleHalfHeight(96.f);
+	GetCapsuleComponent()->SetCapsuleRadius(60.f);
+
+	TargetIcon = CreateDefaultSubobject<UWidgetComponent>(TEXT("LockIconWidget"));
+	TargetIcon->SetupAttachment(RootComponent);
+	TargetIcon->SetWidgetSpace(EWidgetSpace::Screen);
+	TargetIcon->SetDrawSize(FVector2D{ 35.f,35.f });
+}
+
+
+void ATargetableActor::ToggleLockIcon(bool LockOn)
+{
+	if (!TargetIcon->GetWidgetClass()) return;
+
+	if (!TargetIcon->bIsActive && LockOn)
+	{
+		TargetIcon->Activate(1);
+	}
+	else if(TargetIcon->bIsActive && !LockOn)
+	{
+		TargetIcon->Activate(0);
+	}
 }
 
 // Called when the game starts or when spawned
 void ATargetableActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	TargetIcon->Activate(0);
 	
 }
 

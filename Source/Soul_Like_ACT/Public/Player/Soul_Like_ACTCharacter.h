@@ -20,7 +20,14 @@ class ASoul_Like_ACTCharacter : public ATargetableActor
 	class UCameraComponent* FollowCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class UAnimManager* AnimManager;
+	class UAnimManager* AnimManager;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UArrowComponent* TargetLockArrow;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class ULockTargetComponent *TargetLockingComponent;
+
 public:
 	ASoul_Like_ACTCharacter();
 
@@ -36,6 +43,8 @@ public:
 		class AWeaponActor *Weapon;
 
 protected:
+	virtual void BeginPlay() override;
+
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);

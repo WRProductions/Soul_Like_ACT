@@ -4,7 +4,9 @@
 #include "Player/AnimManager.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/ArrowComponent.h"
 #include "Components/InputComponent.h"
+#include "Player/LockTargetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -30,6 +32,7 @@ ASoul_Like_ACTCharacter::ASoul_Like_ACTCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 600.f;
+	GetCharacterMovement()->MaxWalkSpeed = 800.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
@@ -43,10 +46,17 @@ ASoul_Like_ACTCharacter::ASoul_Like_ACTCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	// Arrow Component for Target Lock Component
+	TargetLockArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("TargetLockArrow"));
+	TargetLockArrow->SetupAttachment(RootComponent);
+	TargetLockArrow->bAbsoluteRotation = 1;
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 
 	AnimManager = CreateDefaultSubobject<UAnimManager>(TEXT("AnimManager"));
+
+	TargetLockingComponent = CreateDefaultSubobject<ULockTargetComponent>(TEXT("TargetLockingComponent"));
 
 	Faction = EActorFaction::Player;
 }
@@ -91,7 +101,7 @@ void ASoul_Like_ACTCharacter::UseLMB()
 	{
 		FString DebugMessage;
 		AnimManager->TryAttack(0, DebugMessage);
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, DebugMessage);
+		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, DebugMessage);
 	}
 	else
 	{
@@ -101,6 +111,13 @@ void ASoul_Like_ACTCharacter::UseLMB()
 
 void ASoul_Like_ACTCharacter::UseRMB()
 {
+}
+
+void ASoul_Like_ACTCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	TargetLockingComponent->InitComponent(TargetLockArrow);
 }
 
 void ASoul_Like_ACTCharacter::MoveForward(float Value)
@@ -113,6 +130,12 @@ void ASoul_Like_ACTCharacter::MoveForward(float Value)
 
 		// get forward vector
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		
+		if (TargetLockingComponent->GetIsTargetingEnabled())
+		{
+			Value *= 0.37f;
+		}
+
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -128,6 +151,12 @@ void ASoul_Like_ACTCharacter::MoveRight(float Value)
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
+
+		if (TargetLockingComponent->GetIsTargetingEnabled())
+		{
+			Value *= 0.37f;
+		}
+
 		AddMovementInput(Direction, Value);
 	}
 }

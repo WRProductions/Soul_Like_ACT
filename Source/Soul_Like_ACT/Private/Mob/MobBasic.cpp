@@ -10,6 +10,8 @@ AMobBasic::AMobBasic()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Faction = EActorFaction::Enemy;
+
+	bIsTargetable = 1;
 }
 
 // Called when the game starts or when spawned

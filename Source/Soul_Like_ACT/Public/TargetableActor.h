@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/Targetable.h"
 #include "TargetableActor.generated.h"
 
-class UStatusComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnActorHealthChanged, int32, ActorCurrentHealth, int32, ActorMaxHealth);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnActorHealthChangedNative, int32, int32);
@@ -23,19 +23,27 @@ enum class EActorFaction : uint8
 
 
 UCLASS()
-class SOUL_LIKE_ACT_API ATargetableActor : public ACharacter
+class SOUL_LIKE_ACT_API ATargetableActor : public ACharacter, public ITargetable
 {
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UStatusComponent *StatusComponent;
+		class UStatusComponent *StatusComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		class UWidgetComponent *TargetIcon;
+
 public:
 	// Sets default values for this pawn's properties
 	ATargetableActor();
 
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bIsTargetable;
 
 public:	
 	// Called every frame
@@ -45,13 +53,19 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		EActorFaction Faction;
+	EActorFaction Faction;
 	
 	UPROPERTY(BlueprintAssignable)
-		FOnActorHealthChanged OnActorHealthChanged;
+	FOnActorHealthChanged OnActorHealthChanged;
 
 	UFUNCTION(BlueprintCallable)
-		void BroadCastOnHealthChanged();
+	void BroadCastOnHealthChanged();
+
+	UFUNCTION(BlueprintCallable)
+	virtual bool IsTargetable() const override { return bIsTargetable; }
+
+	UFUNCTION(BlueprintCallable)
+	virtual void ToggleLockIcon(bool LockOn) override;
 };
 
 

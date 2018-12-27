@@ -7,7 +7,7 @@
 ASoul_Like_ACTGameMode::ASoul_Like_ACTGameMode()
 {
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Player/ThirdPersonCharacter"));
+	static ConstructorHelpers::FClassFinder<ATargetableActor> PlayerPawnBPClass(TEXT("/Game/Player/ThirdPersonCharacter"));
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;

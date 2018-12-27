@@ -12,6 +12,22 @@ class SOUL_LIKE_ACT_API ULockTargetComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+protected:
+	FTimerHandle TargetBlockingHandler;
+
+	class AActor *SelectedActor;
+
+	bool bIsTargetingEnabled;
+
+	bool bFreeCamera;
+
+	bool bOwnerControllerRotationYaw, bOwnerOrientRotToMovement, bOwnerControllerDesiredRot;
+
+	TArray<AActor*> PotentialTargetActors;
+
+	class UArrowComponent *PlayerArrow;
+	class ACharacter *PlayerRef;
+
 public:	
 	// Sets default values for this component's properties
 	ULockTargetComponent();
@@ -20,16 +36,36 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	class AActor *PlayerRef;
-	class AActor *Target;
+	//Detection Stages-----------
+	void FindTarget();
+	
+	void GetPotentialTargetsInScreen(TArray<AActor *> &OutPotentialTargets);
+	void RuleOutBlockedTargets(TArray<AActor *> LocalPotentialTargets, TArray<AActor *> &OutPotentialTargets);
+	void FindClosestTargetInScreen(TArray<AActor *> LocalPotentialTargets, AActor *&ClosestTarget);
+	//---------------------------
 
+	void EnableLockingTarget();
+	void DisableLockingTarget();
+
+	void CacheRotationSetting();
+	void ResetRotationSetting();
+
+	void SetRotationMode_FaceTarget();
+
+	bool IsTraceBlocked(AActor *SelectedTarget, TArray<AActor*> IgnoredActors, const ECollisionChannel TraceChannel);
+	FVector GetLineTraceStartLocation();
+
+	void Timer_CheckBlockingAndDistance();
+
+	void Tick_UpdateRotation();
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-		void EnableLockingTarget();
+		void ToggleCameraLock(bool FreeCamera);
 
-	UFUNCTION(BlueprintCallable)
-		void DisableLockingTarget();
+	void InitComponent(class UArrowComponent *ArrowComponentRef);
+
+	bool GetIsTargetingEnabled() { return bIsTargetingEnabled; }
 };
