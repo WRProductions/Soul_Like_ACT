@@ -42,6 +42,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gears)
 		class AWeaponActor *Weapon;
 
+	float ForwardAxisValue, RightAxisValue;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -67,5 +69,10 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	class UAnimManager* GetAnimManager() const { return AnimManager; }
+
+	UFUNCTION(BlueprintCallable)
+		void ResetRotation();
 };
 

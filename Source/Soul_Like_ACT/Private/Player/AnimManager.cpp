@@ -2,8 +2,9 @@
 
 #include "Player/AnimManager.h"
 #include "TimerManager.h"
-#include "GameFramework/Character.h"
-
+#include "Player/Soul_Like_ACTCharacter.h"
+#include "Camera/CameraComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values for this component's properties
 UAnimManager::UAnimManager()
@@ -20,8 +21,7 @@ void UAnimManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	bIsInCombat = 1;
-	
+	PlayerRef = Cast<ASoul_Like_ACTCharacter>(GetOwner());
 }
 
 // Called every frame
@@ -32,7 +32,22 @@ void UAnimManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	// ...
 }
 
-void UAnimManager::TryPlayComboMontage()
+void UAnimManager::PlayMontage()
+{
+	switch (MyActionType)
+	{
+	case EActionType::Attack:
+		PlayComboMontage();
+		break;
+	case EActionType::Dodge:
+		PlayDodgeMontage();
+		break;
+	default:
+		break;
+	}
+}
+
+void UAnimManager::PlayComboMontage()
 {
 	Cast<ACharacter>(GetOwner())->PlayAnimMontage(ComboMontages[ComboIndex], 1.f);
 	IncreaseComboIndex();
@@ -61,14 +76,10 @@ void UAnimManager::IncreasingChannelingPoints()
 	//GetWorld()->GetTimerManager().SetTimer(ChannelingPointsTH, this, &UInputBuffComp::ResetChannelingPoints, .5f, 0, 3.f);
 }
 
-void UAnimManager::TryAttack(bool bTriggeredByAnimBP, FString & DebugMessage)
+void UAnimManager::TryUseDequeMotion(bool bTriggeredByAnimBP, FString & DebugMessage)
 {
-	if (!bIsInCombat)
-	{
-		DebugMessage = "Not In Combat";
-		return;
-	}
-	else if (bIsAttacking)
+
+	if (bIsActing)
 	{
 		if (AutoAttackQueue == EAttackQueueStatus::Disabled)
 		{
@@ -96,7 +107,7 @@ void UAnimManager::TryAttack(bool bTriggeredByAnimBP, FString & DebugMessage)
 			if (bTriggeredByAnimBP)
 			{
 				SetAttackQueue(EAttackQueueStatus::Disabled);
-				TryPlayComboMontage();
+				PlayMontage();
 				DebugMessage = "Attacking";
 				return;
 			}
@@ -109,7 +120,7 @@ void UAnimManager::TryAttack(bool bTriggeredByAnimBP, FString & DebugMessage)
 			&& !bTriggeredByAnimBP)
 		{
 			SetAttackQueue(EAttackQueueStatus::Disabled);
-			TryPlayComboMontage();
+			PlayMontage();
 			DebugMessage = "Manual trigger attacking";
 			return;
 		}
@@ -118,13 +129,44 @@ void UAnimManager::TryAttack(bool bTriggeredByAnimBP, FString & DebugMessage)
 		AutoAttackQueue == EAttackQueueStatus::Disabled
 		&& !bTriggeredByAnimBP)
 	{
-		SetAttackQueue(EAttackQueueStatus::Disabled);
-		TryPlayComboMontage();
+		PlayMontage();
 		DebugMessage = "First attacking";
 		return;
 	}
 	DebugMessage = "Do Nothing";
 	return;
+}
+
+void UAnimManager::PlayDodgeMontage()
+{
+	ResetCombo();
+
+	FVector2D AxisVec2D{ PlayerRef->ForwardAxisValue, PlayerRef->RightAxisValue };
+	FRotator CamForwardRotation = FRotator{ PlayerRef->GetActorRotation().Pitch, PlayerRef->GetInstigator()->GetControlRotation().Yaw, PlayerRef->GetActorRotation().Roll };
+
+	if (AxisVec2D.Size() <= 0.01f)
+	{
+		PlayerRef->SetActorRotation(CamForwardRotation);
+
+		PlayerRef->PlayAnimMontage(Dash_Forward);
+	}
+	else
+	{
+		FRotator ControlledRotation = PlayerRef->GetInstigator()->GetControlRotation();
+
+		FVector ForwardVec = FRotationMatrix(ControlledRotation).GetScaledAxis(EAxis::X) * PlayerRef->ForwardAxisValue * 100.f;
+		FVector RightVec = FRotationMatrix(ControlledRotation).GetScaledAxis(EAxis::Y) * PlayerRef->RightAxisValue * 100.f;
+		ForwardVec.Z = 0;
+		RightVec.Z = 0;
+
+		FVector LookAtRotation = PlayerRef->GetActorLocation() + ForwardVec + RightVec;
+
+		FRotator DodgeDir = UKismetMathLibrary::FindLookAtRotation(PlayerRef->GetActorLocation(), LookAtRotation);
+
+		PlayerRef->SetActorRotation(DodgeDir);
+
+		PlayerRef->PlayAnimMontage(Dash_Forward);
+	}
 }
 
 FString UAnimManager::GetQueueStatusMessage(EAttackQueueStatus const & Inp)

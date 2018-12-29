@@ -30,7 +30,7 @@ ASoul_Like_ACTCharacter::ASoul_Like_ACTCharacter()
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 1000.f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->MaxWalkSpeed = 800.f;
 	GetCharacterMovement()->AirControl = 0.2f;
@@ -83,6 +83,11 @@ void ASoul_Like_ACTCharacter::SetupPlayerInputComponent(class UInputComponent* P
 }
 
 
+void ASoul_Like_ACTCharacter::ResetRotation()
+{
+	SetActorRotation(FRotator{ GetActorRotation().Pitch, GetInstigator()->GetViewRotation().Yaw,GetActorRotation().Roll });
+}
+
 void ASoul_Like_ACTCharacter::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
@@ -100,7 +105,7 @@ void ASoul_Like_ACTCharacter::UseLMB()
 	if (Weapon)
 	{
 		FString DebugMessage;
-		AnimManager->TryAttack(0, DebugMessage);
+		AnimManager->TryUseDequeMotion(EActionType::Attack, 0, DebugMessage);
 		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, DebugMessage);
 	}
 	else
@@ -111,6 +116,8 @@ void ASoul_Like_ACTCharacter::UseLMB()
 
 void ASoul_Like_ACTCharacter::UseRMB()
 {
+	FString DebugMessage;
+	AnimManager->TryUseDequeMotion(EActionType::Dodge, 0, DebugMessage);
 }
 
 void ASoul_Like_ACTCharacter::BeginPlay()
@@ -122,6 +129,9 @@ void ASoul_Like_ACTCharacter::BeginPlay()
 
 void ASoul_Like_ACTCharacter::MoveForward(float Value)
 {
+	//Axis Value for AnimManager
+	ForwardAxisValue = Value;
+
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
 		// find out which way is forward
@@ -133,7 +143,7 @@ void ASoul_Like_ACTCharacter::MoveForward(float Value)
 		
 		if (TargetLockingComponent->GetIsTargetingEnabled())
 		{
-			Value *= 0.37f;
+			Value *= 0.625f;
 		}
 
 		AddMovementInput(Direction, Value);
@@ -142,6 +152,9 @@ void ASoul_Like_ACTCharacter::MoveForward(float Value)
 
 void ASoul_Like_ACTCharacter::MoveRight(float Value)
 {
+	//Get axis value for AnimManager
+	RightAxisValue = Value;
+
 	if ( (Controller != NULL) && (Value != 0.0f) )
 	{
 		// find out which way is right
@@ -154,7 +167,7 @@ void ASoul_Like_ACTCharacter::MoveRight(float Value)
 
 		if (TargetLockingComponent->GetIsTargetingEnabled())
 		{
-			Value *= 0.37f;
+			Value *= 0.625f;
 		}
 
 		AddMovementInput(Direction, Value);

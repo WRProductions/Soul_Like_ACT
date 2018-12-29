@@ -4,7 +4,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Interfaces/Targetable.h"
 #include "DrawDebugHelpers.h"
-#include "GameFramework/Character.h"
+#include "Player/Soul_Like_ACTCharacter.h"
+#include "Player/AnimManager.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/ArrowComponent.h"
 #include "TimerManager.h"
@@ -290,23 +291,27 @@ void ULockTargetComponent::Tick_UpdateRotation()
 		PlayerArrow->SetWorldRotation(FRotator{ 0.f, SlerpedRotation.Yaw, 0.f });
 	}
 
-	//Set Capsule Component rotation to face the target
-	FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(PlayerRef->GetActorLocation(),
-		SelectedActor->GetActorLocation());
-	FRotator PlayerCapRotation = PlayerRef->GetCapsuleComponent()->GetComponentRotation();
-
-	PlayerRef->GetCapsuleComponent()->SetWorldRotation(FMath::RInterpConstantTo(
-		PlayerCapRotation,
-		FRotator{ PlayerCapRotation.Pitch, LookAtRotation.Yaw, PlayerCapRotation.Roll },
-		GetWorld()->GetDeltaSeconds(),
-		250.f));
-
-	if (!bFreeCamera)
+	if (Cast<ASoul_Like_ACTCharacter>(PlayerRef)->GetAnimManager()->GetCanMove())
 	{
-		FRotator LookedAtCameraRotation = FMath::RInterpConstantTo(PlayerRef->GetControlRotation(),
-			LookAtRotation, GetWorld()->GetDeltaSeconds(), 300.f);
+		//Set Capsule Component rotation to face the target
+		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(PlayerRef->GetActorLocation(),
+			SelectedActor->GetActorLocation());
+		FRotator PlayerCapRotation = PlayerRef->GetCapsuleComponent()->GetComponentRotation();
 
-		PlayerRef->GetInstigator()->GetController()->SetControlRotation(LookedAtCameraRotation);
+		PlayerRef->GetCapsuleComponent()->SetWorldRotation(FMath::RInterpConstantTo(
+			PlayerCapRotation,
+			FRotator{ PlayerCapRotation.Pitch, LookAtRotation.Yaw, PlayerCapRotation.Roll },
+			GetWorld()->GetDeltaSeconds(),
+			800.f));
+
+		//Set Camera rotation
+		if (!bFreeCamera)
+		{
+			FRotator LookedAtCameraRotation = FMath::RInterpConstantTo(PlayerRef->GetControlRotation(),
+				LookAtRotation, GetWorld()->GetDeltaSeconds(), 300.f);
+
+			PlayerRef->GetInstigator()->GetController()->SetControlRotation(LookedAtCameraRotation);
+		}
 	}
 }
 

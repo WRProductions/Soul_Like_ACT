@@ -15,6 +15,13 @@ enum class EAttackQueueStatus : uint8
 	ManualAttackOnly
 };
 
+UENUM(BlueprintType)
+enum class EActionType : uint8
+{
+	Attack,
+	Dodge,
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SOUL_LIKE_ACT_API UAnimManager : public UActorComponent
 {
@@ -23,6 +30,8 @@ class SOUL_LIKE_ACT_API UAnimManager : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UAnimManager();
+
+	class ASoul_Like_ACTCharacter *PlayerRef;
 
 protected:
 	// Called when the game starts
@@ -33,16 +42,14 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 protected:
-	bool bIsDashing;
-	bool bIsAttacking;
-
-	bool bIsInCombat;
+	bool bIsActing;
 
 	bool bIsHit;
 
 	bool bCanParry;
 
 	EAttackQueueStatus AutoAttackQueue;
+	EActionType MyActionType;
 
 	int32 ChannelingPoints;
 
@@ -50,12 +57,16 @@ protected:
 
 	FTimerHandle ChannelingPointsTH;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontages)
 		TArray<UAnimMontage*> ComboMontages;
-
 	uint8 ComboIndex;
 
-	void TryPlayComboMontage();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontages)
+		UAnimMontage *Dash_Forward;
+
+	void PlayMontage();
+	void PlayComboMontage();
+	void PlayDodgeMontage();
 
 	void ResetComboIndex() { ComboIndex = 0; }
 
@@ -69,20 +80,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void EnableAttackQueue_InAnim() { AutoAttackQueue = EAttackQueueStatus::WaitForQueue; }
 
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-		bool GetIsInCombat() const { return bIsInCombat; }
-	UFUNCTION(BlueprintCallable)
-		void SwitchModeBetweenCombatAndTravel() { bIsInCombat = !bIsInCombat; }
-
 	UFUNCTION(BlueprintCallable)
 		void ResetCombo();
-
-	UFUNCTION(BlueprintCallable)
-		void CancelAttacking()
-	{
-		bIsDashing = bIsAttacking = 0;
-		ResetCombo();
-	}
 
 	UFUNCTION(BlueprintCallable)
 		void SetCanParry(bool CanParry) { bCanParry = CanParry; }
@@ -97,12 +96,27 @@ public:
 		int32 GetChannelingPoints() const { return ChannelingPoints; }
 
 	UFUNCTION(BlueprintCallable)
-		void EnableIsAttacking() { bIsAttacking = 1; }
+		void EnableActing() { bIsActing = 1; }
 	UFUNCTION(BlueprintCallable)
-		void DisableIsAttacking() { bIsAttacking = 0; }
+		void DisableActing() 
+	{
+		ResetCombo();
+		bIsActing = 0;
+	}
+	UFUNCTION(BlueprintCallable)
+		bool GetCanMove() const { return !bIsActing; }
 
-	UFUNCTION(BlueprintCallable, Category = "Stuff")
-		void TryAttack(bool bTriggeredByAnimBP, FString &DebugMessage);
+	UFUNCTION(BlueprintCallable)
+		void TryUseDequeMotion(bool bTriggeredByAnimBP, FString &DebugMessage);
+
+	UFUNCTION(BlueprintCallable)
+		void SetActionType(const EActionType InpActionType) { MyActionType = InpActionType; }
+
+	void TryUseDequeMotion(const EActionType InpActionType, bool bTriggeredByAnimBP, FString &DebugMessage)
+	{
+		SetActionType(InpActionType);
+		TryUseDequeMotion(bTriggeredByAnimBP, DebugMessage);
+	}
 
 	UFUNCTION(BlueprintCallable)
 		static FString GetQueueStatusMessage(EAttackQueueStatus const &Inp);
