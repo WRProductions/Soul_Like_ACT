@@ -6,6 +6,8 @@
 #include "TargetableActor.h"
 #include "Soul_Like_ACTCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGetLeanAmount, float, LeanAmount);
+
 UCLASS(config=Game)
 class ASoul_Like_ACTCharacter : public ATargetableActor
 {
@@ -31,6 +33,8 @@ class ASoul_Like_ACTCharacter : public ATargetableActor
 public:
 	ASoul_Like_ACTCharacter();
 
+	virtual void Tick(float DeltaTime) override;
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -43,10 +47,12 @@ public:
 		class AWeaponActor *Weapon;
 
 	float ForwardAxisValue, RightAxisValue;
+	float LeanAmount_Char, LeanSpeed_Char, LeanAmount_Anim;
 
 protected:
 	virtual void BeginPlay() override;
 
+	//Tick------------------------------
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);
@@ -57,7 +63,10 @@ protected:
 
 	void UseLMB();
 
-	void UseRMB();
+	void UseDodge();
+
+	void CalculateLeanValue(float TurnValue);
+	//----------------------------------
 
 protected:
 	// APawn interface
@@ -74,5 +83,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void ResetRotation();
+
+	UPROPERTY(BlueprintAssignable)
+		FGetLeanAmount GetLaneAmountDelegate;
 };
 

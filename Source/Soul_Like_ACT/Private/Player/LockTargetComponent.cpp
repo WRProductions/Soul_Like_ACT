@@ -213,7 +213,8 @@ void ULockTargetComponent::DisableLockingTarget()
 
 	PlayerArrow->SetVisibility(0);
 
-	Cast<ITargetable>(SelectedActor)->ToggleLockIcon(0);
+	if(SelectedActor)
+		Cast<ITargetable>(SelectedActor)->ToggleLockIcon(0);
 
 	SelectedActor = nullptr;
 
@@ -257,7 +258,7 @@ void ULockTargetComponent::Timer_CheckBlockingAndDistance()
 	if (IsTraceBlocked(SelectedActor, TArray<AActor*>{SelectedActor}, ECC_WorldStatic))
 	{
 		DisableLockingTarget();
-		return;
+		return FindTarget();
 	}
 
 	float LocalDistance = FVector::Distance(GetOwner()->GetActorLocation(), SelectedActor->GetActorLocation());

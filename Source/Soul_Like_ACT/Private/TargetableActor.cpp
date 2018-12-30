@@ -25,15 +25,14 @@ ATargetableActor::ATargetableActor()
 
 void ATargetableActor::ToggleLockIcon(bool LockOn)
 {
-	if (!TargetIcon->GetWidgetClass()) return;
 
-	if (!TargetIcon->bIsActive && LockOn)
+	if (!TargetIcon->IsVisible() && LockOn)
 	{
-		TargetIcon->Activate(1);
+		TargetIcon->SetVisibility(1);
 	}
-	else if(TargetIcon->bIsActive && !LockOn)
+	else if(TargetIcon->IsVisible() && !LockOn)
 	{
-		TargetIcon->Activate(0);
+		TargetIcon->SetVisibility(0);
 	}
 }
 
@@ -41,15 +40,6 @@ void ATargetableActor::ToggleLockIcon(bool LockOn)
 void ATargetableActor::BeginPlay()
 {
 	Super::BeginPlay();
-
-	TargetIcon->Activate(0);
-	
-}
-
-void ATargetableActor::BroadCastOnHealthChanged()
-{
-	if (OnActorHealthChanged.IsBound())
-		OnActorHealthChanged.Broadcast(StatusComponent->Health, StatusComponent->MaxHealth);
 }
 
 // Called every frame

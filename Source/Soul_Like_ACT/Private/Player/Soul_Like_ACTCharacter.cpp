@@ -61,6 +61,11 @@ ASoul_Like_ACTCharacter::ASoul_Like_ACTCharacter()
 	Faction = EActorFaction::Player;
 }
 
+void ASoul_Like_ACTCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -71,12 +76,14 @@ void ASoul_Like_ACTCharacter::SetupPlayerInputComponent(class UInputComponent* P
 	//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseLMB);
-	PlayerInputComponent->BindAction("RMB", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseRMB);
+	PlayerInputComponent->BindAction("Space", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseDodge);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASoul_Like_ACTCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ASoul_Like_ACTCharacter::MoveRight);
 
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("Turn", this, &ASoul_Like_ACTCharacter::CalculateLeanValue);
+
 	PlayerInputComponent->BindAxis("TurnRate", this, &ASoul_Like_ACTCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ASoul_Like_ACTCharacter::LookUpAtRate);
@@ -114,10 +121,28 @@ void ASoul_Like_ACTCharacter::UseLMB()
 	}
 }
 
-void ASoul_Like_ACTCharacter::UseRMB()
+void ASoul_Like_ACTCharacter::UseDodge()
 {
 	FString DebugMessage;
 	AnimManager->TryUseDequeMotion(EActionType::Dodge, 0, DebugMessage);
+}
+
+void ASoul_Like_ACTCharacter::CalculateLeanValue(float TurnValue)
+{
+	if (TargetLockingComponent->GetIsTargetingEnabled())
+	{
+		LeanAmount_Char = 0.f;
+		LeanSpeed_Char = 10.f;		
+	}
+	else
+	{
+		LeanAmount_Char = TurnValue;
+		LeanSpeed_Char = 1.f;
+	}
+
+	LeanAmount_Anim = FMath::FInterpTo(LeanAmount_Anim, LeanAmount_Char, GetWorld()->GetDeltaSeconds(), LeanSpeed_Char);
+	
+	GetLaneAmountDelegate.Broadcast(LeanAmount_Anim);
 }
 
 void ASoul_Like_ACTCharacter::BeginPlay()
@@ -143,7 +168,7 @@ void ASoul_Like_ACTCharacter::MoveForward(float Value)
 		
 		if (TargetLockingComponent->GetIsTargetingEnabled())
 		{
-			Value *= 0.625f;
+			Value *= 0.6f;
 		}
 
 		AddMovementInput(Direction, Value);
@@ -167,7 +192,7 @@ void ASoul_Like_ACTCharacter::MoveRight(float Value)
 
 		if (TargetLockingComponent->GetIsTargetingEnabled())
 		{
-			Value *= 0.625f;
+			Value *= 0.6f;
 		}
 
 		AddMovementInput(Direction, Value);

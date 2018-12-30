@@ -30,4 +30,3 @@ void UStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 	// ...
 }
-

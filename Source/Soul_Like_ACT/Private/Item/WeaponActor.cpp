@@ -3,6 +3,7 @@
 #include "Item/WeaponActor.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "TargetableActor.h"
 #include "DrawDebugHelpers.h"
 
 
@@ -52,8 +53,8 @@ void AWeaponActor::DrawTraceLine_Implementation(FVector prevVec_, FVector currVe
 
 		for (const auto &Hit : Hits)
 		{
-			APawn * tempChar = Cast<APawn>(Hit.GetActor());
-			if (tempChar && TryExcludeActor(Hit.GetActor()))
+			ATargetableActor * tempChar = Cast<ATargetableActor>(Hit.GetActor());
+			if (tempChar && tempChar->IsTargetable() && TryExcludeActor(Hit.GetActor()))
 			{
 				UE_LOG(LogTemp, Warning, TEXT("%s"), *Hit.GetActor()->GetName());
 				
