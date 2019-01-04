@@ -6,10 +6,16 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/InputComponent.h"
+#include "Perception/AIPerceptionSystem.h"
+#include "Perception/AISenseConfig_Sight.h"
 #include "Player/LockTargetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+
+const float ASoul_Like_ACTCharacter::BattleMovementScale{ .6f };
+const float ASoul_Like_ACTCharacter::TravelMovementScale{ 1.f };
 
 //////////////////////////////////////////////////////////////////////////
 // ASoul_Like_ACTCharacter
@@ -59,11 +65,22 @@ ASoul_Like_ACTCharacter::ASoul_Like_ACTCharacter()
 	TargetLockingComponent = CreateDefaultSubobject<ULockTargetComponent>(TEXT("TargetLockingComponent"));
 
 	Faction = EActorFaction::Player;
+
+	AIPerceptionStimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("AIPerceptionStimuliSource"));
+}
+
+void ASoul_Like_ACTCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	TargetLockingComponent->InitComponent(TargetLockArrow);
 }
 
 void ASoul_Like_ACTCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	MakeMove();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -76,6 +93,8 @@ void ASoul_Like_ACTCharacter::SetupPlayerInputComponent(class UInputComponent* P
 	//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseLMB);
+	PlayerInputComponent->BindAction("RMB", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseRMB_Pressed);
+	PlayerInputComponent->BindAction("RMB", IE_Released, this, &ASoul_Like_ACTCharacter::UseRMB_Released);
 	PlayerInputComponent->BindAction("Space", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseDodge);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASoul_Like_ACTCharacter::MoveForward);
@@ -121,6 +140,18 @@ void ASoul_Like_ACTCharacter::UseLMB()
 	}
 }
 
+void ASoul_Like_ACTCharacter::UseRMB_Pressed()
+{
+	FString DebugMessage;
+	AnimManager->TryUseDequeMotion(EActionType::Parry, 0, DebugMessage);
+}
+
+void ASoul_Like_ACTCharacter::UseRMB_Released()
+{
+	FString DebugMessage;
+	AnimManager->PlayParryMontage_Released();
+}
+
 void ASoul_Like_ACTCharacter::UseDodge()
 {
 	FString DebugMessage;
@@ -145,56 +176,33 @@ void ASoul_Like_ACTCharacter::CalculateLeanValue(float TurnValue)
 	GetLaneAmountDelegate.Broadcast(LeanAmount_Anim);
 }
 
-void ASoul_Like_ACTCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-
-	TargetLockingComponent->InitComponent(TargetLockArrow);
-}
-
 void ASoul_Like_ACTCharacter::MoveForward(float Value)
 {
 	//Axis Value for AnimManager
 	ForwardAxisValue = Value;
-
-	if ((Controller != NULL) && (Value != 0.0f))
-	{
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		// get forward vector
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		
-		if (TargetLockingComponent->GetIsTargetingEnabled())
-		{
-			Value *= 0.6f;
-		}
-
-		AddMovementInput(Direction, Value);
-	}
 }
 
 void ASoul_Like_ACTCharacter::MoveRight(float Value)
 {
 	//Get axis value for AnimManager
 	RightAxisValue = Value;
+}
 
-	if ( (Controller != NULL) && (Value != 0.0f) )
+void ASoul_Like_ACTCharacter::MakeMove()
+{
+	if (Controller)
 	{
-		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
+
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-	
-		// get right vector 
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		// add movement in that direction
+
+		const FVector Direction =
+			(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X) * ForwardAxisValue
+				+ FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y) * RightAxisValue).GetSafeNormal();
 
 		if (TargetLockingComponent->GetIsTargetingEnabled())
-		{
-			Value *= 0.6f;
-		}
-
-		AddMovementInput(Direction, Value);
+			AddMovementInput(Direction, BattleMovementScale);
+		else
+			AddMovementInput(Direction, TravelMovementScale);
 	}
 }

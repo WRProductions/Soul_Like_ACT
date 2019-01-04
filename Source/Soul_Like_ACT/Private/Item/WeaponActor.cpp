@@ -23,6 +23,9 @@ AWeaponActor::AWeaponActor()
 void AWeaponActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	OwnerRef = Cast<ATargetableActor>(GetInstigator());
+	check(OwnerRef);
 }
 
 void AWeaponActor::CheckCollision()
@@ -48,13 +51,16 @@ void AWeaponActor::DrawTraceLine_Implementation(FVector prevVec_, FVector currVe
 	bool bIsHit = GetWorld()->LineTraceMultiByChannel(Hits, prevVec_, currVec_, ECC_Pawn, QueryParams);
 	if (bIsHit)
 	{
-		if (bDrawTraceLine)  
+		if (bDrawTraceLine)
 			DrawDebugLine(GetWorld(), prevVec_, currVec_, FColor::Green, 0, 2.f, 0, 1.f);
 
 		for (const auto &Hit : Hits)
 		{
 			ATargetableActor * tempChar = Cast<ATargetableActor>(Hit.GetActor());
-			if (tempChar && tempChar->IsTargetable() && TryExcludeActor(Hit.GetActor()))
+			if (tempChar 
+				&& tempChar->IsTargetable() 
+				&& ATargetableActor::IsInRivalFaction(OwnerRef, tempChar) 
+				&& TryExcludeActor(Hit.GetActor()))
 			{
 				UE_LOG(LogTemp, Warning, TEXT("%s"), *Hit.GetActor()->GetName());
 				
@@ -87,8 +93,6 @@ bool AWeaponActor::TryExcludeActor(AActor * HitActor)
 
 void AWeaponActor::StartSwing()
 {
-	bIsTracingCollision = 1;
-
 	for (int i = BladeStartLength; i <= BladeTail; i += 10)
 	{
 		CurrVecs.Add(GetActorLocation() + i * GetActorUpVector());

@@ -36,6 +36,17 @@ void ATargetableActor::ToggleLockIcon(bool LockOn)
 	}
 }
 
+const bool ATargetableActor::IsInRivalFaction(ATargetableActor *DamageDealer, ATargetableActor *DamageReceiver)
+{
+	if (DamageDealer->Faction == EActorFaction::Player && DamageReceiver->Faction == EActorFaction::Enemy)
+		return 1;
+	
+	else if (DamageDealer->Faction == EActorFaction::Enemy && DamageReceiver->Faction == EActorFaction::Player)
+		return 1;
+
+	return 0;
+}
+
 // Called when the game starts or when spawned
 void ATargetableActor::BeginPlay()
 {

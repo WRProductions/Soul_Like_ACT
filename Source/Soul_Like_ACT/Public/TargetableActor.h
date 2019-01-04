@@ -53,6 +53,11 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class UStatusComponent *GetStatusComponent() const { return StatusComponent; }
 
+
+//Static
+public:
+
+	static const bool IsInRivalFaction(ATargetableActor *DamageDealer, ATargetableActor *DamageReceiver);
 };
 
 

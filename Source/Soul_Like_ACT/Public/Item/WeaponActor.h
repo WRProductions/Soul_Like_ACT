@@ -18,12 +18,17 @@ class SOUL_LIKE_ACT_API AWeaponActor : public AActor
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = 1))
 	class USkeletalMeshComponent *MeshComp;
 
+	class ATargetableActor *OwnerRef;
+
 public:	
 	// Sets default values for this actor's properties
 	AWeaponActor();
 	
 	UPROPERTY(BlueprintAssignable)
 		FTriggerSlowMotion OnSlowMotionTrigger;
+
+	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
+		bool bCanDamageAllies;
 
 protected:
 	// Called when the game starts or when spawned
@@ -50,8 +55,6 @@ public:
 
 
 protected:
-
-
 	void CheckCollision();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)

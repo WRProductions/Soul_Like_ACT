@@ -21,7 +21,9 @@ protected:
 
 	bool bFreeCamera;
 
-	bool bOwnerControllerRotationYaw, bOwnerOrientRotToMovement, bOwnerControllerDesiredRot;
+	bool bOwnerControllerRotationYaw = 0
+		, bOwnerOrientRotToMovement = 1
+		, bOwnerControllerDesiredRot = 0;
 
 	TArray<AActor*> PotentialTargetActors;
 

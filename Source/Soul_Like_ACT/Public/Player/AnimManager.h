@@ -20,6 +20,7 @@ enum class EActionType : uint8
 {
 	Attack,
 	Dodge,
+	Parry,
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -43,10 +44,9 @@ public:
 
 protected:
 	bool bIsActing;
-
 	bool bIsHit;
-
-	bool bCanParry;
+	bool bIsBlocking;
+	bool bIsParry;
 
 	EAttackQueueStatus AutoAttackQueue;
 	EActionType MyActionType;
@@ -55,7 +55,7 @@ protected:
 
 	int32 MaxComboCount;
 
-	FTimerHandle ChannelingPointsTH;
+	FTimerHandle Handle_WaitToParry;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontages)
 		TArray<UAnimMontage*> ComboMontages;
@@ -63,25 +63,47 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontages)
 		UAnimMontage *Dash_Forward;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontages)
+		UAnimMontage *BlockMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontages)
+		UAnimMontage *ParryMontage;
+
+	bool bCanParry;
+	//Delay Time: 0.2s
+	void Timer_WaitToParry();
 
 	void PlayMontage();
 	void PlayComboMontage();
 	void PlayDodgeMontage();
 
+	void PlayParryMontage_Pressed();
+
 	void ResetComboIndex() { ComboIndex = 0; }
 
 	void IncreaseComboIndex();
 
+	void ResetParryStatus() { bIsBlocking = bIsParry = 0; }
+
 public:
+
+	//Call this every time being hit or use animations other than attacking
+	UFUNCTION(BlueprintCallable)
+		void ResetCombo();
+
+	void PlayParryMontage_Released();
+
+	UFUNCTION(BlueprintCallable)
+		void SetIsBlocking(bool IsBlocking) { bIsBlocking = IsBlocking; }
+	UFUNCTION(BlueprintCallable)
+		void SetIsParry(bool IsParry) { bIsParry = IsParry; }
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 		EAttackQueueStatus GetAttackQueue() const { return AutoAttackQueue; }
 	UFUNCTION(BlueprintCallable)
 		void SetAttackQueue(EAttackQueueStatus AttackQueueStatus) { AutoAttackQueue = AttackQueueStatus; }
-	UFUNCTION(BlueprintCallable)
-		void EnableAttackQueue_InAnim() { AutoAttackQueue = EAttackQueueStatus::WaitForQueue; }
 
 	UFUNCTION(BlueprintCallable)
-		void ResetCombo();
+		void EnableAttackQueue_InAnim() { AutoAttackQueue = EAttackQueueStatus::WaitForQueue; }
 
 	UFUNCTION(BlueprintCallable)
 		void SetCanParry(bool CanParry) { bCanParry = CanParry; }
@@ -112,11 +134,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void SetActionType(const EActionType InpActionType) { MyActionType = InpActionType; }
 
-	void TryUseDequeMotion(const EActionType InpActionType, bool bTriggeredByAnimBP, FString &DebugMessage)
-	{
-		SetActionType(InpActionType);
-		TryUseDequeMotion(bTriggeredByAnimBP, DebugMessage);
-	}
+	void TryUseDequeMotion(const EActionType InpActionType, bool bTriggeredByAnimBP, FString &DebugMessage);
 
 	UFUNCTION(BlueprintCallable)
 		static FString GetQueueStatusMessage(EAttackQueueStatus const &Inp);

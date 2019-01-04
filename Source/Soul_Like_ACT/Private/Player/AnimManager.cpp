@@ -42,6 +42,9 @@ void UAnimManager::PlayMontage()
 	case EActionType::Dodge:
 		PlayDodgeMontage();
 		break;
+	case  EActionType::Parry:
+		PlayParryMontage_Pressed();
+		break;
 	default:
 		break;
 	}
@@ -70,6 +73,7 @@ void UAnimManager::ResetCombo()
 	ResetComboIndex();
 }
 
+
 void UAnimManager::IncreasingChannelingPoints()
 {
 	++ChannelingPoints;
@@ -81,6 +85,10 @@ void UAnimManager::TryUseDequeMotion(bool bTriggeredByAnimBP, FString & DebugMes
 
 	if (bIsActing)
 	{
+		//Parry Montage Trigger
+		if (bCanParry)
+			PlayParryMontage_Pressed();
+
 		if (AutoAttackQueue == EAttackQueueStatus::Disabled)
 		{
 			DebugMessage = "Is Attacking, Cant take input";
@@ -137,6 +145,12 @@ void UAnimManager::TryUseDequeMotion(bool bTriggeredByAnimBP, FString & DebugMes
 	return;
 }
 
+void UAnimManager::TryUseDequeMotion(const EActionType InpActionType, bool bTriggeredByAnimBP, FString &DebugMessage)
+{
+	SetActionType(InpActionType);
+	TryUseDequeMotion(bTriggeredByAnimBP, DebugMessage);
+}
+
 void UAnimManager::PlayDodgeMontage()
 {
 	ResetCombo();
@@ -167,6 +181,50 @@ void UAnimManager::PlayDodgeMontage()
 
 		PlayerRef->PlayAnimMontage(Dash_Forward);
 	}
+}
+
+void UAnimManager::PlayParryMontage_Pressed()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Yellow, "PlayParryMontage_Pressed");
+
+	if (bCanParry)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Yellow, "Try Parry");
+		bCanParry = 0;
+		GetWorld()->GetTimerManager().ClearTimer(Handle_WaitToParry);
+		PlayerRef->PlayAnimMontage(ParryMontage);
+	}
+	else if (!bIsActing)
+	{
+		bCanParry = 1;
+
+		GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Yellow, "Try Block");
+
+		ResetCombo();
+		//PlayerRef->DisableInput(GetWorld()->GetFirstPlayerController());
+
+		GetWorld()->GetTimerManager().SetTimer(Handle_WaitToParry, this, &UAnimManager::Timer_WaitToParry, 1.f, false, 0.3f);
+		PlayerRef->PlayAnimMontage(BlockMontage);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Yellow, "Do Nothing");
+	}
+}
+
+void UAnimManager::PlayParryMontage_Released()
+{
+	if (bIsActing && PlayerRef->GetCurrentMontage() == BlockMontage)
+	{
+		ResetCombo();
+
+		PlayerRef->PlayAnimMontage(BlockMontage, 1.f, FName{ "Block_End" });
+	}
+}
+
+void UAnimManager::Timer_WaitToParry()
+{
+	bCanParry = 0;
 }
 
 FString UAnimManager::GetQueueStatusMessage(EAttackQueueStatus const & Inp)

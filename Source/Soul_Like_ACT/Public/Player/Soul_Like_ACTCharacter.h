@@ -8,6 +8,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGetLeanAmount, float, LeanAmount);
 
+
 UCLASS(config=Game)
 class ASoul_Like_ACTCharacter : public ATargetableActor
 {
@@ -30,7 +31,17 @@ class ASoul_Like_ACTCharacter : public ATargetableActor
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class ULockTargetComponent *TargetLockingComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = AI)
+	class UAIPerceptionStimuliSourceComponent *AIPerceptionStimuliSource;
+
+protected:
+	virtual void BeginPlay() override;
+
 public:
+
+	static const float BattleMovementScale;
+	static const float TravelMovementScale;
+
 	ASoul_Like_ACTCharacter();
 
 	virtual void Tick(float DeltaTime) override;
@@ -50,18 +61,20 @@ public:
 	float LeanAmount_Char, LeanSpeed_Char, LeanAmount_Anim;
 
 protected:
-	virtual void BeginPlay() override;
-
 	//Tick------------------------------
 	void MoveForward(float Value);
-
 	void MoveRight(float Value);
+	void MakeMove();
 
 	void TurnAtRate(float Rate);
 
 	void LookUpAtRate(float Rate);
 
 	void UseLMB();
+
+	void UseRMB_Pressed();
+	void UseRMB_Released ();
+
 
 	void UseDodge();
 
