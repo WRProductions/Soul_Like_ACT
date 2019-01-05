@@ -46,19 +46,18 @@ void AWeaponActor::DrawTraceLine_Implementation(FVector prevVec_, FVector currVe
 	TArray<FHitResult> Hits;
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
-	QueryParams.AddIgnoredActor(GetInstigator());
+	QueryParams.AddIgnoredActor(OwnerRef);
+
+	if (bDrawTraceLine)
+		DrawDebugLine(GetWorld(), prevVec_, currVec_, FColor::Green, 0, 2.f, 0, 1.f);
 
 	bool bIsHit = GetWorld()->LineTraceMultiByChannel(Hits, prevVec_, currVec_, ECC_Pawn, QueryParams);
 	if (bIsHit)
 	{
-		if (bDrawTraceLine)
-			DrawDebugLine(GetWorld(), prevVec_, currVec_, FColor::Green, 0, 2.f, 0, 1.f);
-
 		for (const auto &Hit : Hits)
 		{
 			ATargetableActor * tempChar = Cast<ATargetableActor>(Hit.GetActor());
-			if (tempChar 
-				&& tempChar->IsTargetable() 
+			if (tempChar
 				&& ATargetableActor::IsInRivalFaction(OwnerRef, tempChar) 
 				&& TryExcludeActor(Hit.GetActor()))
 			{
@@ -93,6 +92,8 @@ bool AWeaponActor::TryExcludeActor(AActor * HitActor)
 
 void AWeaponActor::StartSwing()
 {
+	bIsTracingCollision = 1;
+
 	for (int i = BladeStartLength; i <= BladeTail; i += 10)
 	{
 		CurrVecs.Add(GetActorLocation() + i * GetActorUpVector());

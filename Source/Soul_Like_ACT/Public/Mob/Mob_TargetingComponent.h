@@ -29,10 +29,9 @@ protected:
 	class AMobBasic *OwnerRef;
 	class AMobController *OwnerController;
 
-
+	bool bIsTargetingOn;
 
 public:	
-
 	UFUNCTION(BlueprintCallable)
 		void ToggleTargetLocking();
 };
