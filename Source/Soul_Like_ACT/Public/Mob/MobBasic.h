@@ -11,6 +11,10 @@ class SOUL_LIKE_ACT_API AMobBasic : public ATargetableActor
 {
 	GENERATED_BODY()
 
+protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UMob_TargetingComponent *TargetingComponent;
 public:
 	// Sets default values for this pawn's properties
 	AMobBasic();
@@ -29,4 +33,8 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void SetTarget(AActor *PlayerPawn) const;
+
+	bool GetIsStun();
 };

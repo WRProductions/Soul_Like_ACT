@@ -17,7 +17,6 @@ class SOUL_LIKE_ACT_API AMobController : public AAIController
 	GENERATED_BODY()
 
 	class AMobBasic *PossessedMob;
-	class ATargetableActor *PlayerPawn;
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = AI)
 		UAISenseConfig_Sight *sightConfig;

@@ -3,6 +3,7 @@
 #include "MobBasic.h"
 #include "GameFramework/Controller.h"
 #include "Components/CapsuleComponent.h"
+#include "Mob/Mob_TargetingComponent.h"
 #include "StatusComponent.h"
 
 // Sets default values
@@ -10,6 +11,8 @@ AMobBasic::AMobBasic()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	TargetingComponent = CreateDefaultSubobject<UMob_TargetingComponent>(TEXT("TargetingComponent"));
 
 	Faction = EActorFaction::Enemy;
 }
@@ -56,5 +59,17 @@ void AMobBasic::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AMobBasic::SetTarget(AActor *PlayerPawn) const
+{
+	TargetingComponent->SetTarget(PlayerPawn);
+}
+
+bool AMobBasic::GetIsStun()
+{
+	//TODO
+	//If Stuned, cannnot facing player
+	return 0;
 }
 

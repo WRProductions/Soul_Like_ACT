@@ -13,14 +13,13 @@ class SOUL_LIKE_ACT_API UMob_TargetingComponent : public UActorComponent
 	GENERATED_BODY()
 
 protected:
-
 	bool bIsLockingOn;
-
-	AActor *PlayerRef;
 
 public:	
 	// Sets default values for this component's properties
 	UMob_TargetingComponent();
+
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 protected:
 	// Called when the game starts
@@ -29,9 +28,19 @@ protected:
 	class AMobBasic *OwnerRef;
 	class AMobController *OwnerController;
 
-	bool bIsTargetingOn;
+	AActor *TargetPawn;
+	bool bIsFacingTarget;
+
+	void FacingTarget_Start();
+	void FacingTarget_End();
 
 public:	
+	//Toggled through AI BT
 	UFUNCTION(BlueprintCallable)
-		void ToggleTargetLocking();
+	void ToggleTargetLocking();
+
+	void SetTarget(AActor *PlayerPawn) 
+	{ 
+		TargetPawn = PlayerPawn;
+	}
 };

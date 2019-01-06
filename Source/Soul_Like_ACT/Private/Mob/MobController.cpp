@@ -17,7 +17,6 @@ AMobController::AMobController()
 	sightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 	sightConfig->DetectionByAffiliation.bDetectFriendlies = true;
 	PerceptionComponent->ConfigureSense(*sightConfig);
-	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMobController::AISenseUpdateMessage);
 }
 
 void AMobController::BeginPlay()
@@ -36,6 +35,7 @@ void AMobController::Possess(APawn* InPawn)
 
 	PossessedMob = Cast<AMobBasic>(InPawn);
 
+	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMobController::AISenseUpdateMessage);
 }
 
 void AMobController::UnPossess()
@@ -53,4 +53,14 @@ void AMobController::Tick(float DeltaTime)
 void AMobController::AISenseUpdateMessage(AActor* Actor, FAIStimulus Stimulus)
 {
 	UE_LOG(LogTemp, Warning, TEXT("%s is founded by %s"), *Actor->GetName(), *PossessedMob->GetName());
+
+	if (!PossessedMob)
+	{
+		PerceptionComponent->OnTargetPerceptionUpdated.RemoveDynamic(this, &AMobController::AISenseUpdateMessage);
+		return;
+	}
+	if (Stimulus.WasSuccessfullySensed())
+	{
+		PossessedMob->
+	}
 }
