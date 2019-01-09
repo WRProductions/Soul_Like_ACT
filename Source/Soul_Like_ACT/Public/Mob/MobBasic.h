@@ -37,4 +37,10 @@ public:
 	void SetTarget(AActor *PlayerPawn) const;
 
 	bool GetIsStun();
+
+	UMob_TargetingComponent *GetTargetingComponent() const { return TargetingComponent; }
+
+	void SetFocus(bool Enable, AActor * Target);
+
+	bool GetIsTargetingEnabled() const;
 };

@@ -2,21 +2,31 @@
 
 #include "MobController.h"
 #include "Perception/AIPerceptionComponent.h"
+#include "Mob/Mob_TargetingComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BehaviorTree/BlackboardData.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "BehaviorTree/BehaviorTree.h"
 #include "Mob/MobBasic.h"
 
 AMobController::AMobController()
 {
-	// Setup the perception component
-	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
+	//Perception
+	AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
+	SetPerceptionComponent(*AIPerceptionComponent);
 	sightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
-	PerceptionComponent->SetDominantSense(sightConfig->GetSenseImplementation());
 	sightConfig->SightRadius = 1500.f;
-	sightConfig->LoseSightRadius = 2500.f;
+	sightConfig->LoseSightRadius = 2000.f;
 	sightConfig->PeripheralVisionAngleDegrees = 360.0f;
 	sightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	sightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 	sightConfig->DetectionByAffiliation.bDetectFriendlies = true;
-	PerceptionComponent->ConfigureSense(*sightConfig);
+	AIPerceptionComponent->SetDominantSense(sightConfig->GetSenseImplementation());
+	AIPerceptionComponent->ConfigureSense(*sightConfig);
+
+	//BB and BT
+	BlockBoardComp = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackBaordComponent"));
+	BehaviorTreeComp = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorTreeComponent"));
 }
 
 void AMobController::BeginPlay()
@@ -24,7 +34,6 @@ void AMobController::BeginPlay()
 	Super::BeginPlay();
 
 	//FActorPerceptionUpdatedDelegate, AActor*, Actor, FAIStimulus, Stimulus
-
 }
 
 
@@ -35,7 +44,13 @@ void AMobController::Possess(APawn* InPawn)
 
 	PossessedMob = Cast<AMobBasic>(InPawn);
 
-	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMobController::AISenseUpdateMessage);
+	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMobController::AISenseUpdateMessage);
+
+	//set up bb and bt
+	check(BlockBoardData);
+	check(BehaviorTreeAsset);
+	UseBlackboard(BlockBoardData, BlockBoardComp);
+	RunBehaviorTree(BehaviorTreeAsset);
 }
 
 void AMobController::UnPossess()
@@ -52,15 +67,24 @@ void AMobController::Tick(float DeltaTime)
 
 void AMobController::AISenseUpdateMessage(AActor* Actor, FAIStimulus Stimulus)
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s is founded by %s"), *Actor->GetName(), *PossessedMob->GetName());
 
 	if (!PossessedMob)
 	{
-		PerceptionComponent->OnTargetPerceptionUpdated.RemoveDynamic(this, &AMobController::AISenseUpdateMessage);
+		AIPerceptionComponent->OnTargetPerceptionUpdated.RemoveDynamic(this, &AMobController::AISenseUpdateMessage);
 		return;
 	}
-	if (Stimulus.WasSuccessfullySensed())
+
+	if (Cast<ATargetableActor>(Actor)->Faction == EActorFaction::Player)
 	{
-		PossessedMob->
+		if (Stimulus.WasSuccessfullySensed())
+		{
+			BlockBoardComp->SetValueAsObject("PlayerPawn", Actor);
+			UE_LOG(LogTemp, Warning, TEXT("%s is founded by %s"), *Actor->GetName(), *PossessedMob->GetName());
+		}
+		else
+		{
+			BlockBoardComp->SetValueAsObject("PlayerPawn", nullptr);
+			UE_LOG(LogTemp, Warning, TEXT("%s is lost by %s"), *Actor->GetName(), *PossessedMob->GetName());
+		}
 	}
-}
+	}

@@ -6,6 +6,7 @@
 #include "AIController.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISenseConfig.h"
+
 #include "MobController.generated.h"
 
 /**
@@ -16,13 +17,26 @@ class SOUL_LIKE_ACT_API AMobController : public AAIController
 {
 	GENERATED_BODY()
 
-	class AMobBasic *PossessedMob;
 protected:
+	class AMobBasic *PossessedMob;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = AI)
-		UAISenseConfig_Sight *sightConfig;
+		class UAIPerceptionComponent* AIPerceptionComponent;
+	
+	UAISenseConfig_Sight *sightConfig;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = AI)
+		class UBlackboardComponent *BlockBoardComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = AI)
+		class UBehaviorTreeComponent *BehaviorTreeComp;
 
 public:
 	AMobController();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AIAssets)
+		class UBlackboardData *BlockBoardData;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AIAssets)
+		class UBehaviorTree *BehaviorTreeAsset;
 
 protected:
 	virtual void BeginPlay() override;
@@ -35,4 +49,6 @@ public:
 	virtual void UnPossess() override;
 
 	virtual void Tick(float DeltaTime) override;
+
+	class UBehaviorTreeComponent *GetBTComp() const { return BehaviorTreeComp; }
 };

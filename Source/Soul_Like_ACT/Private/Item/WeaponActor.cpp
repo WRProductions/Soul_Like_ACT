@@ -61,7 +61,7 @@ void AWeaponActor::DrawTraceLine_Implementation(FVector prevVec_, FVector currVe
 				&& ATargetableActor::IsInRivalFaction(OwnerRef, tempChar) 
 				&& TryExcludeActor(Hit.GetActor()))
 			{
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *Hit.GetActor()->GetName());
+				//UE_LOG(LogTemp, Warning, TEXT("%s"), *Hit.GetActor()->GetName());
 				
 				OnSlowMotionTrigger.Broadcast(1.f, tempChar);
 				

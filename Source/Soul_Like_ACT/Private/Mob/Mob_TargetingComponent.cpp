@@ -19,7 +19,7 @@ UMob_TargetingComponent::UMob_TargetingComponent()
 void UMob_TargetingComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
 	//Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "UMob_TargetingComponent::TickComponent successful");
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "UMob_TargetingComponent::TickComponent successful");
 
 	if (bIsFacingTarget && !OwnerRef->GetIsStun())
 	{
@@ -36,14 +36,16 @@ void UMob_TargetingComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 void UMob_TargetingComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
 }
 
-void UMob_TargetingComponent::FacingTarget_Start()
+void UMob_TargetingComponent::FacingTarget_Init()
 {
-	bIsFacingTarget = 1;
+	if (TargetPawn)
+	{
+		bIsFacingTarget = 1;
+	}
+	else
+		UE_LOG(LogTemp, Warning, TEXT("UMob_TargetingComponent::FacingTarget_Init failed"));
 }
 
 void UMob_TargetingComponent::FacingTarget_End()
@@ -56,5 +58,5 @@ void UMob_TargetingComponent::ToggleTargetLocking()
 	if (bIsFacingTarget)
 		FacingTarget_End();
 	else if (TargetPawn)
-		FacingTarget_Start();
+		FacingTarget_Init();
 }

@@ -73,3 +73,25 @@ bool AMobBasic::GetIsStun()
 	return 0;
 }
 
+void AMobBasic::SetFocus(bool InputMode, AActor * Target)
+{
+
+	if (TargetingComponent->GetIsEnabled() && InputMode == 0)
+	{
+		TargetingComponent->FacingTarget_End();
+		TargetingComponent->SetTarget(nullptr);
+		return;
+	}
+	if (!TargetingComponent->GetIsEnabled() && InputMode == 1)
+	{
+		TargetingComponent->FacingTarget_Init();
+		TargetingComponent->SetTarget(Target);
+		return;
+	}
+}
+
+bool AMobBasic::GetIsTargetingEnabled() const
+{
+	return TargetingComponent->GetIsEnabled();
+}
+
