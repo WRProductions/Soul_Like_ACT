@@ -4,19 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/Services/BTService_BlackboardBase.h"
-#include "MyBTService_IsPlayerAlive.generated.h"
+#include "MyBTService_IsTargetAvailable.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SOUL_LIKE_ACT_API UMyBTService_IsPlayerAlive : public UBTService_BlackboardBase
+class SOUL_LIKE_ACT_API UMyBTService_IsTargetAvailable : public UBTService_BlackboardBase
 {
 	GENERATED_BODY()
 
 		int32 counter;
 public:
-	UMyBTService_IsPlayerAlive();
+	UMyBTService_IsTargetAvailable();
 
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };

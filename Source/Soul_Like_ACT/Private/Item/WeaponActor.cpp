@@ -41,19 +41,19 @@ void AWeaponActor::CheckCollision()
 	}
 }
 
-void AWeaponActor::DrawTraceLine_Implementation(FVector prevVec_, FVector currVec_, bool bDrawTraceLine)
+void AWeaponActor::DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawTraceLine)
 {
 	TArray<FHitResult> Hits;
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
 	QueryParams.AddIgnoredActor(OwnerRef);
 
-	if (bDrawTraceLine)
-		DrawDebugLine(GetWorld(), prevVec_, currVec_, FColor::Green, 0, 2.f, 0, 1.f);
-
 	bool bIsHit = GetWorld()->LineTraceMultiByChannel(Hits, prevVec_, currVec_, ECC_Pawn, QueryParams);
 	if (bIsHit)
 	{
+		if (bDrawTraceLine)
+			DrawDebugLine(GetWorld(), prevVec_, currVec_, FColor::Green, 0, 2.f, 0, 1.f);
+
 		for (const auto &Hit : Hits)
 		{
 			ATargetableActor * tempChar = Cast<ATargetableActor>(Hit.GetActor());
@@ -62,9 +62,8 @@ void AWeaponActor::DrawTraceLine_Implementation(FVector prevVec_, FVector currVe
 				&& TryExcludeActor(Hit.GetActor()))
 			{
 				//UE_LOG(LogTemp, Warning, TEXT("%s"), *Hit.GetActor()->GetName());
-				
-				OnSlowMotionTrigger.Broadcast(1.f, tempChar);
-				
+				SlowMotionTrigger();
+
 				UGameplayStatics::ApplyDamage(Hit.GetActor(), 30.f, GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
 				if (HitSound)
 					UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, Hit.Location);
@@ -73,11 +72,8 @@ void AWeaponActor::DrawTraceLine_Implementation(FVector prevVec_, FVector currVe
 			}
 		}
 	}
-	else
-	{
-		if (bDrawTraceLine) 
+	else if (bDrawTraceLine) 
 			DrawDebugLine(GetWorld(), prevVec_, currVec_, FColor::Red, 0, 2.f, 0, 1.f);
-	}
 }
 
 bool AWeaponActor::TryExcludeActor(AActor * HitActor)
@@ -93,6 +89,8 @@ bool AWeaponActor::TryExcludeActor(AActor * HitActor)
 void AWeaponActor::StartSwing()
 {
 	bIsTracingCollision = 1;
+
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, GetInstigator()->GetName() + " swinging the weapon");
 
 	for (int i = BladeStartLength; i <= BladeTail; i += 10)
 	{

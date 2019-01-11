@@ -15,6 +15,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UMob_TargetingComponent *TargetingComponent;
+
 public:
 	// Sets default values for this pawn's properties
 	AMobBasic();

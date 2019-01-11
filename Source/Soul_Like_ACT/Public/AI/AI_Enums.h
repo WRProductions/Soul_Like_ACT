@@ -9,17 +9,15 @@
 UENUM(BlueprintType)
 enum class EAgreesiveActions : uint8
 {
-	WalkAround,
-	RunAttack,
-	DashAttack,
+	Attack,
 	DashBack,
+	RunToTarget,
+	Strafe,
 };
 
 UENUM(BlueprintType)
 enum class EDefensiveActions : uint8
 {
-	WalkAround,
-	RunToPlayer,
-	RunToPlayer2,
-	RunToPlayer3,
+	Strafe,
+	RunToTarget,
 };

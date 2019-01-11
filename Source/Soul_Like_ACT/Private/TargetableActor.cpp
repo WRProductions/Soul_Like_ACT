@@ -47,6 +47,16 @@ const bool ATargetableActor::IsInRivalFaction(ATargetableActor *DamageDealer, AT
 	return 0;
 }
 
+void ATargetableActor::Exec_TryGetHit(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, EOnHitRefelction &Outp)
+{
+	return;
+}
+
+void ATargetableActor::OnDamageTaken_Implementation(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	StatusComponent->TakeDamage(FMath::TruncToInt(Damage));
+}
+
 // Called when the game starts or when spawned
 void ATargetableActor::BeginPlay()
 {

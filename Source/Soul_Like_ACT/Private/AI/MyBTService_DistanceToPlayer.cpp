@@ -20,7 +20,7 @@ void UMyBTService_DistanceToPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, 
 	if (PlayeyPawn)
 	{
 		float DistanceToPlayer = FVector::Distance(Cast<AMobController>(OwnerComp.GetOwner())->GetPawn()->GetActorLocation(), PlayeyPawn->GetActorLocation());
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::SanitizeFloat(DistanceToPlayer));
+		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::SanitizeFloat(DistanceToPlayer));
 		OwnerComp.GetBlackboardComponent()->SetValueAsFloat("DistanceToPlayer", DistanceToPlayer);
 		return;
 	}

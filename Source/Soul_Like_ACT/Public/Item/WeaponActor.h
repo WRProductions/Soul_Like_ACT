@@ -6,10 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "WeaponActor.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTriggerSlowMotion, float, HitStrength, AActor*, HitReceiver);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FTriggerSlowMotionNative, float, AActor*);
-
-
 UCLASS()
 class SOUL_LIKE_ACT_API AWeaponActor : public AActor
 {
@@ -23,12 +19,13 @@ class SOUL_LIKE_ACT_API AWeaponActor : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AWeaponActor();
-	
-	UPROPERTY(BlueprintAssignable)
-		FTriggerSlowMotion OnSlowMotionTrigger;
 
 	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
 		bool bCanDamageAllies;
+	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
+		USoundBase *HitSound;
+	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
+		UParticleSystem *BloodSplash;
 
 protected:
 	// Called when the game starts or when spawned
@@ -57,10 +54,9 @@ public:
 protected:
 	void CheckCollision();
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawTraceLine);
-
 	bool TryExcludeActor(AActor *HitActor);
+
+	void DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawTraceLine);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ShowDrawTraceLine, meta = (ExposeOnSpawn = 1))
@@ -71,8 +67,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void EndSwing();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		USoundBase *HitSound;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		UParticleSystem *BloodSplash;
+	UFUNCTION(BlueprintImplementableEvent)
+		void SlowMotionTrigger();
 };

@@ -41,6 +41,8 @@ void AMobBasic::OnDeath_Implementation(int32 CurrHealth, int32 MaxHealth)
 		if (LocalController)
 			LocalController->UnPossess();
 
+		GetTargetingComponent()->FacingTarget_End();
+
 		Faction = EActorFaction::Untargetable;
 
 		ToggleLockIcon(0);

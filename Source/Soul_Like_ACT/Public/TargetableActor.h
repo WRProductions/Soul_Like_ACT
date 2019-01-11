@@ -8,6 +8,16 @@
 #include "TargetableActor.generated.h"
 
 UENUM(BlueprintType)
+enum class EOnHitRefelction: uint8
+{
+	Immune,
+	Parry,
+	Block,
+	OnHit,
+	Vulnerable,
+};
+
+UENUM(BlueprintType)
 enum class EActorFaction : uint8
 {
 	Untargetable,
@@ -53,11 +63,21 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class UStatusComponent *GetStatusComponent() const { return StatusComponent; }
 
-
 //Static
 public:
-
 	static const bool IsInRivalFaction(ATargetableActor *DamageDealer, ATargetableActor *DamageReceiver);
+
+	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = Outp))
+	virtual void Exec_TryGetHit(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, EOnHitRefelction &Outp);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void OnDamageTaken(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void OnHitEffects(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void OnStunEffects(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void OnParryEffects(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 };
 
 
