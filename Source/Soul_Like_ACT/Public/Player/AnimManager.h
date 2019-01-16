@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "AnimManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStun, bool, IsStun);
+
 UENUM(BlueprintType)
 enum class EAttackQueueStatus : uint8
 {
@@ -21,6 +23,7 @@ enum class EActionType : uint8
 	Attack,
 	Dodge,
 	Parry,
+	Block,
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -38,15 +41,24 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		bool bIsStun;
+
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bIsActing;
-	bool bIsHit;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bIsBlocking;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bIsParry;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bIsDodging;
+
+protected:
 
 	EAttackQueueStatus AutoAttackQueue;
 	EActionType MyActionType;
@@ -86,17 +98,23 @@ protected:
 
 public:
 
+
 	//Call this every time being hit or use animations other than attacking
 	UFUNCTION(BlueprintCallable)
 		void ResetCombo();
 
 	void PlayParryMontage_Released();
 
+	/*
 	UFUNCTION(BlueprintCallable)
 		void SetIsBlocking(bool IsBlocking) { bIsBlocking = IsBlocking; }
 	UFUNCTION(BlueprintCallable)
 		void SetIsParry(bool IsParry) { bIsParry = IsParry; }
-
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+		bool GetIsParry() const { return bIsParry; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+		bool GetIsBlocking() const { return bIsBlocking; }
+	*/
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 		EAttackQueueStatus GetAttackQueue() const { return AutoAttackQueue; }
 	UFUNCTION(BlueprintCallable)
@@ -118,13 +136,10 @@ public:
 		int32 GetChannelingPoints() const { return ChannelingPoints; }
 
 	UFUNCTION(BlueprintCallable)
-		void EnableActing() { bIsActing = 1; }
+		void EnableActing();
 	UFUNCTION(BlueprintCallable)
-		void DisableActing() 
-	{
-		ResetCombo();
-		bIsActing = 0;
-	}
+		void DisableActing();
+	
 	UFUNCTION(BlueprintCallable)
 		bool GetCanMove() const { return !bIsActing; }
 
@@ -138,5 +153,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		static FString GetQueueStatusMessage(EAttackQueueStatus const &Inp);
+
+	UFUNCTION(BlueprintCallable)
+		void SetIsStun(bool IsStun);
 	
+	UPROPERTY(BlueprintAssignable)
+		FOnStun OnStun_Delegate;
 };

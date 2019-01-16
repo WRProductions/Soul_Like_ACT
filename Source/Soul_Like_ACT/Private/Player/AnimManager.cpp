@@ -80,6 +80,17 @@ void UAnimManager::IncreasingChannelingPoints()
 	//GetWorld()->GetTimerManager().SetTimer(ChannelingPointsTH, this, &UInputBuffComp::ResetChannelingPoints, .5f, 0, 3.f);
 }
 
+void UAnimManager::EnableActing()
+{
+	bIsActing = 1;
+}
+
+void UAnimManager::DisableActing()
+{
+	ResetCombo();
+	bIsActing = 0;
+}
+
 void UAnimManager::TryUseDequeMotion(bool bTriggeredByAnimBP, FString & DebugMessage)
 {
 
@@ -242,5 +253,21 @@ FString UAnimManager::GetQueueStatusMessage(EAttackQueueStatus const & Inp)
 	default:
 		return "Invalid Input";
 	}
+}
+
+void UAnimManager::SetIsStun(bool IsStun)
+{
+	bIsStun = IsStun;
+
+	if (IsStun)
+	{
+		PlayerRef->DisableInput(Cast<APlayerController>(PlayerRef->GetInstigatorController()));
+	}
+	else
+	{
+		PlayerRef->EnableInput(Cast<APlayerController>(PlayerRef->GetInstigatorController()));
+	}
+
+	OnStun_Delegate.Broadcast(bIsStun);
 }
 

@@ -5,6 +5,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Mob/Mob_TargetingComponent.h"
 #include "StatusComponent.h"
+#include "Types/DamageType_MeleeHit.h"
+#include "Types/DamageType_ParryRefelction.h"
 
 // Sets default values
 AMobBasic::AMobBasic()
@@ -97,3 +99,43 @@ bool AMobBasic::GetIsTargetingEnabled() const
 	return TargetingComponent->GetIsEnabled();
 }
 
+void AMobBasic::Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, EOnHitRefelction &Outp)
+{
+	if (UDamageType->GetClass() == UDamageType_MeleeHit::StaticClass())
+	{
+		if (Damage >= StatusComponent->MaxHealth)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Vulnerable"));
+			Outp = EOnHitRefelction::Vulnerable;
+			return;
+		}
+		/*
+		else if (AnimManager->bIsParry)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Parry"));
+			Outp = EOnHitRefelction::Parry;
+			return;
+		}
+		else if (AnimManager->bIsBlocking)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Blocking"));
+			Outp = EOnHitRefelction::Block;
+			return;
+		}
+		else if (AnimManager->bIsDodging)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Dodging"));
+			Outp = EOnHitRefelction::Immune;
+			return;
+		}*/
+	}
+	else if (UDamageType->GetClass() == UDamageType_ParryRefelction::StaticClass())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Vulnerable"));
+		Outp = EOnHitRefelction::Vulnerable;
+		return;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("OnHit"));
+	Outp = EOnHitRefelction::OnHit;
+	return;
+}

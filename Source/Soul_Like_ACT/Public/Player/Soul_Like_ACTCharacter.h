@@ -8,7 +8,6 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGetLeanAmount, float, LeanAmount);
 
-
 UCLASS(config=Game)
 class ASoul_Like_ACTCharacter : public ATargetableActor
 {
@@ -54,9 +53,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gears)
-		class AWeaponActor *Weapon;
-
 	float ForwardAxisValue, RightAxisValue;
 	float LeanAmount_Char, LeanSpeed_Char, LeanAmount_Anim;
 
@@ -99,5 +95,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 		FGetLeanAmount GetLaneAmountDelegate;
+
+	//Warning: Link this to AnyDamage node in BP
+	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = Outp))
+		void Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, EOnHitRefelction &Outp);
 };
 

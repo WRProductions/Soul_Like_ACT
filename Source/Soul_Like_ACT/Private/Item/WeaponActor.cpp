@@ -3,8 +3,10 @@
 #include "Item/WeaponActor.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Types/DamageType_MeleeHit.h"
 #include "TargetableActor.h"
 #include "DrawDebugHelpers.h"
+
 
 
 // Sets default values
@@ -56,19 +58,28 @@ void AWeaponActor::DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawT
 
 		for (const auto &Hit : Hits)
 		{
-			ATargetableActor * tempChar = Cast<ATargetableActor>(Hit.GetActor());
-			if (tempChar
-				&& ATargetableActor::IsInRivalFaction(OwnerRef, tempChar) 
+			ATargetableActor * TargetPawn = Cast<ATargetableActor>(Hit.GetActor());
+			if (TargetPawn
+				&& ATargetableActor::IsInRivalFaction(OwnerRef, TargetPawn) 
 				&& TryExcludeActor(Hit.GetActor()))
 			{
-				//UE_LOG(LogTemp, Warning, TEXT("%s"), *Hit.GetActor()->GetName());
-				SlowMotionTrigger();
+				//DEBUG
+				UGameplayStatics::ApplyDamage(Hit.GetActor(), 30.f, GetInstigatorController(), GetOwner(), UDamageType_MeleeHit::StaticClass());
 
-				UGameplayStatics::ApplyDamage(Hit.GetActor(), 30.f, GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
+				OwnerRef->TriggerSlowMotion_WithDelay();
+
 				if (HitSound)
 					UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, Hit.Location);
 				if (BloodSplash)
 					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BloodSplash, Hit.ImpactPoint, FRotator::ZeroRotator, 1);;
+				if (BladeCollisionFX)
+				{
+					/*
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BladeCollisionFX, Hit.ImpactPoint, FRotator::ZeroRotator, 1);;
+					OwnerRef->OnHit_SlowMotion();
+					TargetPawn->OnHit_SlowMotion();
+					*/				
+				}
 			}
 		}
 	}
@@ -90,7 +101,10 @@ void AWeaponActor::StartSwing()
 {
 	bIsTracingCollision = 1;
 
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, GetInstigator()->GetName() + " swinging the weapon");
+	if (SwingSound)
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SwingSound, GetActorLocation());
+
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, GetInstigator()->GetName() + " swinging the weapon");
 
 	for (int i = BladeStartLength; i <= BladeTail; i += 10)
 	{

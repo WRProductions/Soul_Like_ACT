@@ -36,6 +36,15 @@ void ATargetableActor::ToggleLockIcon(bool LockOn)
 	}
 }
 
+void ATargetableActor::TriggerSlowMotion_WithDelay()
+{
+	if (GetWorldTimerManager().GetTimerRemaining(Handler_SlowMotionDelay) <= 0.f)
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Handler_SlowMotionDelay.IsValid()");
+		GetWorldTimerManager().SetTimer(Handler_SlowMotionDelay, this, &ATargetableActor::TriggerSlowMotion, 1.f, 0, 0.1f);
+	}
+}
+
 const bool ATargetableActor::IsInRivalFaction(ATargetableActor *DamageDealer, ATargetableActor *DamageReceiver)
 {
 	if (DamageDealer->Faction == EActorFaction::Player && DamageReceiver->Faction == EActorFaction::Enemy)
@@ -47,14 +56,17 @@ const bool ATargetableActor::IsInRivalFaction(ATargetableActor *DamageDealer, AT
 	return 0;
 }
 
-void ATargetableActor::Exec_TryGetHit(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, EOnHitRefelction &Outp)
-{
-	return;
-}
 
-void ATargetableActor::OnDamageTaken_Implementation(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+bool ATargetableActor::OnDamageTaken_Implementation(float Damage, class UDamageType const* DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	TriggerSlowMotion_WithDelay();
+
 	StatusComponent->TakeDamage(FMath::TruncToInt(Damage));
+	bool IsDead_Local = StatusComponent->GetHealthPercent() <= 0.f;
+	
+	if (IsDead_Local) OnDead_Delegate.Broadcast();
+	
+	return (IsDead_Local);
 }
 
 // Called when the game starts or when spawned

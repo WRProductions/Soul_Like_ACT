@@ -37,8 +37,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetHealthPercent() { return ((float)Health / MaxHealth); }
 
-	UFUNCTION(BlueprintCallable)
-	void TakeDamage(int32 DamageTake) 
+	void TakeDamage(float DamageTake) 
 	{ 
 		Health = FMath::Clamp(Health -= DamageTake, 0, MaxHealth); 
 		if (OnActorHealthChanged.IsBound())

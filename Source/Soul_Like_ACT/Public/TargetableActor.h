@@ -7,6 +7,8 @@
 #include "Interfaces/Targetable.h"
 #include "TargetableActor.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDead);
+
 UENUM(BlueprintType)
 enum class EOnHitRefelction: uint8
 {
@@ -35,16 +37,31 @@ public:
 	// Sets default values for this pawn's properties
 	ATargetableActor();
 
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UStatusComponent *StatusComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UWidgetComponent *TargetIcon;
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+
+	FTimerHandle Handle_SlowMotion, Handler_SlowMotionDelay;
+
+	void WaitForDilationReset()
+	{ 
+		CustomTimeDilation = 1.f; 
+	}
+
+	void TriggerSlowMotion()
+	{
+		CustomTimeDilation = 0.01f;
+		GetWorldTimerManager().SetTimer(Handle_SlowMotion, this, &ATargetableActor::WaitForDilationReset, 1.f, 0, 0.15f);
+	}
 
 public:	
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -54,30 +71,39 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EActorFaction Faction;
 
-	UFUNCTION(BlueprintCallable)
-	virtual bool IsTargetable() const override { return Faction != EActorFaction::Untargetable; }
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gears)
+		class AWeaponActor *Weapon;
 
-	UFUNCTION(BlueprintCallable)
-	virtual void ToggleLockIcon(bool LockOn) override;
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	class UStatusComponent *GetStatusComponent() const { return StatusComponent; }
+	UPROPERTY(BlueprintAssignable)
+		FOnDead OnDead_Delegate;
 
 //Static
 public:
 	static const bool IsInRivalFaction(ATargetableActor *DamageDealer, ATargetableActor *DamageReceiver);
 
-	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = Outp))
-	virtual void Exec_TryGetHit(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, EOnHitRefelction &Outp);
+	UFUNCTION(BlueprintCallable)
+		virtual bool IsTargetable() const override { return Faction != EActorFaction::Untargetable; }
 
+	UFUNCTION(BlueprintCallable)
+		virtual void ToggleLockIcon(bool LockOn) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+		class UStatusComponent *GetStatusComponent() const { return StatusComponent; }
+	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void OnDamageTaken(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	bool OnDamageTaken(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser);
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void OnHitEffects(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	void OnHitEffects(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser);
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void OnStunEffects(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	void OnStunEffects(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser);
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void OnParryEffects(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	void OnParryEffects(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser);
+
+	//Called by WeaponActor and OnHit
+	UFUNCTION(BlueprintCallable)
+		void TriggerSlowMotion_WithDelay();
+
+
 };
 
 

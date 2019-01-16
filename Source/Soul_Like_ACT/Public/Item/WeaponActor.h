@@ -20,12 +20,16 @@ public:
 	// Sets default values for this actor's properties
 	AWeaponActor();
 
-	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
 		bool bCanDamageAllies;
-	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
+		USoundBase *SwingSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
 		USoundBase *HitSound;
-	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
 		UParticleSystem *BloodSplash;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
+		UParticleSystem *BladeCollisionFX;
 
 protected:
 	// Called when the game starts or when spawned
@@ -67,6 +71,5 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void EndSwing();
 
-	UFUNCTION(BlueprintImplementableEvent)
-		void SlowMotionTrigger();
+	bool GetIsSwinging() const { return bIsTracingCollision; }
 };

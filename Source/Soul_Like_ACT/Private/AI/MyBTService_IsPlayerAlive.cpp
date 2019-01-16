@@ -28,7 +28,7 @@ void UMyBTService_IsTargetAvailable::TickNode(UBehaviorTreeComponent& OwnerComp,
 		return;
 	}
 	ATargetableActor *PlayerPawn = Cast<ATargetableActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("PlayerPawn"));
-	if (!PlayerPawn || PlayerPawn->StatusComponent->GetHealthPercent() <= 0)
+	if (!PlayerPawn || PlayerPawn->GetStatusComponent()->GetHealthPercent() <= 0)
 	{
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool(GetSelectedBlackboardKey(), 0);
 		return;

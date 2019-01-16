@@ -12,6 +12,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "GameFramework/Controller.h"
+#include "Types/DamageType_MeleeHit.h"
+#include "Types/DamageType_ParryRefelction.h"
+#include "StatusComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 const float ASoul_Like_ACTCharacter::BattleMovementScale{ .6f };
@@ -112,6 +115,47 @@ void ASoul_Like_ACTCharacter::SetupPlayerInputComponent(class UInputComponent* P
 void ASoul_Like_ACTCharacter::ResetRotation()
 {
 	SetActorRotation(FRotator{ GetActorRotation().Pitch, GetInstigator()->GetViewRotation().Yaw,GetActorRotation().Roll });
+}
+
+
+void ASoul_Like_ACTCharacter::Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, EOnHitRefelction &Outp)
+{
+	if (UDamageType->GetClass() == UDamageType_MeleeHit::StaticClass())
+	{
+		if (Damage >= StatusComponent->MaxHealth)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Vulnerable"));
+			Outp = EOnHitRefelction::Vulnerable;
+			return;
+		}
+		else if (AnimManager->bIsParry)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Parry"));
+			Outp = EOnHitRefelction::Parry;
+			return;
+		}
+		else if (AnimManager->bIsBlocking)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Blocking"));
+			Outp = EOnHitRefelction::Block;
+			return;
+		}
+		else if (AnimManager->bIsDodging)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Dodging"));
+			Outp = EOnHitRefelction::Immune;
+			return;
+		}
+	}
+	else if (UDamageType->GetClass() == UDamageType_ParryRefelction::StaticClass())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Vulnerable"));
+		Outp = EOnHitRefelction::Vulnerable;
+		return;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("OnHit"));
+	Outp = EOnHitRefelction::OnHit;
+	return;
 }
 
 void ASoul_Like_ACTCharacter::TurnAtRate(float Rate)

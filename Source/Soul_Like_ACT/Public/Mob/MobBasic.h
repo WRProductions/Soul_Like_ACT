@@ -20,6 +20,9 @@ public:
 	// Sets default values for this pawn's properties
 	AMobBasic();
 
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsStun;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -44,4 +47,8 @@ public:
 	void SetFocus(bool Enable, AActor * Target);
 
 	bool GetIsTargetingEnabled() const;
+
+	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = Outp))
+		void Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, EOnHitRefelction &Outp);
+
 };
