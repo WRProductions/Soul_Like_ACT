@@ -20,8 +20,8 @@ public:
 	// Sets default values for this pawn's properties
 	AMobBasic();
 
-	UPROPERTY(BlueprintReadWrite)
-	bool bIsStun;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		class UMobActionManager *ActionManager;
 
 protected:
 	// Called when the game starts or when spawned

@@ -23,13 +23,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
 		bool bCanDamageAllies;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
+		float WeaponDamage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		USoundBase *SwingSound;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
-		USoundBase *HitSound;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
-		UParticleSystem *BloodSplash;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UParticleSystem *BladeCollisionFX;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UParticleSystem *OnHitFX;
 
 protected:
 	// Called when the game starts or when spawned

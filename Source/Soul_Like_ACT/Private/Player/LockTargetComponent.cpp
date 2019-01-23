@@ -49,13 +49,14 @@ void ULockTargetComponent::ToggleCameraLock(bool FreeCamera)
 	if (!bIsTargetingEnabled)
 	{
 		bFreeCamera = FreeCamera;
-		FindTarget();
+		FindTarget(ETargetFindingDirection::Centre);
 	}
 	else
 	{
 		DisableLockingTarget();
 	}
 }
+
 
 
 void ULockTargetComponent::InitComponent(class UArrowComponent *ArrowComponentRef)
@@ -69,7 +70,7 @@ void ULockTargetComponent::InitComponent(class UArrowComponent *ArrowComponentRe
 }
 
 
-void ULockTargetComponent::FindTarget()
+void ULockTargetComponent::FindTarget(ETargetFindingDirection Direction /*= ETargetFindingDirection::Centre*/)
 {
 	TArray<AActor*> LocalPotentialTargets, LocalPotentialTargets_Stage_2;
 	
@@ -81,12 +82,13 @@ void ULockTargetComponent::FindTarget()
 
 	if (LocalPotentialTargets_Stage_2.Num() == 0) { return DisableLockingTarget(); }
 
-	FindClosestTargetInScreen(LocalPotentialTargets_Stage_2, SelectedActor);
+	if (Direction == ETargetFindingDirection::Centre)
+		FindClosestTargetInScreen(LocalPotentialTargets_Stage_2, SelectedActor);
+	else
+		Find_InDirection(LocalPotentialTargets_Stage_2, SelectedActor, Direction);
 
 	if (SelectedActor)
-	{
 		EnableLockingTarget();
-	}
 }
 
 
@@ -128,11 +130,11 @@ void ULockTargetComponent::RuleOutBlockedTargets(TArray<AActor *> LocalPotential
 }
 
 
-void ULockTargetComponent::FindClosestTargetInScreen(TArray<AActor *> LocalPotentialTargets, AActor *&ClosestTarget)
+void ULockTargetComponent::FindClosestTargetInScreen(TArray<AActor *> &LocalPotentialTargets, AActor *&ClosestTarget)
 {
 	int32 LocalX, LocalY;
 	GetWorld()->GetFirstPlayerController()->GetViewportSize(LocalX, LocalY);
-	FVector2D ScreenCentre{ (float)LocalX, (float)LocalY };
+	FVector2D ScreenCentre{ LocalX * .5f, LocalY * .5f };
 
 	//Get first potential target
 	FVector2D TargetScreenPosition;
@@ -153,8 +155,65 @@ void ULockTargetComponent::FindClosestTargetInScreen(TArray<AActor *> LocalPoten
 		}
 	}
 
-	if(TempClosestTarget)
+	if (TempClosestTarget)
+	{
 		ClosestTarget = TempClosestTarget;
+		//UE_LOG(LogTemp, Warning, TEXT("Target Position on Screen: %s, Screen Centre Vec: %s"), *TargetScreenPosition.ToString(), *ScreenCentre.ToString());
+	}
+}
+
+
+void ULockTargetComponent::Find_InDirection(TArray<AActor *> &LocalPotentialTargets, AActor *&ClosestTarget, ETargetFindingDirection Direction)
+{
+	if (!bIsTargetingEnabled || !SelectedActor)
+	{
+		return;
+	}
+	else
+	{
+		AActor *TempClosestTarget = nullptr;
+
+		FVector2D SelectedVector;
+		UGameplayStatics::ProjectWorldToScreen(GetWorld()->GetFirstPlayerController(),
+			ClosestTarget->GetActorLocation(),
+			SelectedVector);
+
+		//Get first potential target
+		FVector2D TargetScreenPosition;
+
+		float ClosestScreenDistance = 100000.f;
+
+		for (int i = 0; i < LocalPotentialTargets.Num(); ++i)
+		{
+			//Skip the selected actor
+			if(SelectedActor == LocalPotentialTargets[i]) continue;
+
+			UGameplayStatics::ProjectWorldToScreen(GetWorld()->GetFirstPlayerController(),
+				LocalPotentialTargets[i]->GetActorLocation(),
+				TargetScreenPosition);
+
+			//Compare X
+			if (Direction == ETargetFindingDirection::Left && TargetScreenPosition.X > SelectedVector.X) 
+				continue;
+			if (Direction == ETargetFindingDirection::Right && TargetScreenPosition.X < SelectedVector.X)
+				continue;
+
+			float LocalScreenDistance = FVector2D::Distance(TargetScreenPosition, SelectedVector);
+
+			if (LocalScreenDistance < ClosestScreenDistance)
+			{
+				TempClosestTarget = LocalPotentialTargets[i];
+				ClosestScreenDistance = LocalScreenDistance;
+			}
+		}
+
+		if (TempClosestTarget)
+		{
+			Cast<ATargetableActor>(ClosestTarget)->ToggleLockIcon(false);
+			ClosestTarget = TempClosestTarget;
+			//UE_LOG(LogTemp, Warning, TEXT("Target Position on Screen: %s, Screen Centre Vec: %s"), *TargetScreenPosition.ToString(), *ScreenCentre.ToString());
+		}
+	}
 }
 
 

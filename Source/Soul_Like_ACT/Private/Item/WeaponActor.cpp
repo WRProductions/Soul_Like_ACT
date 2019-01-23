@@ -64,14 +64,15 @@ void AWeaponActor::DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawT
 				&& TryExcludeActor(Hit.GetActor()))
 			{
 				//DEBUG
-				UGameplayStatics::ApplyDamage(Hit.GetActor(), 30.f, GetInstigatorController(), GetOwner(), UDamageType_MeleeHit::StaticClass());
+				UGameplayStatics::ApplyDamage(Hit.GetActor(), WeaponDamage, GetInstigatorController(), GetOwner(), UDamageType_MeleeHit::StaticClass());
 
-				OwnerRef->TriggerSlowMotion_WithDelay();
+				OwnerRef->TriggerSlowMotion_WithDelay(0.f);
 
-				if (HitSound)
-					UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, Hit.Location);
-				if (BloodSplash)
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BloodSplash, Hit.ImpactPoint, FRotator::ZeroRotator, 1);;
+				if (OnHitFX)
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), OnHitFX, Hit.ImpactPoint, FRotator::ZeroRotator, 1);;
+				}
+
 				if (BladeCollisionFX)
 				{
 					/*

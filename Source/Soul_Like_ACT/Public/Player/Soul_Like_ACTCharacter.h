@@ -71,6 +71,7 @@ protected:
 	void UseRMB_Pressed();
 	void UseRMB_Released ();
 
+	void ZoomCamera(float Rate);
 
 	void UseDodge();
 

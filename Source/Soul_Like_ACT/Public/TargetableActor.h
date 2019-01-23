@@ -47,6 +47,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UWidgetComponent *TargetIcon;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		USoundBase *OnHitSound;
+
 	FTimerHandle Handle_SlowMotion, Handler_SlowMotionDelay;
 
 	void WaitForDilationReset()
@@ -101,7 +104,7 @@ public:
 
 	//Called by WeaponActor and OnHit
 	UFUNCTION(BlueprintCallable)
-		void TriggerSlowMotion_WithDelay();
+		void TriggerSlowMotion_WithDelay(float Delay);
 
 
 };

@@ -109,6 +109,8 @@ void ASoul_Like_ACTCharacter::SetupPlayerInputComponent(class UInputComponent* P
 	PlayerInputComponent->BindAxis("TurnRate", this, &ASoul_Like_ACTCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ASoul_Like_ACTCharacter::LookUpAtRate);
+
+	PlayerInputComponent->BindAxis("Zoom", this, &ASoul_Like_ACTCharacter::ZoomCamera);
 }
 
 
@@ -194,6 +196,12 @@ void ASoul_Like_ACTCharacter::UseRMB_Released()
 {
 	FString DebugMessage;
 	AnimManager->PlayParryMontage_Released();
+}
+
+void ASoul_Like_ACTCharacter::ZoomCamera(float Rate)
+{
+	float &ArmLength = CameraBoom->TargetArmLength;
+	ArmLength += Rate * -100.f;
 }
 
 void ASoul_Like_ACTCharacter::UseDodge()

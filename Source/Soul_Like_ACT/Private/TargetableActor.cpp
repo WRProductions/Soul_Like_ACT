@@ -36,12 +36,12 @@ void ATargetableActor::ToggleLockIcon(bool LockOn)
 	}
 }
 
-void ATargetableActor::TriggerSlowMotion_WithDelay()
+void ATargetableActor::TriggerSlowMotion_WithDelay(float Delay)
 {
 	if (GetWorldTimerManager().GetTimerRemaining(Handler_SlowMotionDelay) <= 0.f)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Handler_SlowMotionDelay.IsValid()");
-		GetWorldTimerManager().SetTimer(Handler_SlowMotionDelay, this, &ATargetableActor::TriggerSlowMotion, 1.f, 0, 0.1f);
+		GetWorldTimerManager().SetTimer(Handler_SlowMotionDelay, this, &ATargetableActor::TriggerSlowMotion, 1.f, 0, Delay);
 	}
 }
 
@@ -59,7 +59,7 @@ const bool ATargetableActor::IsInRivalFaction(ATargetableActor *DamageDealer, AT
 
 bool ATargetableActor::OnDamageTaken_Implementation(float Damage, class UDamageType const* DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	TriggerSlowMotion_WithDelay();
+	TriggerSlowMotion_WithDelay(0.1f);
 
 	StatusComponent->TakeDamage(FMath::TruncToInt(Damage));
 	bool IsDead_Local = StatusComponent->GetHealthPercent() <= 0.f;

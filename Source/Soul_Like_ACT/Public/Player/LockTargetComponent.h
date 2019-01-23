@@ -6,6 +6,13 @@
 #include "Components/ActorComponent.h"
 #include "LockTargetComponent.generated.h"
 
+UENUM(BlueprintType)
+enum class ETargetFindingDirection : uint8
+{
+	Centre,
+	Left,
+	Right,
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SOUL_LIKE_ACT_API ULockTargetComponent : public UActorComponent
@@ -39,11 +46,13 @@ protected:
 	virtual void BeginPlay() override;
 
 	//Detection Stages-----------
-	void FindTarget();
+	void FindTarget(ETargetFindingDirection Direction = ETargetFindingDirection::Centre);
 	
 	void GetPotentialTargetsInScreen(TArray<AActor *> &OutPotentialTargets);
 	void RuleOutBlockedTargets(TArray<AActor *> LocalPotentialTargets, TArray<AActor *> &OutPotentialTargets);
-	void FindClosestTargetInScreen(TArray<AActor *> LocalPotentialTargets, AActor *&ClosestTarget);
+
+	void FindClosestTargetInScreen(TArray<AActor *> &LocalPotentialTargets, AActor *&ClosestTarget);
+	void Find_InDirection(TArray<AActor *> &LocalPotentialTargets, AActor *&ClosestTarget, ETargetFindingDirection Direction);
 	//---------------------------
 
 	void EnableLockingTarget();
@@ -66,6 +75,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void ToggleCameraLock(bool FreeCamera);
+
+	UFUNCTION(BlueprintCallable)
+		void Toggle_InDirection(ETargetFindingDirection Direction) { FindTarget(Direction); }
 
 	void InitComponent(class UArrowComponent *ArrowComponentRef);
 

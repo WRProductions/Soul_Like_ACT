@@ -4,7 +4,10 @@
 #include "GameFramework/Controller.h"
 #include "Components/CapsuleComponent.h"
 #include "Mob/Mob_TargetingComponent.h"
+#include "Mob/MobActionManager.h"
+#include "UObject/ConstructorHelpers.h"
 #include "StatusComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Types/DamageType_MeleeHit.h"
 #include "Types/DamageType_ParryRefelction.h"
 
@@ -16,7 +19,14 @@ AMobBasic::AMobBasic()
 
 	TargetingComponent = CreateDefaultSubobject<UMob_TargetingComponent>(TEXT("TargetingComponent"));
 
+	ActionManager = CreateDefaultSubobject<UMobActionManager>(TEXT("ActionManager"));
+
 	Faction = EActorFaction::Enemy;
+
+	TSubclassOf <class UUserWidget> IconWidget = ConstructorHelpers::FClassFinder<UUserWidget>(
+		TEXT("/Game/UMG/Mob/WB_LockIcon")).Class;
+	TargetIcon->SetWidgetClass(IconWidget);
+	TargetIcon->SetVisibility(0);
 }
 
 // Called when the game starts or when spawned
@@ -46,6 +56,8 @@ void AMobBasic::OnDeath_Implementation(int32 CurrHealth, int32 MaxHealth)
 		GetTargetingComponent()->FacingTarget_End();
 
 		Faction = EActorFaction::Untargetable;
+
+		StopAnimMontage(GetMesh()->GetAnimInstance()->GetCurrentActiveMontage());
 
 		ToggleLockIcon(0);
 	}
@@ -103,25 +115,28 @@ void AMobBasic::Exec_TryGetHit(float Damage, class UDamageType const* UDamageTyp
 {
 	if (UDamageType->GetClass() == UDamageType_MeleeHit::StaticClass())
 	{
-		if (Damage >= StatusComponent->MaxHealth)
+		if (Damage >= StatusComponent->MaxHealth * 0.35f)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Vulnerable"));
 			Outp = EOnHitRefelction::Vulnerable;
 			return;
 		}
+		else if (ActionManager->bIsBlocking)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Blocking"));
+			Outp = EOnHitRefelction::Block;
+			return;
+		}
 		/*
+
+
 		else if (AnimManager->bIsParry)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Parry"));
 			Outp = EOnHitRefelction::Parry;
 			return;
 		}
-		else if (AnimManager->bIsBlocking)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Blocking"));
-			Outp = EOnHitRefelction::Block;
-			return;
-		}
+		
 		else if (AnimManager->bIsDodging)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Dodging"));
