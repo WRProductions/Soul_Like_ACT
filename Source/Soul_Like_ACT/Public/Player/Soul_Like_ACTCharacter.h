@@ -30,6 +30,9 @@ class ASoul_Like_ACTCharacter : public ATargetableActor
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class ULockTargetComponent *TargetLockingComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UInventoryManager *InventoryManager;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = AI)
 	class UAIPerceptionStimuliSourceComponent *AIPerceptionStimuliSource;
 
@@ -66,7 +69,10 @@ protected:
 
 	void LookUpAtRate(float Rate);
 
-	void UseLMB();
+	void UseLMB_Pressed();
+	bool bIsLeftMouseButtonPressed;
+	float LMB_Timer;
+	void UseLMB_Released();
 
 	void UseRMB_Pressed();
 	void UseRMB_Released ();
@@ -94,11 +100,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void ResetRotation();
 
+	UFUNCTION(BlueprintCallable)
+		void SetActionState(const EInputState InpActionType);
+
+	UFUNCTION(BlueprintCallable)
+		AWeaponActor *EquipGear(TSubclassOf<AWeaponActor> WeaponClassRef, bool bShowTracelines);
+
 	UPROPERTY(BlueprintAssignable)
 		FGetLeanAmount GetLaneAmountDelegate;
 
 	//Warning: Link this to AnyDamage node in BP
 	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = Outp))
-		void Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, EOnHitRefelction &Outp);
+		virtual void Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp) override;
 };
 

@@ -14,16 +14,21 @@ enum class EAttackQueueStatus : uint8
 	Disabled,
 	WaitForQueue,
 	Queued,
-	ManualAttackOnly
+	ManualInputOnly
 };
 
 UENUM(BlueprintType)
-enum class EActionType : uint8
+enum class EInputState : uint8
 {
-	Attack,
+	Loco,
+	Attack_Light,
+	Attack_Heavy,
 	Dodge,
 	Parry,
 	Block,
+	OnHit,
+	OnStun,
+	OnDead,
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -42,32 +47,31 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		bool bIsStun;
+	class UDA_PlayerAnimSet *DefaultAnimSet;
 
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool bIsActing;
+	EInputState InputState;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool bIsBlocking;
+	bool bStopMovement;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool bIsParry;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	bool bIsDodging;
+	class UDA_ComboMontage *CurrentMontageDA;
 
 protected:
-
 	EAttackQueueStatus AutoAttackQueue;
-	EActionType MyActionType;
 
 	int32 ChannelingPoints;
 
 	int32 MaxComboCount;
 
 	FTimerHandle Handle_WaitToParry;
+	bool bCanCastParry;
+	void Timer_ResetCanTriggerParry();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontages)
 		TArray<UAnimMontage*> ComboMontages;
@@ -80,24 +84,23 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontages)
 		UAnimMontage *ParryMontage;
 
-	bool bCanParry;
-	//Delay Time: 0.2s
-	void Timer_WaitToParry();
-
 	void PlayMontage();
-	void PlayComboMontage();
+	void PlayLightAttack();
 	void PlayDodgeMontage();
-
-	void PlayParryMontage_Pressed();
+	void PlayBlockOrParry();
 
 	void ResetComboIndex() { ComboIndex = 0; }
 
 	void IncreaseComboIndex();
 
-	void ResetParryStatus() { bIsBlocking = bIsParry = 0; }
+	void ResetParryStatus() { bCanCastParry = 0; }
 
 public:
-
+	//Prevent movement input while montage is playing
+	UFUNCTION(BlueprintCallable)
+		void EnableActing();
+	UFUNCTION(BlueprintCallable)
+		void EndActing();
 
 	//Call this every time being hit or use animations other than attacking
 	UFUNCTION(BlueprintCallable)
@@ -105,16 +108,6 @@ public:
 
 	void PlayParryMontage_Released();
 
-	/*
-	UFUNCTION(BlueprintCallable)
-		void SetIsBlocking(bool IsBlocking) { bIsBlocking = IsBlocking; }
-	UFUNCTION(BlueprintCallable)
-		void SetIsParry(bool IsParry) { bIsParry = IsParry; }
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-		bool GetIsParry() const { return bIsParry; }
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-		bool GetIsBlocking() const { return bIsBlocking; }
-	*/
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 		EAttackQueueStatus GetAttackQueue() const { return AutoAttackQueue; }
 	UFUNCTION(BlueprintCallable)
@@ -124,39 +117,23 @@ public:
 		void EnableAttackQueue_InAnim() { AutoAttackQueue = EAttackQueueStatus::WaitForQueue; }
 
 	UFUNCTION(BlueprintCallable)
-		void SetCanParry(bool CanParry) { bCanParry = CanParry; }
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-		bool GetCanParry() const { return bCanParry; }
-
-	UFUNCTION(BlueprintCallable)
 		void IncreasingChannelingPoints();
 	UFUNCTION(BlueprintCallable)
 		void ResetChannelingPoints() { ChannelingPoints = 0; }
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 		int32 GetChannelingPoints() const { return ChannelingPoints; }
-
-	UFUNCTION(BlueprintCallable)
-		void EnableActing();
-	UFUNCTION(BlueprintCallable)
-		void DisableActing();
 	
 	UFUNCTION(BlueprintCallable)
-		bool GetCanMove() const { return !bIsActing; }
+		bool GetCanMove() const { return !bStopMovement; }
 
 	UFUNCTION(BlueprintCallable)
 		void TryUseDequeMotion(bool bTriggeredByAnimBP, FString &DebugMessage);
 
-	UFUNCTION(BlueprintCallable)
-		void SetActionType(const EActionType InpActionType) { MyActionType = InpActionType; }
-
-	void TryUseDequeMotion(const EActionType InpActionType, bool bTriggeredByAnimBP, FString &DebugMessage);
+	void TryUseDequeMotion(const EInputState InpActionType, bool bTriggeredByAnimBP, FString &DebugMessage);
 
 	UFUNCTION(BlueprintCallable)
 		static FString GetQueueStatusMessage(EAttackQueueStatus const &Inp);
 
 	UFUNCTION(BlueprintCallable)
 		void SetIsStun(bool IsStun);
-	
-	UPROPERTY(BlueprintAssignable)
-		FOnStun OnStun_Delegate;
 };

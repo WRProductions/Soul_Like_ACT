@@ -5,7 +5,9 @@
 #include "Components/CapsuleComponent.h"
 #include "Mob/Mob_TargetingComponent.h"
 #include "Mob/MobActionManager.h"
+#include "Item/WeaponActor.h"
 #include "UObject/ConstructorHelpers.h"
+#include "ActorFXManager.h"
 #include "StatusComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Types/DamageType_MeleeHit.h"
@@ -111,25 +113,34 @@ bool AMobBasic::GetIsTargetingEnabled() const
 	return TargetingComponent->GetIsEnabled();
 }
 
-void AMobBasic::Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, EOnHitRefelction &Outp)
+void AMobBasic::Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp)
 {
+	if (!IsTargetable()) return;
+
 	if (UDamageType->GetClass() == UDamageType_MeleeHit::StaticClass())
 	{
 		if (Damage >= StatusComponent->MaxHealth * 0.35f)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Vulnerable"));
 			Outp = EOnHitRefelction::Vulnerable;
+
+			if(Weapon)
+				Weapon->EndSwing();
+
+			FXManager->PlayEffects(HitInfo, EFXType::VE_OnHit);
+
 			return;
 		}
 		else if (ActionManager->bIsBlocking)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Blocking"));
 			Outp = EOnHitRefelction::Block;
+
+			FXManager->PlayEffects(HitInfo, EFXType::VE_OnBlock);
+
 			return;
 		}
 		/*
-
-
 		else if (AnimManager->bIsParry)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Parry"));
@@ -148,9 +159,21 @@ void AMobBasic::Exec_TryGetHit(float Damage, class UDamageType const* UDamageTyp
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Vulnerable"));
 		Outp = EOnHitRefelction::Vulnerable;
+		
+		if (Weapon)
+			Weapon->EndSwing();
+
+		FXManager->PlayEffects(HitInfo, EFXType::VE_OnHit);
+
 		return;
 	}
 	UE_LOG(LogTemp, Warning, TEXT("OnHit"));
 	Outp = EOnHitRefelction::OnHit;
+	
+	if (Weapon)
+		Weapon->EndSwing();
+
+	FXManager->PlayEffects(HitInfo, EFXType::VE_OnHit);
+
 	return;
 }

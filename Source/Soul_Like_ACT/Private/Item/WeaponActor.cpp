@@ -28,14 +28,16 @@ void AWeaponActor::BeginPlay()
 
 	OwnerRef = Cast<ATargetableActor>(GetInstigator());
 	check(OwnerRef);
+
+	check(GearInfo);
 }
 
 void AWeaponActor::CheckCollision()
 {
 	PrevVecs = CurrVecs;
-	for (int i = BladeStartLength; i <= BladeTail; i += 20)
+	for (int i = GearInfo->BladeStartLength; i <= GearInfo->BladeTail; i += 20)
 	{
-		int32 size_ = (i - BladeStartLength) / 10;
+		int32 size_ = (i - GearInfo->BladeStartLength) / 10;
 
 		CurrVecs[size_] = GetActorLocation() + i * GetActorUpVector();
 
@@ -63,17 +65,16 @@ void AWeaponActor::DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawT
 				&& ATargetableActor::IsInRivalFaction(OwnerRef, TargetPawn) 
 				&& TryExcludeActor(Hit.GetActor()))
 			{
-				//DEBUG
-				UGameplayStatics::ApplyDamage(Hit.GetActor(), WeaponDamage, GetInstigatorController(), GetOwner(), UDamageType_MeleeHit::StaticClass());
+				UGameplayStatics::ApplyPointDamage(Hit.GetActor(), GearInfo->DamageMultiplier, -(Hit.Normal), Hit, GetInstigatorController(), GetInstigator(), UDamageType_MeleeHit::StaticClass());
 
 				OwnerRef->TriggerSlowMotion_WithDelay(0.f);
 
-				if (OnHitFX)
+				if (GearInfo->OnHitFX)
 				{
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), OnHitFX, Hit.ImpactPoint, FRotator::ZeroRotator, 1);;
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), GearInfo->OnHitFX, Hit.ImpactPoint, FRotator::ZeroRotator, 1);;
 				}
 
-				if (BladeCollisionFX)
+				if (GearInfo->BladeCollisionFX)
 				{
 					/*
 					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BladeCollisionFX, Hit.ImpactPoint, FRotator::ZeroRotator, 1);;
@@ -102,12 +103,15 @@ void AWeaponActor::StartSwing()
 {
 	bIsTracingCollision = 1;
 
-	if (SwingSound)
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SwingSound, GetActorLocation());
+	CurrVecs.Reset();
+	MyTargets.Empty();
+
+	if (GearInfo->SwingSound)
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), GearInfo->SwingSound, GetActorLocation());
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, GetInstigator()->GetName() + " swinging the weapon");
 
-	for (int i = BladeStartLength; i <= BladeTail; i += 10)
+	for (int i = GearInfo->BladeStartLength; i <= GearInfo->BladeTail; i += 10)
 	{
 		CurrVecs.Add(GetActorLocation() + i * GetActorUpVector());
 	}
@@ -116,8 +120,6 @@ void AWeaponActor::StartSwing()
 void AWeaponActor::EndSwing()
 {
 	bIsTracingCollision = 0;
-	CurrVecs.Reset();
-	MyTargets.Empty();
 }
 
 // Called every frame

@@ -9,6 +9,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDead);
 
+//Exec only
 UENUM(BlueprintType)
 enum class EOnHitRefelction: uint8
 {
@@ -47,8 +48,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UWidgetComponent *TargetIcon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		USoundBase *OnHitSound;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		class UActorFXManager *FXManager;
 
 	FTimerHandle Handle_SlowMotion, Handler_SlowMotionDelay;
 
@@ -74,9 +75,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EActorFaction Faction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gears)
-		class AWeaponActor *Weapon;
-
 	UPROPERTY(BlueprintAssignable)
 		FOnDead OnDead_Delegate;
 
@@ -92,21 +90,16 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 		class UStatusComponent *GetStatusComponent() const { return StatusComponent; }
-	
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	bool OnDamageTaken(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser);
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void OnHitEffects(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser);
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void OnStunEffects(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser);
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void OnParryEffects(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser);
+		bool OnDamageTaken(float Damage, class UDamageType const* DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
 	//Called by WeaponActor and OnHit
 	UFUNCTION(BlueprintCallable)
 		void TriggerSlowMotion_WithDelay(float Delay);
 
-
+	//Warning: Link this to AnyPointDamage node in BP
+	virtual void Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp);
 };
 
 

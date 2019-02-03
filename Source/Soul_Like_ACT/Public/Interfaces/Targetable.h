@@ -6,6 +6,18 @@
 #include "UObject/Interface.h"
 #include "Targetable.generated.h"
 
+UENUM(BlueprintType)
+enum class EActionStatus : uint8
+{
+	Idle,
+	Attack,
+	Dash,
+	Block,
+	Parry,
+	Stun,
+	Dead,
+};
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UTargetable : public UInterface

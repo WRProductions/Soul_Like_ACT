@@ -3,12 +3,15 @@
 #include "Player/Soul_Like_ACTCharacter.h"
 #include "Player/AnimManager.h"
 #include "Camera/CameraComponent.h"
+#include "Item/WeaponActor.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/ArrowComponent.h"
 #include "Components/InputComponent.h"
 #include "Perception/AIPerceptionSystem.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Player/LockTargetComponent.h"
+#include "Player/InventoryManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "GameFramework/Controller.h"
@@ -17,7 +20,7 @@
 #include "StatusComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
-const float ASoul_Like_ACTCharacter::BattleMovementScale{ .6f };
+const float ASoul_Like_ACTCharacter::BattleMovementScale{ 1.f };
 const float ASoul_Like_ACTCharacter::TravelMovementScale{ 1.f };
 
 //////////////////////////////////////////////////////////////////////////
@@ -41,7 +44,7 @@ ASoul_Like_ACTCharacter::ASoul_Like_ACTCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 1000.f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 600.f;
-	GetCharacterMovement()->MaxWalkSpeed = 800.f;
+	GetCharacterMovement()->MaxWalkSpeed = 550.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
@@ -67,6 +70,8 @@ ASoul_Like_ACTCharacter::ASoul_Like_ACTCharacter()
 
 	TargetLockingComponent = CreateDefaultSubobject<ULockTargetComponent>(TEXT("TargetLockingComponent"));
 
+	InventoryManager = CreateDefaultSubobject<UInventoryManager>(TEXT("InventoryManager"));
+
 	Faction = EActorFaction::Player;
 
 	AIPerceptionStimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("AIPerceptionStimuliSource"));
@@ -83,7 +88,24 @@ void ASoul_Like_ACTCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//Movement
 	MakeMove();
+
+	//Attack
+	LMB_Timer += DeltaTime;
+	if (LMB_Timer >= 1.0f)
+	{
+		//Auto Cast
+		bIsLeftMouseButtonPressed = 0;
+		LMB_Timer = 0.f;
+
+		if (InventoryManager->CurrentWeapon)
+		{
+			FString DebugMessage;
+			AnimManager->TryUseDequeMotion(EInputState::Attack_Heavy, 0, DebugMessage);
+			//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, DebugMessage);
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -95,7 +117,7 @@ void ASoul_Like_ACTCharacter::SetupPlayerInputComponent(class UInputComponent* P
 	check(PlayerInputComponent);
 	//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseLMB);
+	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseLMB_Pressed);
 	PlayerInputComponent->BindAction("RMB", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseRMB_Pressed);
 	PlayerInputComponent->BindAction("RMB", IE_Released, this, &ASoul_Like_ACTCharacter::UseRMB_Released);
 	PlayerInputComponent->BindAction("Space", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseDodge);
@@ -120,7 +142,25 @@ void ASoul_Like_ACTCharacter::ResetRotation()
 }
 
 
-void ASoul_Like_ACTCharacter::Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, EOnHitRefelction &Outp)
+void ASoul_Like_ACTCharacter::SetActionState(const EInputState InpActionType)
+{
+	AnimManager->InputState = InpActionType;
+}
+
+AWeaponActor * ASoul_Like_ACTCharacter::EquipGear(TSubclassOf<AWeaponActor> WeaponClassRef, bool bShowTracelines)
+{
+	//UnEquip and delete the item
+
+
+	AWeaponActor *LocalWeapon = Cast<AWeaponActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), WeaponClassRef, FTransform::Identity, ESpawnActorCollisionHandlingMethod::AlwaysSpawn, this));
+	LocalWeapon->Instigator = this;
+	LocalWeapon->bEnableDrawTraceLine = bShowTracelines;
+	InventoryManager->EquipGear(LocalWeapon);
+
+	return LocalWeapon;
+}
+
+void ASoul_Like_ACTCharacter::Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp)
 {
 	if (UDamageType->GetClass() == UDamageType_MeleeHit::StaticClass())
 	{
@@ -128,21 +168,22 @@ void ASoul_Like_ACTCharacter::Exec_TryGetHit(float Damage, class UDamageType con
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Vulnerable"));
 			Outp = EOnHitRefelction::Vulnerable;
+
 			return;
 		}
-		else if (AnimManager->bIsParry)
+		else if (AnimManager->InputState == EInputState::Parry)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Parry"));
 			Outp = EOnHitRefelction::Parry;
 			return;
 		}
-		else if (AnimManager->bIsBlocking)
+		else if (AnimManager->InputState == EInputState::Block)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Blocking"));
 			Outp = EOnHitRefelction::Block;
 			return;
 		}
-		else if (AnimManager->bIsDodging)
+		else if (AnimManager->InputState == EInputState::Dodge)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Dodging"));
 			Outp = EOnHitRefelction::Immune;
@@ -153,10 +194,12 @@ void ASoul_Like_ACTCharacter::Exec_TryGetHit(float Damage, class UDamageType con
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Vulnerable"));
 		Outp = EOnHitRefelction::Vulnerable;
+
 		return;
 	}
 	UE_LOG(LogTemp, Warning, TEXT("OnHit"));
 	Outp = EOnHitRefelction::OnHit;
+
 	return;
 }
 
@@ -172,25 +215,40 @@ void ASoul_Like_ACTCharacter::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
-void ASoul_Like_ACTCharacter::UseLMB()
+void ASoul_Like_ACTCharacter::UseLMB_Pressed()
 {
-	if (Weapon)
+	bIsLeftMouseButtonPressed = 1;
+}
+
+
+void ASoul_Like_ACTCharacter::UseLMB_Released()
+{
+	if (bIsLeftMouseButtonPressed && LMB_Timer < 1.0f)
 	{
-		FString DebugMessage;
-		AnimManager->TryUseDequeMotion(EActionType::Attack, 0, DebugMessage);
-		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, DebugMessage);
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "No Weapon");
+		bIsLeftMouseButtonPressed = 0;
+		LMB_Timer = 0.f;
+		//Auto Cast
+
+		if (InventoryManager->CurrentWeapon)
+		{
+			FString DebugMessage;
+			AnimManager->TryUseDequeMotion(EInputState::Attack_Light, 0, DebugMessage);
+			//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, DebugMessage);
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "No Weapon");
+		}
 	}
 }
+
 
 void ASoul_Like_ACTCharacter::UseRMB_Pressed()
 {
 	FString DebugMessage;
-	AnimManager->TryUseDequeMotion(EActionType::Parry, 0, DebugMessage);
+	AnimManager->TryUseDequeMotion(EInputState::Block, 0, DebugMessage);
 }
+
 
 void ASoul_Like_ACTCharacter::UseRMB_Released()
 {
@@ -207,7 +265,7 @@ void ASoul_Like_ACTCharacter::ZoomCamera(float Rate)
 void ASoul_Like_ACTCharacter::UseDodge()
 {
 	FString DebugMessage;
-	AnimManager->TryUseDequeMotion(EActionType::Dodge, 0, DebugMessage);
+	AnimManager->TryUseDequeMotion(EInputState::Dodge, 0, DebugMessage);
 }
 
 void ASoul_Like_ACTCharacter::CalculateLeanValue(float TurnValue)

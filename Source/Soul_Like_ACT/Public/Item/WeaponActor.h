@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Types/DA_Gear.h"
 #include "WeaponActor.generated.h"
 
 UCLASS()
@@ -20,16 +21,11 @@ public:
 	// Sets default values for this actor's properties
 	AWeaponActor();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GearInfo)
+		UDA_Gear *GearInfo;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
 		bool bCanDamageAllies;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
-		float WeaponDamage;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		USoundBase *SwingSound;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UParticleSystem *BladeCollisionFX;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UParticleSystem *OnHitFX;
 
 protected:
 	// Called when the game starts or when spawned
@@ -39,10 +35,7 @@ protected:
 
 	FTimerHandle SwingHandle, TracingHandle;
 
-	UPROPERTY(BlueprintReadWrite)
-	int32 BladeStartLength = 20;
-	UPROPERTY(BlueprintReadWrite)
-	int32 BladeTail = 120;
+
 
 	TArray<FVector>PrevVecs;
 	TArray<FVector>CurrVecs;

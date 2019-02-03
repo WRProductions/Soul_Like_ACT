@@ -6,6 +6,8 @@
 #include "TargetableActor.h"
 #include "MobBasic.generated.h"
 
+class UDA_FXCollection;
+
 UCLASS()
 class SOUL_LIKE_ACT_API AMobBasic : public ATargetableActor
 {
@@ -15,6 +17,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UMob_TargetingComponent *TargetingComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gears)
+		class AWeaponActor *Weapon;
 
 public:
 	// Sets default values for this pawn's properties
@@ -49,6 +54,5 @@ public:
 	bool GetIsTargetingEnabled() const;
 
 	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = Outp))
-		void Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, EOnHitRefelction &Outp);
-
+		virtual void Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp) override;
 };

@@ -34,23 +34,23 @@ void UAnimManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 
 void UAnimManager::PlayMontage()
 {
-	switch (MyActionType)
+	switch (InputState)
 	{
-	case EActionType::Attack:
-		PlayComboMontage();
+	case EInputState::Attack_Light:
+		PlayLightAttack();
 		break;
-	case EActionType::Dodge:
+	case EInputState::Dodge:
 		PlayDodgeMontage();
 		break;
-	case  EActionType::Parry:
-		PlayParryMontage_Pressed();
+	case  EInputState::Block:
+		PlayBlockOrParry();
 		break;
 	default:
 		break;
 	}
 }
 
-void UAnimManager::PlayComboMontage()
+void UAnimManager::PlayLightAttack()
 {
 	Cast<ACharacter>(GetOwner())->PlayAnimMontage(ComboMontages[ComboIndex], 1.f);
 	IncreaseComboIndex();
@@ -61,9 +61,7 @@ void UAnimManager::IncreaseComboIndex()
 	++ComboIndex;
 
 	if (ComboIndex >= ComboMontages.Num())
-	{
 		ResetComboIndex();
-	}
 }
 
 void UAnimManager::ResetCombo()
@@ -82,24 +80,19 @@ void UAnimManager::IncreasingChannelingPoints()
 
 void UAnimManager::EnableActing()
 {
-	bIsActing = 1;
+	bStopMovement = 1;
 }
 
-void UAnimManager::DisableActing()
+void UAnimManager::EndActing()
 {
 	ResetCombo();
-	bIsActing = 0;
+	bStopMovement = 0;
 }
 
 void UAnimManager::TryUseDequeMotion(bool bTriggeredByAnimBP, FString & DebugMessage)
 {
-
-	if (bIsActing)
+	if (bStopMovement)
 	{
-		//Parry Montage Trigger
-		if (bCanParry)
-			PlayParryMontage_Pressed();
-
 		if (AutoAttackQueue == EAttackQueueStatus::Disabled)
 		{
 			DebugMessage = "Is Attacking, Cant take input";
@@ -109,8 +102,7 @@ void UAnimManager::TryUseDequeMotion(bool bTriggeredByAnimBP, FString & DebugMes
 		{
 			if (bTriggeredByAnimBP)
 			{
-				SetAttackQueue(EAttackQueueStatus::ManualAttackOnly);
-				DebugMessage = "Waiting for manual input";
+				SetAttackQueue(EAttackQueueStatus::ManualInputOnly);
 				return;
 			}
 			//Triggered Manually
@@ -126,26 +118,27 @@ void UAnimManager::TryUseDequeMotion(bool bTriggeredByAnimBP, FString & DebugMes
 			if (bTriggeredByAnimBP)
 			{
 				SetAttackQueue(EAttackQueueStatus::Disabled);
+				
 				PlayMontage();
-				DebugMessage = "Attacking";
+				DebugMessage = "Anim triggered attacking";
 				return;
 			}
 			else
 			{
 				DebugMessage = "Queued, Cant take input";
+				return;
 			}
 		}
-		else if (AutoAttackQueue == EAttackQueueStatus::ManualAttackOnly
+		else if (AutoAttackQueue == EAttackQueueStatus::ManualInputOnly
 			&& !bTriggeredByAnimBP)
 		{
 			SetAttackQueue(EAttackQueueStatus::Disabled);
 			PlayMontage();
-			DebugMessage = "Manual trigger attacking";
+			DebugMessage = "Manual triggered attacking";
 			return;
 		}
 	}
-	else if (
-		AutoAttackQueue == EAttackQueueStatus::Disabled
+	else if (AutoAttackQueue == EAttackQueueStatus::Disabled
 		&& !bTriggeredByAnimBP)
 	{
 		PlayMontage();
@@ -156,9 +149,9 @@ void UAnimManager::TryUseDequeMotion(bool bTriggeredByAnimBP, FString & DebugMes
 	return;
 }
 
-void UAnimManager::TryUseDequeMotion(const EActionType InpActionType, bool bTriggeredByAnimBP, FString &DebugMessage)
+void UAnimManager::TryUseDequeMotion(const EInputState InpActionType, bool bTriggeredByAnimBP, FString &DebugMessage)
 {
-	SetActionType(InpActionType);
+	InputState = InpActionType;
 	TryUseDequeMotion(bTriggeredByAnimBP, DebugMessage);
 }
 
@@ -194,38 +187,29 @@ void UAnimManager::PlayDodgeMontage()
 	}
 }
 
-void UAnimManager::PlayParryMontage_Pressed()
+void UAnimManager::PlayBlockOrParry()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Yellow, "PlayParryMontage_Pressed");
-
-	if (bCanParry)
+	if (bCanCastParry)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Yellow, "Try Parry");
-		bCanParry = 0;
-		GetWorld()->GetTimerManager().ClearTimer(Handle_WaitToParry);
+		GetWorld()->GetTimerManager().SetTimer(Handle_WaitToParry, this, &UAnimManager::Timer_ResetCanTriggerParry,1.f, false, -1.f);
 		PlayerRef->PlayAnimMontage(ParryMontage);
 	}
-	else if (!bIsActing)
+	else if (GetCanMove())
 	{
-		bCanParry = 1;
-
-		GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Yellow, "Try Block");
 
 		ResetCombo();
-		//PlayerRef->DisableInput(GetWorld()->GetFirstPlayerController());
 
-		GetWorld()->GetTimerManager().SetTimer(Handle_WaitToParry, this, &UAnimManager::Timer_WaitToParry, 1.f, false, 0.3f);
+		bCanCastParry = 1;
+		GetWorld()->GetTimerManager().SetTimer(Handle_WaitToParry, this, &UAnimManager::Timer_ResetCanTriggerParry, 1.f, false, 0.3f);
+		
 		PlayerRef->PlayAnimMontage(BlockMontage);
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Yellow, "Do Nothing");
 	}
 }
 
 void UAnimManager::PlayParryMontage_Released()
 {
-	if (bIsActing && PlayerRef->GetCurrentMontage() == BlockMontage)
+	if (!GetCanMove() && PlayerRef->GetCurrentMontage() == BlockMontage)
 	{
 		ResetCombo();
 
@@ -233,9 +217,9 @@ void UAnimManager::PlayParryMontage_Released()
 	}
 }
 
-void UAnimManager::Timer_WaitToParry()
+void UAnimManager::Timer_ResetCanTriggerParry()
 {
-	bCanParry = 0;
+	bCanCastParry = 0;
 }
 
 FString UAnimManager::GetQueueStatusMessage(EAttackQueueStatus const & Inp)
@@ -244,7 +228,7 @@ FString UAnimManager::GetQueueStatusMessage(EAttackQueueStatus const & Inp)
 	{
 	case EAttackQueueStatus::Disabled:
 		return "EAttackQueueStatus::Disabled";
-	case EAttackQueueStatus::ManualAttackOnly:
+	case EAttackQueueStatus::ManualInputOnly:
 		return "EAttackQueueStatus::ManualAttackOnly";
 	case EAttackQueueStatus::Queued:
 		return "EAttackQueueStatus::Queued";
@@ -257,17 +241,18 @@ FString UAnimManager::GetQueueStatusMessage(EAttackQueueStatus const & Inp)
 
 void UAnimManager::SetIsStun(bool IsStun)
 {
-	bIsStun = IsStun;
-
 	if (IsStun)
 	{
+		InputState = EInputState::OnStun;
+
 		PlayerRef->DisableInput(Cast<APlayerController>(PlayerRef->GetInstigatorController()));
 	}
 	else
 	{
+		InputState = EInputState::Loco;
+
 		PlayerRef->EnableInput(Cast<APlayerController>(PlayerRef->GetInstigatorController()));
 	}
 
-	OnStun_Delegate.Broadcast(bIsStun);
 }
 

@@ -4,6 +4,7 @@
 #include "StatusComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
+#include "ActorFxManager.h"
 
 // Sets default values
 ATargetableActor::ATargetableActor()
@@ -12,6 +13,7 @@ ATargetableActor::ATargetableActor()
 	PrimaryActorTick.bCanEverTick = true;
 
 	StatusComponent = CreateDefaultSubobject<UStatusComponent>(TEXT("StatusComponent"));
+	FXManager = CreateDefaultSubobject<UActorFXManager>(TEXT("FXManager"));
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(96.f);
 	GetCapsuleComponent()->SetCapsuleRadius(60.f);
@@ -43,6 +45,11 @@ void ATargetableActor::TriggerSlowMotion_WithDelay(float Delay)
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Handler_SlowMotionDelay.IsValid()");
 		GetWorldTimerManager().SetTimer(Handler_SlowMotionDelay, this, &ATargetableActor::TriggerSlowMotion, 1.f, 0, Delay);
 	}
+}
+
+void ATargetableActor::Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp)
+{
+	return;
 }
 
 const bool ATargetableActor::IsInRivalFaction(ATargetableActor *DamageDealer, ATargetableActor *DamageReceiver)

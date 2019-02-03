@@ -6,6 +6,18 @@
 #include "Components/ActorComponent.h"
 #include "MobActionManager.generated.h"
 
+UENUM(BlueprintType)
+enum class EMobActionState : uint8
+{
+	Idel,
+	Attack,
+	Dodge,
+	Parry,
+	Block,
+	OnHit,
+	OnStun,
+	OnDead,
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SOUL_LIKE_ACT_API UMobActionManager : public UActorComponent
@@ -15,6 +27,8 @@ class SOUL_LIKE_ACT_API UMobActionManager : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UMobActionManager();
+
+	EMobActionState MobActionState;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 		bool bIsActing;
