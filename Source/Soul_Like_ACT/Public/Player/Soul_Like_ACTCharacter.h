@@ -6,7 +6,6 @@
 #include "TargetableActor.h"
 #include "Soul_Like_ACTCharacter.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGetLeanAmount, float, LeanAmount);
 
 UCLASS(config=Game)
 class ASoul_Like_ACTCharacter : public ATargetableActor
@@ -24,13 +23,13 @@ class ASoul_Like_ACTCharacter : public ATargetableActor
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UAnimManager* AnimManager;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
 	class UArrowComponent* TargetLockArrow;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
 	class ULockTargetComponent *TargetLockingComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
 	class UInventoryManager *InventoryManager;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = AI)
@@ -57,7 +56,10 @@ public:
 	float BaseLookUpRate;
 
 	float ForwardAxisValue, RightAxisValue;
-	float LeanAmount_Char, LeanSpeed_Char, LeanAmount_Anim;
+	float LeanAmount_Char, LeanSpeed_Char;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float LeanAmount_Anim;
 
 protected:
 	//Tick------------------------------
@@ -69,10 +71,13 @@ protected:
 
 	void LookUpAtRate(float Rate);
 
-	void UseLMB_Pressed();
 	bool bIsLeftMouseButtonPressed;
 	float LMB_Timer;
+	FTimerHandle Handle_LMB_ReleaseDelay;
+	void UseLMB_Pressed();
 	void UseLMB_Released();
+	void CastLightAttack();
+	
 
 	void UseRMB_Pressed();
 	void UseRMB_Released ();
@@ -95,7 +100,7 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-	class UAnimManager* GetAnimManager() const { return AnimManager; }
+	FORCEINLINE class UAnimManager* GetAnimManager() const { return AnimManager; }
 
 	UFUNCTION(BlueprintCallable)
 		void ResetRotation();
@@ -105,9 +110,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		AWeaponActor *EquipGear(TSubclassOf<AWeaponActor> WeaponClassRef, bool bShowTracelines);
-
-	UPROPERTY(BlueprintAssignable)
-		FGetLeanAmount GetLaneAmountDelegate;
 
 	//Warning: Link this to AnyDamage node in BP
 	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = Outp))

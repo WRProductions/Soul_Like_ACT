@@ -12,6 +12,7 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "Player/LockTargetComponent.h"
 #include "Player/InventoryManager.h"
+#include "Player/AnimDABuffer.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "GameFramework/Controller.h"
@@ -91,19 +92,23 @@ void ASoul_Like_ACTCharacter::Tick(float DeltaTime)
 	//Movement
 	MakeMove();
 
+	
 	//Attack
-	LMB_Timer += DeltaTime;
-	if (LMB_Timer >= 1.0f)
+	if (bIsLeftMouseButtonPressed)
 	{
-		//Auto Cast
-		bIsLeftMouseButtonPressed = 0;
-		LMB_Timer = 0.f;
-
-		if (InventoryManager->CurrentWeapon)
+		LMB_Timer += DeltaTime;
+		if (LMB_Timer >= 0.5f)
 		{
-			FString DebugMessage;
-			AnimManager->TryUseDequeMotion(EInputState::Attack_Heavy, 0, DebugMessage);
-			//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, DebugMessage);
+			//Auto Cast
+			bIsLeftMouseButtonPressed = 0;
+			LMB_Timer = 0.f;
+
+			if (InventoryManager->CurrentWeapon)
+			{
+				FString DebugMessage;
+				AnimManager->TryUseDequeMotion(EInputState::Attack_Heavy, 0, DebugMessage);
+				//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, DebugMessage);
+			}
 		}
 	}
 }
@@ -118,6 +123,7 @@ void ASoul_Like_ACTCharacter::SetupPlayerInputComponent(class UInputComponent* P
 	//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseLMB_Pressed);
+	PlayerInputComponent->BindAction("LMB", IE_Released, this, &ASoul_Like_ACTCharacter::UseLMB_Released);
 	PlayerInputComponent->BindAction("RMB", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseRMB_Pressed);
 	PlayerInputComponent->BindAction("RMB", IE_Released, this, &ASoul_Like_ACTCharacter::UseRMB_Released);
 	PlayerInputComponent->BindAction("Space", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseDodge);
@@ -218,27 +224,60 @@ void ASoul_Like_ACTCharacter::LookUpAtRate(float Rate)
 void ASoul_Like_ACTCharacter::UseLMB_Pressed()
 {
 	bIsLeftMouseButtonPressed = 1;
+	
+	if (InventoryManager->CurrentWeapon)
+	{
+		FString DebugMessage;
+		AnimManager->TryUseDequeMotion(EInputState::Attack_Pre, 0, DebugMessage);
+		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, DebugMessage);
+	}
 }
 
 
+/*
+	Make light attack only
+*/
 void ASoul_Like_ACTCharacter::UseLMB_Released()
 {
-	if (bIsLeftMouseButtonPressed && LMB_Timer < 1.0f)
+	if (!bIsLeftMouseButtonPressed)
 	{
-		bIsLeftMouseButtonPressed = 0;
-		LMB_Timer = 0.f;
-		//Auto Cast
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "LMB is not pressed");
+		return;
+	}
+	if (GetWorldTimerManager().IsTimerActive(Handle_LMB_ReleaseDelay))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Handle_LMB_ReleaseDelay is already activated");
+		return;
+	}
+	if (LMB_Timer < 0.2f)
+	{
+		GetWorldTimerManager().SetTimer(
+			Handle_LMB_ReleaseDelay,
+			this,
+			&ASoul_Like_ACTCharacter::CastLightAttack,
+			1.f,
+			false,
+			0.3f-LMB_Timer);
+	}
+	else if (LMB_Timer < 0.5f)
+	{
+		CastLightAttack();
+	}
+}
 
-		if (InventoryManager->CurrentWeapon)
-		{
-			FString DebugMessage;
-			AnimManager->TryUseDequeMotion(EInputState::Attack_Light, 0, DebugMessage);
-			//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, DebugMessage);
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "No Weapon");
-		}
+
+void ASoul_Like_ACTCharacter::CastLightAttack()
+{
+	UE_LOG(LogTemp, Warning, TEXT("%f"), (LMB_Timer));
+
+	bIsLeftMouseButtonPressed = 0;
+	LMB_Timer = 0.f;
+
+	if (InventoryManager->CurrentWeapon)
+	{
+		FString DebugMessage;
+		AnimManager->TryUseDequeMotion(EInputState::Attack_Light, 0, DebugMessage);
+		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, DebugMessage);
 	}
 }
 
@@ -270,20 +309,18 @@ void ASoul_Like_ACTCharacter::UseDodge()
 
 void ASoul_Like_ACTCharacter::CalculateLeanValue(float TurnValue)
 {
-	if (TargetLockingComponent->GetIsTargetingEnabled())
+	if (TargetLockingComponent->GetIsTargetingEnabled() || GetMovementComponent()->Velocity.Size() < 10.f)
 	{
 		LeanAmount_Char = 0.f;
 		LeanSpeed_Char = 10.f;		
 	}
 	else
 	{
-		LeanAmount_Char = TurnValue;
+		LeanAmount_Char = TurnValue * 10.f;
 		LeanSpeed_Char = 1.f;
 	}
 
 	LeanAmount_Anim = FMath::FInterpTo(LeanAmount_Anim, LeanAmount_Char, GetWorld()->GetDeltaSeconds(), LeanSpeed_Char);
-	
-	GetLaneAmountDelegate.Broadcast(LeanAmount_Anim);
 }
 
 void ASoul_Like_ACTCharacter::MoveForward(float Value)

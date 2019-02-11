@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
 #include "AnimDABuffer.generated.h"
 
-class UDA_ComboMontage;
+class UDA_AttackMontage;
+class UDA_UtilityMontage;
 class AWeaponActor;
-class ATargetableActor;
+class UAnimManager;
+class ASoul_Like_ACTCharacter;
 
 UENUM(BlueprintType)
 enum class EComboChoise : uint8
@@ -23,31 +24,18 @@ enum class EComboChoise : uint8
 
 */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class SOUL_LIKE_ACT_API UAnimDABuffer : public UActorComponent
+class SOUL_LIKE_ACT_API UAnimDABuffer : public UObject
 {
 	GENERATED_BODY()
 
-	class ASoul_Like_ACTCharacter *OwnerRef;
-
-	class UAnimManager *PlayerAnimManager;
-
-	class AWeaponActor *PlayerWeapon;
-
-public:	
-	// Sets default values for this component's properties
-	UAnimDABuffer();
-		
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-	void CalculateDmg(AWeaponActor *PlayerWeapon);
-
-	void CalculateForce(ATargetableActor *Target);
-
-	void GetCombo(EComboChoise ComboType);
-
 public:
+	// Apply or Reset the combo DA to AnimManager
+	static void ApplyComboDA(UAnimManager *AnimManagerRef, bool bResetCombo = 0);
 
-	bool PlayComboMontage(EComboChoise );
+	UFUNCTION(BlueprintCallable)
+	static class UAnimMontage *GetAnimMontageFromAttackDA(UDA_AttackMontage *AttackDA, EComboChoise ELightOrHeavy);
+	UFUNCTION(BlueprintCallable)
+	static class UAnimMontage *GetPreMontageFromAttackDA(UDA_AttackMontage *AttackDA);
+	UFUNCTION(BlueprintCallable)
+	static class UAnimMontage *GetAnimMontageFromUtilityDA(UDA_UtilityMontage *UtilityDA);
 };

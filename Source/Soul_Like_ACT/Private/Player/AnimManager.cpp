@@ -1,8 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Player/AnimManager.h"
-#include "TimerManager.h"
 #include "Player/Soul_Like_ACTCharacter.h"
+#include "Player/AnimDABuffer.h"
+#include "Types/DA_PlayerAnimSet.h"
+#include "Types/DA_ComboMontage.h"
+#include "TimerManager.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -22,6 +25,9 @@ void UAnimManager::BeginPlay()
 	Super::BeginPlay();
 
 	PlayerRef = Cast<ASoul_Like_ACTCharacter>(GetOwner());
+
+	//CurrentCombo is by default the default anim set
+	UAnimDABuffer::ApplyComboDA(this, 1);
 }
 
 // Called every frame
@@ -39,6 +45,12 @@ void UAnimManager::PlayMontage()
 	case EInputState::Attack_Light:
 		PlayLightAttack();
 		break;
+	case EInputState::Attack_Heavy:
+		PlayHeavyAttack();
+		break;
+	case EInputState::Attack_Pre:
+		PlayPreAttack();
+		break;
 	case EInputState::Dodge:
 		PlayDodgeMontage();
 		break;
@@ -50,25 +62,49 @@ void UAnimManager::PlayMontage()
 	}
 }
 
+void UAnimManager::PlayPreAttack()
+{
+	Cast<ACharacter>(GetOwner())->PlayAnimMontage(CurrentComboStage->Pre_Montage);
+}
+
 void UAnimManager::PlayLightAttack()
 {
-	Cast<ACharacter>(GetOwner())->PlayAnimMontage(ComboMontages[ComboIndex], 1.f);
-	IncreaseComboIndex();
+	UAnimMontage *LocalMontage = UAnimDABuffer::GetAnimMontageFromAttackDA(
+		CurrentComboStage,
+		EComboChoise::LightAttack);
+	Cast<ACharacter>(GetOwner())->PlayAnimMontage(nullptr, 1.f);
+	//Cast<ACharacter>(GetOwner())->PlayAnimMontage(CurrentComboStage->Normal_Montage, 1.f);
+	GetNextAttackDA();
 }
 
-void UAnimManager::IncreaseComboIndex()
+
+void UAnimManager::PlayHeavyAttack()
 {
-	++ComboIndex;
-
-	if (ComboIndex >= ComboMontages.Num())
-		ResetComboIndex();
+	UAnimMontage *LocalMontage = UAnimDABuffer::GetAnimMontageFromAttackDA(
+		CurrentComboStage,
+		EComboChoise::HeavyAttack);
+	Cast<ACharacter>(GetOwner())->PlayAnimMontage(CurrentComboStage->Heavy_Montage, 1.f);
+	GetNextAttackDA();
 }
+
+
+void UAnimManager::GetNextAttackDA()
+{
+	UAnimDABuffer::ApplyComboDA(this, 0);
+}
+
 
 void UAnimManager::ResetCombo()
 {
 	SetAttackQueue(EAttackQueueStatus::Disabled);
 
 	ResetComboIndex();
+}
+
+
+void UAnimManager::ResetComboIndex()
+{
+	UAnimDABuffer::ApplyComboDA(this, 1);
 }
 
 
@@ -138,7 +174,7 @@ void UAnimManager::TryUseDequeMotion(bool bTriggeredByAnimBP, FString & DebugMes
 			return;
 		}
 	}
-	else if (AutoAttackQueue == EAttackQueueStatus::Disabled
+	if (AutoAttackQueue == EAttackQueueStatus::Disabled
 		&& !bTriggeredByAnimBP)
 	{
 		PlayMontage();
@@ -206,6 +242,7 @@ void UAnimManager::PlayBlockOrParry()
 		PlayerRef->PlayAnimMontage(BlockMontage);
 	}
 }
+
 
 void UAnimManager::PlayParryMontage_Released()
 {

@@ -6,7 +6,8 @@
 #include "Engine/DataAsset.h"
 #include "DA_PlayerAnimSet.generated.h"
 
-class UDA_ComboMontage;
+class UDA_AttackMontage;
+class UDA_UtilityMontage;
 
 /**
  * 
@@ -20,31 +21,29 @@ public:
 
 	//Dodge
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UDA_ComboMontage* Dodge_F;
+		UDA_UtilityMontage* Dodge_F;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UDA_ComboMontage* Dodge_B;
+		UDA_UtilityMontage* Dodge_B;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UDA_ComboMontage* Dodge_L;
+		UDA_UtilityMontage* Dodge_L;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UDA_ComboMontage* Dodge_R;
+		UDA_UtilityMontage* Dodge_R;
 
 	//Block
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UDA_ComboMontage* Block;
+		UDA_UtilityMontage* Block;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UDA_ComboMontage* Block_Guard;
+		UDA_UtilityMontage* Block_Guard;
 
 	//Parry
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UDA_ComboMontage* Parry;
+		UDA_UtilityMontage* Parry;
 
 	//Attack
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UDA_ComboMontage* ComboSet1;
+		UDA_AttackMontage* ComboSet1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UDA_ComboMontage* ComboSet2;
+		UDA_AttackMontage *DashAttack;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UDA_ComboMontage *DashAttack;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UDA_ComboMontage *ParryAttack;
+		UDA_AttackMontage *ParryAttack;
 };

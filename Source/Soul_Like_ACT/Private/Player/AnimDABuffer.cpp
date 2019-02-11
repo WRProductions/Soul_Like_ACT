@@ -1,40 +1,49 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "AnimDABuffer.h"
+#include "Player/AnimManager.h"
+#include "Types/DA_ComboMontage.h"
+#include "Animation/AnimMontage.h"
+#include "Types/DA_PlayerAnimSet.h"
+#include "Player/Soul_Like_ACTCharacter.h"
 
-// Sets default values for this component's properties
-UAnimDABuffer::UAnimDABuffer()
+
+void UAnimDABuffer::ApplyComboDA(UAnimManager *AnimManagerRef, bool bResetCombo /*= 0*/)
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = 0;
-
-	// ...
+	if (!bResetCombo && AnimManagerRef->CurrentComboStage->Combo_DA)
+	{
+		AnimManagerRef->CurrentComboStage = AnimManagerRef->CurrentComboStage->Combo_DA;
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "UAnimDABuffer combo applied");
+	}
+	else
+	{
+		AnimManagerRef->CurrentComboStage = AnimManagerRef->DefaultAnimSet->ComboSet1;
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "UAnimDABuffer combo inited");
+	}
 }
 
-
-// Called when the game starts
-void UAnimDABuffer::BeginPlay()
+class UAnimMontage * UAnimDABuffer::GetAnimMontageFromAttackDA(UDA_AttackMontage *AttackDA, EComboChoise ELightOrHeavy)
 {
-	Super::BeginPlay();
-
-	OwnerRef = Cast<ASoul_Like_ACTCharacter>(GetOwner());
+	switch (ELightOrHeavy)
+	{
+	case EComboChoise::LightAttack:
+		return AttackDA->Normal_Montage;
+	case EComboChoise::HeavyAttack:
+		if (AttackDA->Heavy_Montage)
+			return AttackDA->Heavy_Montage;
+		else 
+			return AttackDA->Normal_Montage;
+	default:
+		return nullptr;
+	}
 }
 
-void UAnimDABuffer::CalculateDmg(AWeaponActor * PlayerWeapon)
+class UAnimMontage * UAnimDABuffer::GetPreMontageFromAttackDA(UDA_AttackMontage *AttackDA)
 {
-
+	return AttackDA->Pre_Montage;
 }
 
-void UAnimDABuffer::CalculateForce(ATargetableActor * Target)
+class UAnimMontage * UAnimDABuffer::GetAnimMontageFromUtilityDA(UDA_UtilityMontage *UtilityDA)
 {
-}
-
-void UAnimDABuffer::GetCombo(EComboChoise ComboType)
-{
-}
-
-bool UAnimDABuffer::PlayComboMontage()
-{
-
+	return UtilityDA->Normal_Montage;
 }

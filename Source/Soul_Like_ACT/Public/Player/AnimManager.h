@@ -21,6 +21,7 @@ UENUM(BlueprintType)
 enum class EInputState : uint8
 {
 	Loco,
+	Attack_Pre,
 	Attack_Light,
 	Attack_Heavy,
 	Dodge,
@@ -46,9 +47,6 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	class UDA_PlayerAnimSet *DefaultAnimSet;
-
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -59,8 +57,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bStopMovement;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	class UDA_ComboMontage *CurrentMontageDA;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UDA_PlayerAnimSet *DefaultAnimSet;
+
+	UPROPERTY(VisibleAnywhere)
+	class UDA_AttackMontage *CurrentComboStage;
 
 protected:
 	EAttackQueueStatus AutoAttackQueue;
@@ -73,9 +74,6 @@ protected:
 	bool bCanCastParry;
 	void Timer_ResetCanTriggerParry();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontages)
-		TArray<UAnimMontage*> ComboMontages;
-	uint8 ComboIndex;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontages)
 		UAnimMontage *Dash_Forward;
@@ -85,13 +83,14 @@ protected:
 		UAnimMontage *ParryMontage;
 
 	void PlayMontage();
+	void PlayPreAttack();
 	void PlayLightAttack();
+	void PlayHeavyAttack();
 	void PlayDodgeMontage();
 	void PlayBlockOrParry();
 
-	void ResetComboIndex() { ComboIndex = 0; }
-
-	void IncreaseComboIndex();
+	void ResetComboIndex();
+	void GetNextAttackDA();
 
 	void ResetParryStatus() { bCanCastParry = 0; }
 
@@ -110,11 +109,13 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 		EAttackQueueStatus GetAttackQueue() const { return AutoAttackQueue; }
-	UFUNCTION(BlueprintCallable)
-		void SetAttackQueue(EAttackQueueStatus AttackQueueStatus) { AutoAttackQueue = AttackQueueStatus; }
+	
+	void SetAttackQueue(EAttackQueueStatus AttackQueueStatus) { AutoAttackQueue = AttackQueueStatus; }
 
 	UFUNCTION(BlueprintCallable)
 		void EnableAttackQueue_InAnim() { AutoAttackQueue = EAttackQueueStatus::WaitForQueue; }
+	UFUNCTION(BlueprintCallable)
+		void DisableAttackQueue_InAnim() { AutoAttackQueue = EAttackQueueStatus::Disabled; }
 
 	UFUNCTION(BlueprintCallable)
 		void IncreasingChannelingPoints();
