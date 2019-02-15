@@ -48,9 +48,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	EInputState InputState;
 
@@ -64,6 +61,9 @@ public:
 	class UDA_AttackMontage *CurrentComboStage;
 
 protected:
+	bool bCanLightAttack;
+	bool bLightAttackQueued;
+
 	EAttackQueueStatus AutoAttackQueue;
 
 	int32 ChannelingPoints;
@@ -74,20 +74,15 @@ protected:
 	bool bCanCastParry;
 	void Timer_ResetCanTriggerParry();
 
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontages)
-		UAnimMontage *Dash_Forward;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontages)
-		UAnimMontage *BlockMontage;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontages)
-		UAnimMontage *ParryMontage;
-
 	void PlayMontage();
 	void PlayPreAttack();
 	void PlayLightAttack();
 	void PlayHeavyAttack();
 	void PlayDodgeMontage();
 	void PlayBlockOrParry();
+	void PlayParry_Try();
+
+	void TriggerLightAttackFromQueue();
 
 	void ResetComboIndex();
 	void GetNextAttackDA();
@@ -97,9 +92,23 @@ protected:
 public:
 	//Prevent movement input while montage is playing
 	UFUNCTION(BlueprintCallable)
-		void EnableActing();
+		void DisableMovementInput();
 	UFUNCTION(BlueprintCallable)
-		void EndActing();
+		void EnableMovementInput();
+
+	//--------------------------------
+	
+	//Called by AnimNotify
+	UFUNCTION(BlueprintCallable)
+		void EnableLightAttackQueue();
+	UFUNCTION(BlueprintCallable)
+		void TriggerHeavyAttack();
+	
+	//Called by LMB_Release
+	void TryTriggerAttack();
+	//------------------------------
+
+
 
 	//Call this every time being hit or use animations other than attacking
 	UFUNCTION(BlueprintCallable)

@@ -13,12 +13,12 @@ void UAnimDABuffer::ApplyComboDA(UAnimManager *AnimManagerRef, bool bResetCombo 
 	if (!bResetCombo && AnimManagerRef->CurrentComboStage->Combo_DA)
 	{
 		AnimManagerRef->CurrentComboStage = AnimManagerRef->CurrentComboStage->Combo_DA;
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "UAnimDABuffer combo applied");
+		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "UAnimDABuffer combo applied");
 	}
 	else
 	{
 		AnimManagerRef->CurrentComboStage = AnimManagerRef->DefaultAnimSet->ComboSet1;
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "UAnimDABuffer combo inited");
+		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "UAnimDABuffer combo inited");
 	}
 }
 

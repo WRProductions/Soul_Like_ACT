@@ -61,6 +61,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float LeanAmount_Anim;
 
+	bool bIsLeftMouseButtonPressed;
+
 protected:
 	//Tick------------------------------
 	void MoveForward(float Value);
@@ -71,7 +73,6 @@ protected:
 
 	void LookUpAtRate(float Rate);
 
-	bool bIsLeftMouseButtonPressed;
 	float LMB_Timer;
 	FTimerHandle Handle_LMB_ReleaseDelay;
 	void UseLMB_Pressed();
