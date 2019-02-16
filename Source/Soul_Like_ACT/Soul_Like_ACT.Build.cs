@@ -8,6 +8,16 @@ public class Soul_Like_ACT : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "GameplayTasks", "NavigationSystem" });
+		PublicDependencyModuleNames.AddRange(new string[] {
+            "Core",
+            "CoreUObject",
+            "Slate",
+            "Engine",
+            "InputCore",
+            "GameplayAbilities",
+            "GameplayTags",
+            "GameplayTasks",
+            "UMG",
+            "NavigationSystem" });
     }
 }
