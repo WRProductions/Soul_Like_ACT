@@ -2,6 +2,7 @@
 
 #include "Abilities/SoulAttributeSet.h"
 #include "GameplayEffect.h"
+#include "TargetableActor.h"
 #include "GameplayEffectExtension.h"
 
 
@@ -70,12 +71,12 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	// Get the Target actor, which should be our owner
 	AActor* TargetActor = nullptr;
 	AController* TargetController = nullptr;
-	ARPGCharacterBase* TargetCharacter = nullptr;
+	ATargetableActor* TargetCharacter = nullptr;
 	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
 	{
 		TargetActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
 		TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
-		TargetCharacter = Cast<ARPGCharacterBase>(TargetActor);
+		TargetCharacter = Cast<ATargetableActor>(TargetActor);
 	}
 
 	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
@@ -83,7 +84,7 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		// Get the Source actor
 		AActor* SourceActor = nullptr;
 		AController* SourceController = nullptr;
-		ARPGCharacterBase* SourceCharacter = nullptr;
+		ATargetableActor* SourceCharacter = nullptr;
 		if (Source && Source->AbilityActorInfo.IsValid() && Source->AbilityActorInfo->AvatarActor.IsValid())
 		{
 			SourceActor = Source->AbilityActorInfo->AvatarActor.Get();
@@ -99,11 +100,11 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			// Use the controller to find the source pawn
 			if (SourceController)
 			{
-				SourceCharacter = Cast<ARPGCharacterBase>(SourceController->GetPawn());
+				SourceCharacter = Cast<ATargetableActor>(SourceController->GetPawn());
 			}
 			else
 			{
-				SourceCharacter = Cast<ARPGCharacterBase>(SourceActor);
+				SourceCharacter = Cast<ATargetableActor>(SourceActor);
 			}
 
 			// Set the causer actor based on context if it's set
