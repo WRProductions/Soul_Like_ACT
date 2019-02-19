@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Abilities/SoulAttributeSet.h"
 #include "Interfaces/Targetable.h"
 #include "TargetableActor.generated.h"
 
