@@ -52,6 +52,11 @@ void ATargetableActor::Exec_TryGetHit(float Damage, class UDamageType const* UDa
 	return;
 }
 
+UAbilitySystemComponent* ATargetableActor::GetAbilitySystemComponent() const
+{
+	throw std::logic_error("The method or operation is not implemented.");
+}
+
 const bool ATargetableActor::IsInRivalFaction(ATargetableActor *DamageDealer, ATargetableActor *DamageReceiver)
 {
 	if (DamageDealer->Faction == EActorFaction::Player && DamageReceiver->Faction == EActorFaction::Enemy)

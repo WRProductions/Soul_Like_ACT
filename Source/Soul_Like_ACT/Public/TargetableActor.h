@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "AbilitySystemInterface.h"
+#include "Abilities/SoulAbilitySystemComponent.h"
 #include "Abilities/SoulAttributeSet.h"
 #include "Interfaces/Targetable.h"
 #include "TargetableActor.generated.h"
@@ -31,7 +33,7 @@ enum class EActorFaction : uint8
 
 
 UCLASS()
-class SOUL_LIKE_ACT_API ATargetableActor : public ACharacter, public ITargetable
+class SOUL_LIKE_ACT_API ATargetableActor : public ACharacter, public ITargetable, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -66,6 +68,7 @@ protected:
 	}
 
 public:	
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -77,27 +80,27 @@ public:
 	EActorFaction Faction;
 
 	UPROPERTY(BlueprintAssignable)
-		FOnDead OnDead_Delegate;
+	FOnDead OnDead_Delegate;
 
 //Static
 public:
 	static const bool IsInRivalFaction(ATargetableActor *DamageDealer, ATargetableActor *DamageReceiver);
 
 	UFUNCTION(BlueprintCallable)
-		virtual bool IsTargetable() const override { return Faction != EActorFaction::Untargetable; }
+	virtual bool IsTargetable() const override { return Faction != EActorFaction::Untargetable; }
 
 	UFUNCTION(BlueprintCallable)
-		virtual void ToggleLockIcon(bool LockOn) override;
+	virtual void ToggleLockIcon(bool LockOn) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-		class UStatusComponent *GetStatusComponent() const { return StatusComponent; }
+	class UStatusComponent *GetStatusComponent() const { return StatusComponent; }
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-		bool OnDamageTaken(float Damage, class UDamageType const* DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	bool OnDamageTaken(float Damage, class UDamageType const* DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
 	//Called by WeaponActor and OnHit
 	UFUNCTION(BlueprintCallable)
-		void TriggerSlowMotion_WithDelay(float Delay);
+	void TriggerSlowMotion_WithDelay(float Delay);
 
 	//Warning: Link this to AnyPointDamage node in BP
 	virtual void Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp);
