@@ -1,9 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Abilities/SoulAbilitySystemComponent.h"
-#include "TargetableActor.h"
+#include "SoulCharacterBase.h"
 #include "Abilities/SoulGameplayAbility.h"
 #include "AbilitySystemGlobals.h"
+
 
 void USoulAbilitySystemComponent::GetActiveAbilitiesWithTags(const FGameplayTagContainer & GameplayTagContainer, TArray<USoulGameplayAbility*>& ActiveAbilities)
 {
@@ -25,7 +26,7 @@ void USoulAbilitySystemComponent::GetActiveAbilitiesWithTags(const FGameplayTagC
 
 int32 USoulAbilitySystemComponent::GetDefaultAbilityLevel() const
 {
-	ATargetableActor* OwningCharacter = Cast<ATargetableActor>(OwnerActor);
+	ASoulCharacterBase* OwningCharacter = Cast<ASoulCharacterBase>(OwnerActor);
 
 	if (OwningCharacter)
 	{

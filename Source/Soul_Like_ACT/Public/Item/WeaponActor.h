@@ -7,6 +7,8 @@
 #include "Types/DA_Gear.h"
 #include "WeaponActor.generated.h"
 
+class ASoulCharacterBase;
+
 UCLASS()
 class SOUL_LIKE_ACT_API AWeaponActor : public AActor
 {
@@ -15,7 +17,7 @@ class SOUL_LIKE_ACT_API AWeaponActor : public AActor
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = 1))
 	class USkeletalMeshComponent *MeshComp;
 
-	class ATargetableActor *OwnerRef;
+	ASoulCharacterBase *OwnerRef;
 
 public:	
 	// Sets default values for this actor's properties
@@ -65,4 +67,10 @@ public:
 		void EndSwing();
 
 	bool GetIsSwinging() const { return bIsTracingCollision; }
+
+	//When OnHit
+	//Send HitInformation back to GA
+	UFUNCTION(BlueprintImplementableEvent)
+	bool ApplyGAOnHit(ASoulCharacterBase *Target);
+
 };

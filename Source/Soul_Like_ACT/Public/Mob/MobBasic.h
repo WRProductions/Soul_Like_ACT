@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TargetableActor.h"
+#include "SoulCharacterBase.h"
 #include "MobBasic.generated.h"
 
 class UDA_FXCollection;
 
 UCLASS()
-class SOUL_LIKE_ACT_API AMobBasic : public ATargetableActor
+class SOUL_LIKE_ACT_API AMobBasic : public ASoulCharacterBase
 {
 	GENERATED_BODY()
 

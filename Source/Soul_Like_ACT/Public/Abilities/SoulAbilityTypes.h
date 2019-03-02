@@ -11,11 +11,11 @@
 #include "CoreMinimal.h"
 #include "GameplayEffectTypes.h"
 #include "Abilities/GameplayAbilityTargetTypes.h"
-#include "SoulAbilityType.generated.h"
+#include "SoulAbilityTypes.generated.h"
 
 class USoulAbilitySystemComponent;
 class UGameplayEffect;
-class URPGTargetType;
+class USoulTargetType;
 
 
 /**
@@ -32,7 +32,7 @@ public:
 
 	/** Sets the way that targeting happens */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = GameplayEffectContainer)
-		TSubclassOf<URPGTargetType> TargetType;
+		TSubclassOf<USoulTargetType> TargetType;
 
 	/** List of gameplay effects to apply to the targets */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = GameplayEffectContainer)
@@ -46,7 +46,7 @@ struct FSoulGameplayEffectContainerSpec
 	GENERATED_BODY()
 
 public:
-	FRPGGameplayEffectContainerSpec() {}
+	FSoulGameplayEffectContainerSpec() {}
 
 	/** Computed target data */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = GameplayEffectContainer)

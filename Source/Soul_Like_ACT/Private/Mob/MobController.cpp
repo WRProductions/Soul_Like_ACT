@@ -74,7 +74,7 @@ void AMobController::AISenseUpdateMessage(AActor* Actor, FAIStimulus Stimulus)
 		return;
 	}
 
-	if (Cast<ATargetableActor>(Actor)->Faction == EActorFaction::Player)
+	if (Cast<ASoulCharacterBase>(Actor)->Faction == EActorFaction::Player)
 	{
 		if (Stimulus.WasSuccessfullySensed())
 		{

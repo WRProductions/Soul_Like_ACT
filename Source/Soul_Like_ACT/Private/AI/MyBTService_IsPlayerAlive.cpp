@@ -4,9 +4,8 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
-#include "TargetableActor.h"
+#include "SoulCharacterBase.h"
 #include "Mob/MobController.h"
-#include "StatusComponent.h"
 
 
 UMyBTService_IsTargetAvailable::UMyBTService_IsTargetAvailable()
@@ -27,8 +26,8 @@ void UMyBTService_IsTargetAvailable::TickNode(UBehaviorTreeComponent& OwnerComp,
 		Owner->GetBTComp()->StopTree(EBTStopMode::Forced);
 		return;
 	}
-	ATargetableActor *PlayerPawn = Cast<ATargetableActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("PlayerPawn"));
-	if (!PlayerPawn || PlayerPawn->GetStatusComponent()->GetHealthPercent() <= 0)
+	ASoulCharacterBase *PlayerPawn = Cast<ASoulCharacterBase>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("PlayerPawn"));
+	if (!PlayerPawn || PlayerPawn->GetHealth() <= 0)
 	{
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool(GetSelectedBlackboardKey(), 0);
 		return;

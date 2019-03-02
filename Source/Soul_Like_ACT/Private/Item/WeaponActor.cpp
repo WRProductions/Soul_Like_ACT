@@ -3,8 +3,8 @@
 #include "Item/WeaponActor.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Types/DamageType_MeleeHit.h"
-#include "TargetableActor.h"
+#include "Types/DamageTypes.h"
+#include "SoulCharacterBase.h"
 #include "DrawDebugHelpers.h"
 
 
@@ -26,7 +26,7 @@ void AWeaponActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OwnerRef = Cast<ATargetableActor>(GetInstigator());
+	OwnerRef = Cast<ASoulCharacterBase>(GetInstigator());
 	check(OwnerRef);
 
 	check(GearInfo);
@@ -60,12 +60,13 @@ void AWeaponActor::DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawT
 
 		for (const auto &Hit : Hits)
 		{
-			ATargetableActor * TargetPawn = Cast<ATargetableActor>(Hit.GetActor());
+			ASoulCharacterBase * TargetPawn = Cast<ASoulCharacterBase>(Hit.GetActor());
 			if (TargetPawn
-				&& ATargetableActor::IsInRivalFaction(OwnerRef, TargetPawn) 
-				&& TryExcludeActor(Hit.GetActor()))
+				&& ASoulCharacterBase::IsInRivalFaction(OwnerRef, TargetPawn) 
+				&& TryExcludeActor(TargetPawn))
 			{
-				UGameplayStatics::ApplyPointDamage(Hit.GetActor(), GearInfo->DamageMultiplier, -(Hit.Normal), Hit, GetInstigatorController(), GetInstigator(), UDamageType_MeleeHit::StaticClass());
+				ApplyGAOnHit(TargetPawn);
+
 
 				OwnerRef->TriggerSlowMotion_WithDelay(0.f);
 
