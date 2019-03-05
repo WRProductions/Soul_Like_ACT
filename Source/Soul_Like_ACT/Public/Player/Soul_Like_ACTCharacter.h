@@ -38,6 +38,8 @@ class ASoul_Like_ACTCharacter : public ASoulCharacterBase
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void PossessedBy(AController* NewController) override;
+
 public:
 
 	static const float BattleMovementScale;

@@ -46,6 +46,9 @@ public:
 		USoundBase *SwingSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		USoundBase *OnHitSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UParticleSystem *BladeCollisionFX;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

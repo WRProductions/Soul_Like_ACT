@@ -41,6 +41,13 @@ public:
 	// Sets default values for this pawn's properties
 	ASoulCharacterBase();
 
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void UnPossessed() override;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = AnimGA)
+	TSubclassOf<UGameplayAbility> TempGA;
+
+	struct FGameplayAbilitySpecHandle TempGAHandle;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -77,7 +84,7 @@ protected:
 	}
 
 public:	
-	virtual USoulAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

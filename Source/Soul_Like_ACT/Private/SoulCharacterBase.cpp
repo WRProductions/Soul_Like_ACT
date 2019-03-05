@@ -31,38 +31,6 @@ ASoulCharacterBase::ASoulCharacterBase()
 	TargetIcon->SetDrawSize(FVector2D{ 35.f,35.f });
 }
 
-void ASoulCharacterBase::AddStartupGameplayAbilities()
-{
-	check(AbilitySystemComponent);
-
-	if (Role == ROLE_Authority && !bAbilitiesInitialized)
-	{
-		/*
-		// Grant abilities, but only on the server	
-		for (TSubclassOf<USoulGameplayAbility>& StartupAbility : GameplayAbilities)
-		{
-			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(StartupAbility, GetCharacterLevel(), INDEX_NONE, this));
-		}
-		
-		
-		// Now apply passives
-		for (TSubclassOf<UGameplayEffect>& GameplayEffect : PassiveGameplayEffects)
-		{
-			FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
-			EffectContext.AddSourceObject(this);
-
-			FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, GetCharacterLevel(), EffectContext);
-			if (NewHandle.IsValid())
-			{
-				FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
-			}
-		}
-
-		AddSlottedGameplayAbilities();
-		*/
-		bAbilitiesInitialized = true;
-	}
-}
 
 void ASoulCharacterBase::ToggleLockIcon(bool LockOn)
 {
@@ -122,7 +90,7 @@ void ASoulCharacterBase::HandleMoveSpeedChanged(float DeltaValue, const FGamepla
 	}
 }
 
-USoulAbilitySystemComponent* ASoulCharacterBase::GetAbilitySystemComponent() const
+UAbilitySystemComponent* ASoulCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
 }
@@ -138,6 +106,16 @@ const bool ASoulCharacterBase::IsInRivalFaction(ASoulCharacterBase *DamageDealer
 	return 0;
 }
 
+
+void ASoulCharacterBase::PossessedBy(AController * NewController)
+{
+	Super::PossessedBy(NewController);
+}
+
+void ASoulCharacterBase::UnPossessed()
+{
+	Super::UnPossessed();
+}
 
 // Called when the game starts or when spawned
 void ASoulCharacterBase::BeginPlay()

@@ -67,22 +67,10 @@ void AWeaponActor::DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawT
 			{
 				ApplyGAOnHit(TargetPawn);
 
+				TriggerSlowMotion();
 
-				OwnerRef->TriggerSlowMotion_WithDelay(0.f);
-
-				if (GearInfo->OnHitFX)
-				{
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), GearInfo->OnHitFX, Hit.ImpactPoint, FRotator::ZeroRotator, 1);;
-				}
-
-				if (GearInfo->BladeCollisionFX)
-				{
-					/*
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BladeCollisionFX, Hit.ImpactPoint, FRotator::ZeroRotator, 1);;
-					OwnerRef->OnHit_SlowMotion();
-					TargetPawn->OnHit_SlowMotion();
-					*/				
-				}
+				SpawnVFX(Hit);
+				SpawnSFX(Hit);
 			}
 		}
 	}
@@ -90,6 +78,10 @@ void AWeaponActor::DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawT
 			DrawDebugLine(GetWorld(), prevVec_, currVec_, FColor::Red, 0, 2.f, 0, 1.f);
 }
 
+/*
+* Exclude the actor which takes the impact
+* Return true if the Actor has not been impacted
+*/
 bool AWeaponActor::TryExcludeActor(AActor * HitActor)
 {
 	if (MyTargets.Contains(HitActor))
@@ -131,4 +123,3 @@ void AWeaponActor::Tick(float DeltaTime)
 	if(bIsTracingCollision)
 		CheckCollision();
 }
-

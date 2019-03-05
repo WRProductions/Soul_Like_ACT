@@ -35,14 +35,10 @@ protected:
 
 	bool bIsTracingCollision;
 
-	FTimerHandle SwingHandle, TracingHandle;
-
-
-
 	TArray<FVector>PrevVecs;
 	TArray<FVector>CurrVecs;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	TArray<AActor*> MyTargets;
 
 public:	
@@ -73,4 +69,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	bool ApplyGAOnHit(ASoulCharacterBase *Target);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void SpawnSFX(const FHitResult &HitResult);
+	UFUNCTION(BlueprintImplementableEvent)
+	void SpawnVFX(const FHitResult &HitResult);
+	UFUNCTION(BlueprintImplementableEvent)
+	void TriggerSlowMotion();
 };

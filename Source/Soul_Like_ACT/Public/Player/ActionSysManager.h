@@ -6,8 +6,9 @@
 #include "Components/ActorComponent.h"
 #include "ActionSysManager.generated.h"
 
-class UGameplayAbility;
 class USoulGameplayAbility;
+class UGameplayAbility;
+class UAnimMontage;
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SOUL_LIKE_ACT_API UActionSysManager : public UActorComponent
@@ -20,9 +21,6 @@ public:
 
 	class ASoul_Like_ACTCharacter *PlayerRef;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimCombo)
-		TSubclassOf<UGameplayAbility> AttackGA;
-
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -31,7 +29,9 @@ protected:
 
 	void GetActiveAbilitiesWithTags(struct FGameplayTagContainer AbilityTags, TArray<USoulGameplayAbility*>& ActiveAbilities);
 
-	bool JumpSectionForCombo() const;
+	bool bCanJumpSection;
+	FName JumpSectionName;
+	UAnimMontage *JumpMontage;
 
 public:
 	bool bBlockMovement;
@@ -40,4 +40,9 @@ public:
 	bool bCanUseAnyGA() const;
 
 	bool DoMeleeAttack();
+
+	UFUNCTION(BlueprintCallable)
+	bool SetJumpSection(const FName InpComboScetionName, UAnimMontage *InpMontage);
+	UFUNCTION(BlueprintCallable)
+	bool JumpSectionForCombo();
 };

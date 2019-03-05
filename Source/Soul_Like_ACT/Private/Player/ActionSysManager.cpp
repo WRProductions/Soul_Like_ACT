@@ -3,6 +3,7 @@
 #include "Player/ActionSysManager.h"
 #include "Player/Soul_Like_ACTCharacter.h"
 #include "Types/DA_PlayerAnimSet.h"
+#include "Animation/AnimInstance.h"
 #include "Types/DA_ComboMontage.h"
 #include "Abilities/SoulAbilitySystemComponent.h"
 #include "TimerManager.h"
@@ -34,9 +35,42 @@ bool UActionSysManager::DoMeleeAttack()
 		return ActivateAbilitiesWithWeapon(true);
 }
 
+bool UActionSysManager::SetJumpSection(const FName InpComboScetionName, UAnimMontage *InpMontage)
+{
+	bCanJumpSection = 1;
+
+	JumpSectionName = InpComboScetionName;
+	JumpMontage = InpMontage;
+
+	return true;
+}
+
+bool UActionSysManager::JumpSectionForCombo()
+{
+	if (!bCanJumpSection) return false;
+
+	UAnimInstance *AnimInstance = PlayerRef->GetMesh()->GetAnimInstance();
+	UAnimMontage *CurrentMontage = AnimInstance->GetCurrentActiveMontage();
+	
+	if (!JumpMontage || JumpMontage == CurrentMontage)
+	{
+		FName CurrentSectionName = AnimInstance->Montage_GetCurrentSection(CurrentMontage);
+		
+		AnimInstance->Montage_SetNextSection(CurrentSectionName, JumpSectionName, CurrentMontage);
+		
+		return true;
+	}
+	else
+	{
+		//TODO: use other ability
+		return true;
+	}
+	return false;
+}
+
 bool UActionSysManager::ActivateAbilitiesWithWeapon(bool bAllowRemoteActivation) const
 {
-	return PlayerRef->GetAbilitySystemComponent()->TryActivateAbilityByClass(AttackGA, true);
+	return Cast<USoulAbilitySystemComponent>(PlayerRef->GetAbilitySystemComponent())->TryActivateAbility(PlayerRef->TempGAHandle, true);
 }
 
 void UActionSysManager::GetActiveAbilitiesWithTags(FGameplayTagContainer AbilityTags, TArray<USoulGameplayAbility*>& ActiveAbilities)
@@ -47,14 +81,9 @@ void UActionSysManager::GetActiveAbilitiesWithTags(FGameplayTagContainer Ability
 	}
 }
 
-bool UActionSysManager::JumpSectionForCombo() const
-{
-	return false;
-}
-
 bool UActionSysManager::bIsUsingMelee() const
 {
-	USoulAbilitySystemComponent *LocalComp = PlayerRef->GetAbilitySystemComponent();
+	USoulAbilitySystemComponent *LocalComp = Cast<USoulAbilitySystemComponent>(PlayerRef->GetAbilitySystemComponent());
 
 	if (!LocalComp) return 0;
 	else
@@ -76,7 +105,7 @@ bool UActionSysManager::bIsUsingMelee() const
 
 bool UActionSysManager::bIsUsingAbility() const
 {
-	USoulAbilitySystemComponent *LocalComp = PlayerRef->GetAbilitySystemComponent();
+	USoulAbilitySystemComponent *LocalComp = Cast<USoulAbilitySystemComponent>(PlayerRef->GetAbilitySystemComponent());
 	
 	if (!LocalComp) return 0;
 	else

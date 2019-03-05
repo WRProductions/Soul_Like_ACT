@@ -83,13 +83,24 @@ void ASoul_Like_ACTCharacter::BeginPlay()
 	TargetLockingComponent->InitComponent(TargetLockArrow);
 }
 
+void ASoul_Like_ACTCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (AbilitySystemComponent)
+	{
+		if (HasAuthority() && TempGA)
+			TempGAHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(TempGA.GetDefaultObject(), GetCharacterLevel(), INDEX_NONE, this));
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	}
+}
+
 void ASoul_Like_ACTCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 	//Movement
 	MakeMove();
-
 }
 
 void ASoul_Like_ACTCharacter::DoMeleeAttack()
@@ -139,6 +150,7 @@ AWeaponActor * ASoul_Like_ACTCharacter::EquipGear(TSubclassOf<AWeaponActor> Weap
 
 	AWeaponActor *LocalWeapon = Cast<AWeaponActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), WeaponClassRef, FTransform::Identity, ESpawnActorCollisionHandlingMethod::AlwaysSpawn, this));
 	LocalWeapon->Instigator = this;
+	LocalWeapon->SetOwner(this);
 	LocalWeapon->bEnableDrawTraceLine = bShowTracelines;
 	InventoryManager->EquipGear(LocalWeapon);
 
