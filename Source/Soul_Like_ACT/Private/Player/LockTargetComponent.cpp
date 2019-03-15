@@ -4,7 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Interfaces/Targetable.h"
 #include "DrawDebugHelpers.h"
-#include "Player/Soul_Like_ACTCharacter.h"
+#include "SoulCharacterBase.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/ArrowComponent.h"
 #include "Player/ActionSysManager.h"
@@ -69,6 +69,14 @@ void ULockTargetComponent::InitComponent(class UArrowComponent *ArrowComponentRe
 	PlayerArrow->SetVisibility(0);
 }
 
+
+bool ULockTargetComponent::SetForceFacingOffset(bool Inp)
+{
+	if (bIsTargetingEnabled)
+		bForcedFacingOffset = Inp;
+	
+	return Inp;
+}
 
 void ULockTargetComponent::FindTarget(ETargetFindingDirection Direction /*= ETargetFindingDirection::Centre*/)
 {
@@ -348,11 +356,21 @@ void ULockTargetComponent::Tick_UpdateRotation()
 		PlayerArrow->SetWorldRotation(FRotator{ 0.f, SlerpedRotation.Yaw, 0.f });
 	}
 
-	if (!Cast<ASoul_Like_ACTCharacter>(PlayerRef)->GetActionSysManager()->bBlockMovement)
+	//Set Capsule Component rotation to face the target
+	FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(PlayerRef->GetActorLocation(),
+		SelectedActor->GetActorLocation());
+
+	if (!bFreeCamera)
 	{
-		//Set Capsule Component rotation to face the target
-		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(PlayerRef->GetActorLocation(),
-			SelectedActor->GetActorLocation());
+		FRotator LookedAtCameraRotation = FMath::RInterpConstantTo(PlayerRef->GetControlRotation(),
+			LookAtRotation + FRotator{ -30.f, 0.f, 0.f }, GetWorld()->GetDeltaSeconds(), 300.f);
+
+		PlayerRef->GetInstigator()->GetController()->SetControlRotation(LookedAtCameraRotation);
+	}
+
+	//TODO need a precise condition
+	if (!PlayerRef->GetMesh()->GetAnimInstance()->IsAnyMontagePlaying() || bIsTargetingEnabled)
+	{
 		FRotator PlayerCapRotation = PlayerRef->GetCapsuleComponent()->GetComponentRotation();
 
 		PlayerRef->GetCapsuleComponent()->SetWorldRotation(FMath::RInterpConstantTo(
@@ -360,15 +378,6 @@ void ULockTargetComponent::Tick_UpdateRotation()
 			FRotator{ PlayerCapRotation.Pitch, LookAtRotation.Yaw, PlayerCapRotation.Roll },
 			GetWorld()->GetDeltaSeconds(),
 			800.f));
-
-		//Set Camera rotation
-		if (!bFreeCamera)
-		{
-			FRotator LookedAtCameraRotation = FMath::RInterpConstantTo(PlayerRef->GetControlRotation(),
-				LookAtRotation, GetWorld()->GetDeltaSeconds(), 300.f);
-
-			PlayerRef->GetInstigator()->GetController()->SetControlRotation(LookedAtCameraRotation);
-		}
 	}
 }
 

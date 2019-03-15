@@ -44,10 +44,7 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void UnPossessed() override;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = AnimGA)
-	TSubclassOf<UGameplayAbility> TempGA;
 
-	struct FGameplayAbilitySpecHandle TempGAHandle;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -59,11 +56,11 @@ protected:
 		class UActorFXManager *FXManager;
 
 	/** The component used to handle ability system interactions */
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 		class USoulAbilitySystemComponent *AbilitySystemComponent;
 
 	/** List of attributes modified by the ability system */
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 		USoulAttributeSet* AttributeSet;
 
 	/** If true we have initialized our abilities */
@@ -190,6 +187,12 @@ protected:
 	virtual void HandleManaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 	virtual void HandleMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 	friend USoulAttributeSet;
+
+public:
+	
+	UFUNCTION(BlueprintCallable)
+		static void TagContainerToString(const FGameplayTagContainer &Container, FString &Outp)
+	{
+		Outp = Container.ToString();
+	}
 };
-
-

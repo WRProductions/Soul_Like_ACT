@@ -89,8 +89,15 @@ void ASoul_Like_ACTCharacter::PossessedBy(AController* NewController)
 
 	if (AbilitySystemComponent)
 	{
-		if (HasAuthority() && TempGA)
-			TempGAHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(TempGA.GetDefaultObject(), GetCharacterLevel(), INDEX_NONE, this));
+		if (HasAuthority() && AbilityArray.Num() > 0)
+		{
+			for (auto TempAbility : AbilityArray)
+			{
+				if(TempAbility)
+					AbilitySystemComponent->GiveAbility(TempAbility);
+			}
+
+		}
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	}
 }
@@ -98,14 +105,16 @@ void ASoul_Like_ACTCharacter::PossessedBy(AController* NewController)
 void ASoul_Like_ACTCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	//Movement
-	MakeMove();
 }
 
 void ASoul_Like_ACTCharacter::DoMeleeAttack()
 {
 	ActionSysManager->DoMeleeAttack();
+}
+
+void ASoul_Like_ACTCharacter::DoDodge()
+{
+	ActionSysManager->DoDodge();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -115,16 +124,6 @@ void ASoul_Like_ACTCharacter::SetupPlayerInputComponent(class UInputComponent* P
 {
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &ASoul_Like_ACTCharacter::DoMeleeAttack);
-//	PlayerInputComponent->BindAction("LMB", IE_Released, this, &ASoul_Like_ACTCharacter::UseLMB_Released);
-// 	PlayerInputComponent->BindAction("RMB", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseRMB_Pressed);
-// 	PlayerInputComponent->BindAction("RMB", IE_Released, this, &ASoul_Like_ACTCharacter::UseRMB_Released);
-// 	PlayerInputComponent->BindAction("Space", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseDodge);
-
-	PlayerInputComponent->BindAxis("MoveForward", this, &ASoul_Like_ACTCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ASoul_Like_ACTCharacter::MoveRight);
 
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("Turn", this, &ASoul_Like_ACTCharacter::CalculateLeanValue);
@@ -210,6 +209,19 @@ void ASoul_Like_ACTCharacter::CalculateLeanValue(float TurnValue)
 	LeanAmount_Anim = FMath::FInterpTo(LeanAmount_Anim, LeanAmount_Char, GetWorld()->GetDeltaSeconds(), LeanSpeed_Char);
 }
 
+FVector ASoul_Like_ACTCharacter::PredictMovement()
+{
+	const FRotator Rotation = Controller->GetControlRotation();
+
+	const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+	const FVector Direction =
+		(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X) * ForwardAxisValue
+			+ FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y) * RightAxisValue).GetSafeNormal();
+
+	return Direction;
+}
+
 void ASoul_Like_ACTCharacter::MoveForward(float Value)
 {
 	//Axis Value for AnimManager
@@ -226,13 +238,7 @@ void ASoul_Like_ACTCharacter::MakeMove()
 {
 	if (Controller)
 	{
-		const FRotator Rotation = Controller->GetControlRotation();
-
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		const FVector Direction =
-			(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X) * ForwardAxisValue
-				+ FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y) * RightAxisValue).GetSafeNormal();
+		FVector Direction = PredictMovement();
 
 		if (TargetLockingComponent->GetIsTargetingEnabled())
 			AddMovementInput(Direction, BattleMovementScale);

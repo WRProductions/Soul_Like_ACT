@@ -26,4 +26,6 @@ public:
 
 	/** Version of function in AbilitySystemGlobals that returns correct type */
 	static USoulAbilitySystemComponent* GetAbilitySystemComponentFromActor(const AActor* Actor, bool LookForComponent = false);
+
+
 };

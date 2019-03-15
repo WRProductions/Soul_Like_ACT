@@ -40,6 +40,10 @@ protected:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = AnimGA)
+		TArray<TSubclassOf<UGameplayAbility>> AbilityArray;
+
+
 public:
 
 	static const float BattleMovementScale;
@@ -67,11 +71,18 @@ public:
 
 protected:
 	//Tick------------------------------
+
+	UFUNCTION(BlueprintCallable)
 	void MoveForward(float Value);
+	UFUNCTION(BlueprintCallable)
 	void MoveRight(float Value);
+	UFUNCTION(BlueprintCallable)
 	void MakeMove();
 
+	UFUNCTION(BlueprintCallable)
 	void DoMeleeAttack();
+	UFUNCTION(BlueprintCallable)
+	void DoDodge();
 
 	void TurnAtRate(float Rate);
 
@@ -81,8 +92,11 @@ protected:
 
 	void UseDodge();
 
+	UFUNCTION(BlueprintCallable)
 	void CalculateLeanValue(float TurnValue);
 	//----------------------------------
+
+	FVector PredictMovement();
 
 protected:
 	// APawn interface
@@ -107,6 +121,14 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = Outp))
 		virtual void Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp) override;
 
+	//Use this to remove tag like Ability.Melee
+	//So we can force to use Evade while attacking
+	UFUNCTION(BlueprintCallable)
+	void RemoveGameplayTag_DANGER(const FGameplayTag& GameplayTag)
+	{
+		AbilitySystemComponent->SetTagMapCount(GameplayTag, 0);
+	}
+	
 	friend UActionSysManager;
 };
 
