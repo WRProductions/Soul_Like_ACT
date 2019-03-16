@@ -22,11 +22,8 @@ class SOUL_LIKE_ACT_API ULockTargetComponent : public UActorComponent
 protected:
 	FTimerHandle TargetBlockingHandler;
 
-	class AActor *SelectedActor;
-
-	bool bIsTargetingEnabled;
-
 	bool bFreeCamera;
+	bool bForcedFacingOffset;
 
 	bool bOwnerControllerRotationYaw = 0
 		, bOwnerOrientRotToMovement = 1
@@ -40,6 +37,10 @@ protected:
 public:	
 	// Sets default values for this component's properties
 	ULockTargetComponent();
+
+	class AActor *SelectedActor;
+
+	bool bIsTargetingEnabled;
 
 protected:
 	// Called when the game starts
@@ -82,4 +83,8 @@ public:
 	void InitComponent(class UArrowComponent *ArrowComponentRef);
 
 	bool GetIsTargetingEnabled() { return bIsTargetingEnabled; }
+
+	UFUNCTION(BlueprintCallable)
+	bool SetForceFacingOffset(bool Inp);
+
 };

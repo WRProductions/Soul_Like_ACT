@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TargetableActor.h"
+#include "SoulCharacterBase.h"
 #include "Soul_Like_ACTCharacter.generated.h"
 
 
 UCLASS(config=Game)
-class ASoul_Like_ACTCharacter : public ATargetableActor
+class ASoul_Like_ACTCharacter : public ASoulCharacterBase
 {
 	GENERATED_BODY()
 
@@ -21,7 +21,7 @@ class ASoul_Like_ACTCharacter : public ATargetableActor
 	class UCameraComponent* FollowCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UAnimManager* AnimManager;
+	class UActionSysManager* ActionSysManager;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
 	class UArrowComponent* TargetLockArrow;
@@ -38,6 +38,7 @@ class ASoul_Like_ACTCharacter : public ATargetableActor
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void PossessedBy(AController* NewController) override;
 public:
 
 	static const float BattleMovementScale;
@@ -65,30 +66,32 @@ public:
 
 protected:
 	//Tick------------------------------
+
+	UFUNCTION(BlueprintCallable)
 	void MoveForward(float Value);
+	UFUNCTION(BlueprintCallable)
 	void MoveRight(float Value);
+	UFUNCTION(BlueprintCallable)
 	void MakeMove();
+
+	UFUNCTION(BlueprintCallable)
+	void DoMeleeAttack();
+	UFUNCTION(BlueprintCallable)
+	void DoDodge();
 
 	void TurnAtRate(float Rate);
 
 	void LookUpAtRate(float Rate);
 
-	float LMB_Timer;
-	FTimerHandle Handle_LMB_ReleaseDelay;
-	void UseLMB_Pressed();
-	void UseLMB_Released();
-	void CastLightAttack();
-	
-
-	void UseRMB_Pressed();
-	void UseRMB_Released ();
-
 	void ZoomCamera(float Rate);
 
 	void UseDodge();
 
+	UFUNCTION(BlueprintCallable)
 	void CalculateLeanValue(float TurnValue);
 	//----------------------------------
+
+	FVector PredictMovement();
 
 protected:
 	// APawn interface
@@ -101,13 +104,10 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-	FORCEINLINE class UAnimManager* GetAnimManager() const { return AnimManager; }
+	FORCEINLINE class UActionSysManager* GetActionSysManager() const { return ActionSysManager; }
 
 	UFUNCTION(BlueprintCallable)
 		void ResetRotation();
-
-	UFUNCTION(BlueprintCallable)
-		void SetActionState(const EInputState InpActionType);
 
 	UFUNCTION(BlueprintCallable)
 		AWeaponActor *EquipGear(TSubclassOf<AWeaponActor> WeaponClassRef, bool bShowTracelines);
@@ -115,5 +115,15 @@ public:
 	//Warning: Link this to AnyDamage node in BP
 	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = Outp))
 		virtual void Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp) override;
+
+	//Use this to remove tag like Ability.Melee
+	//So we can force to use Evade while attacking
+	UFUNCTION(BlueprintCallable)
+	void RemoveGameplayTag_DANGER(const FGameplayTag& GameplayTag)
+	{
+		AbilitySystemComponent->SetTagMapCount(GameplayTag, 0);
+	}
+	
+	friend UActionSysManager;
 };
 

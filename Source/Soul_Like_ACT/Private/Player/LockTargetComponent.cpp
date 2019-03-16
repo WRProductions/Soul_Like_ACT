@@ -4,10 +4,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "Interfaces/Targetable.h"
 #include "DrawDebugHelpers.h"
-#include "Player/Soul_Like_ACTCharacter.h"
-#include "Player/AnimManager.h"
+#include "SoulCharacterBase.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/ArrowComponent.h"
+#include "Player/ActionSysManager.h"
 #include "TimerManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -69,6 +69,14 @@ void ULockTargetComponent::InitComponent(class UArrowComponent *ArrowComponentRe
 	PlayerArrow->SetVisibility(0);
 }
 
+
+bool ULockTargetComponent::SetForceFacingOffset(bool Inp)
+{
+	if (bIsTargetingEnabled)
+		bForcedFacingOffset = Inp;
+	
+	return Inp;
+}
 
 void ULockTargetComponent::FindTarget(ETargetFindingDirection Direction /*= ETargetFindingDirection::Centre*/)
 {
@@ -209,7 +217,7 @@ void ULockTargetComponent::Find_InDirection(TArray<AActor *> &LocalPotentialTarg
 
 		if (TempClosestTarget)
 		{
-			Cast<ATargetableActor>(ClosestTarget)->ToggleLockIcon(false);
+			Cast<ASoulCharacterBase>(ClosestTarget)->ToggleLockIcon(false);
 			ClosestTarget = TempClosestTarget;
 			//UE_LOG(LogTemp, Warning, TEXT("Target Position on Screen: %s, Screen Centre Vec: %s"), *TargetScreenPosition.ToString(), *ScreenCentre.ToString());
 		}
@@ -344,18 +352,25 @@ void ULockTargetComponent::Tick_UpdateRotation()
 	//Set Arrow Rotation
 	if (PlayerArrow)
 	{
-		FRotator SlerpedRotation = FMath::RInterpConstantTo(PlayerArrow->GetComponentRotation()
-			, GetOwner()->GetInstigatorController()->GetControlRotation()
-			, GetWorld()->GetDeltaSeconds()
-			, 250.f);
+		FRotator SlerpedRotation = GetOwner()->GetInstigatorController()->GetControlRotation();
 		PlayerArrow->SetWorldRotation(FRotator{ 0.f, SlerpedRotation.Yaw, 0.f });
 	}
 
-	if (Cast<ASoul_Like_ACTCharacter>(PlayerRef)->GetAnimManager()->GetCanMove())
+	//Set Capsule Component rotation to face the target
+	FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(PlayerRef->GetActorLocation(),
+		SelectedActor->GetActorLocation());
+
+	if (!bFreeCamera)
 	{
-		//Set Capsule Component rotation to face the target
-		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(PlayerRef->GetActorLocation(),
-			SelectedActor->GetActorLocation());
+		FRotator LookedAtCameraRotation = FMath::RInterpConstantTo(PlayerRef->GetControlRotation(),
+			LookAtRotation + FRotator{ -30.f, 0.f, 0.f }, GetWorld()->GetDeltaSeconds(), 300.f);
+
+		PlayerRef->GetInstigator()->GetController()->SetControlRotation(LookedAtCameraRotation);
+	}
+
+	//TODO need a precise condition
+	if (!PlayerRef->GetMesh()->GetAnimInstance()->IsAnyMontagePlaying() || bIsTargetingEnabled)
+	{
 		FRotator PlayerCapRotation = PlayerRef->GetCapsuleComponent()->GetComponentRotation();
 
 		PlayerRef->GetCapsuleComponent()->SetWorldRotation(FMath::RInterpConstantTo(
@@ -363,15 +378,6 @@ void ULockTargetComponent::Tick_UpdateRotation()
 			FRotator{ PlayerCapRotation.Pitch, LookAtRotation.Yaw, PlayerCapRotation.Roll },
 			GetWorld()->GetDeltaSeconds(),
 			800.f));
-
-		//Set Camera rotation
-		if (!bFreeCamera)
-		{
-			FRotator LookedAtCameraRotation = FMath::RInterpConstantTo(PlayerRef->GetControlRotation(),
-				LookAtRotation, GetWorld()->GetDeltaSeconds(), 300.f);
-
-			PlayerRef->GetInstigator()->GetController()->SetControlRotation(LookedAtCameraRotation);
-		}
 	}
 }
 

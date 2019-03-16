@@ -8,10 +8,8 @@
 #include "Item/WeaponActor.h"
 #include "UObject/ConstructorHelpers.h"
 #include "ActorFXManager.h"
-#include "StatusComponent.h"
 #include "Components/WidgetComponent.h"
-#include "Types/DamageType_MeleeHit.h"
-#include "Types/DamageType_ParryRefelction.h"
+#include "Types/DamageTypes.h"
 
 // Sets default values
 AMobBasic::AMobBasic()
@@ -35,8 +33,6 @@ AMobBasic::AMobBasic()
 void AMobBasic::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	StatusComponent->OnActorHealthChanged.AddDynamic(this, &AMobBasic::OnDeath);
 }
 
 
@@ -119,13 +115,10 @@ void AMobBasic::Exec_TryGetHit(float Damage, class UDamageType const* UDamageTyp
 
 	if (UDamageType->GetClass() == UDamageType_MeleeHit::StaticClass())
 	{
-		if (Damage >= StatusComponent->MaxHealth * 0.35f)
+		if (Damage >= 100000.f)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Vulnerable"));
 			Outp = EOnHitRefelction::Vulnerable;
-
-			if(Weapon)
-				Weapon->EndSwing();
 
 			FXManager->PlayEffects(HitInfo, EFXType::VE_OnHit);
 

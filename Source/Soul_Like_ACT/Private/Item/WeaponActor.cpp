@@ -3,8 +3,8 @@
 #include "Item/WeaponActor.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Types/DamageType_MeleeHit.h"
-#include "TargetableActor.h"
+#include "Types/DamageTypes.h"
+#include "SoulCharacterBase.h"
 #include "DrawDebugHelpers.h"
 
 
@@ -26,7 +26,7 @@ void AWeaponActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OwnerRef = Cast<ATargetableActor>(GetInstigator());
+	OwnerRef = Cast<ASoulCharacterBase>(GetInstigator());
 	check(OwnerRef);
 
 	check(GearInfo);
@@ -60,28 +60,19 @@ void AWeaponActor::DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawT
 
 		for (const auto &Hit : Hits)
 		{
-			ATargetableActor * TargetPawn = Cast<ATargetableActor>(Hit.GetActor());
+			ASoulCharacterBase * TargetPawn = Cast<ASoulCharacterBase>(Hit.GetActor());
 			if (TargetPawn
-				&& ATargetableActor::IsInRivalFaction(OwnerRef, TargetPawn) 
-				&& TryExcludeActor(Hit.GetActor()))
+				&& ASoulCharacterBase::IsInRivalFaction(OwnerRef, TargetPawn) 
+				&& TryExcludeActor(TargetPawn))
 			{
-				UGameplayStatics::ApplyPointDamage(Hit.GetActor(), GearInfo->DamageMultiplier, -(Hit.Normal), Hit, GetInstigatorController(), GetInstigator(), UDamageType_MeleeHit::StaticClass());
+				ApplyGAOnHit(TargetPawn);
 
-				OwnerRef->TriggerSlowMotion_WithDelay(0.f);
+				TriggerSlowMotion(Hit);
 
-				if (GearInfo->OnHitFX)
-				{
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), GearInfo->OnHitFX, Hit.ImpactPoint, FRotator::ZeroRotator, 1);;
-				}
+				SpawnVFX(Hit);
+				SpawnSFX(Hit);
 
-				if (GearInfo->BladeCollisionFX)
-				{
-					/*
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BladeCollisionFX, Hit.ImpactPoint, FRotator::ZeroRotator, 1);;
-					OwnerRef->OnHit_SlowMotion();
-					TargetPawn->OnHit_SlowMotion();
-					*/				
-				}
+				ApplySpecialEffect(Hit);
 			}
 		}
 	}
@@ -89,6 +80,10 @@ void AWeaponActor::DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawT
 			DrawDebugLine(GetWorld(), prevVec_, currVec_, FColor::Red, 0, 2.f, 0, 1.f);
 }
 
+/*
+* Exclude the actor which takes the impact
+* Return true if the Actor has not been impacted
+*/
 bool AWeaponActor::TryExcludeActor(AActor * HitActor)
 {
 	if (MyTargets.Contains(HitActor))
@@ -130,4 +125,3 @@ void AWeaponActor::Tick(float DeltaTime)
 	if(bIsTracingCollision)
 		CheckCollision();
 }
-

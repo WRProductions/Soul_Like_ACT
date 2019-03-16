@@ -15,7 +15,7 @@ enum class EFXType : uint8
 };
 
 
-class ATargetableActor;
+class ASoulCharacterBase;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SOUL_LIKE_ACT_API UActorFXManager : public UActorComponent

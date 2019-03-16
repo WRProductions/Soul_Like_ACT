@@ -1,7 +1,7 @@
 // Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
 
 #include "Player/Soul_Like_ACTCharacter.h"
-#include "Player/AnimManager.h"
+#include "Player/ActionSysManager.h"
 #include "Camera/CameraComponent.h"
 #include "Item/WeaponActor.h"
 #include "Components/CapsuleComponent.h"
@@ -12,13 +12,10 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "Player/LockTargetComponent.h"
 #include "Player/InventoryManager.h"
-#include "Player/AnimDABuffer.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "GameFramework/Controller.h"
-#include "Types/DamageType_MeleeHit.h"
-#include "Types/DamageType_ParryRefelction.h"
-#include "StatusComponent.h"
+#include "Types/DamageTypes.h"
 #include "GameFramework/SpringArmComponent.h"
 
 const float ASoul_Like_ACTCharacter::BattleMovementScale{ 1.f };
@@ -67,7 +64,8 @@ ASoul_Like_ACTCharacter::ASoul_Like_ACTCharacter()
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 
-	AnimManager = CreateDefaultSubobject<UAnimManager>(TEXT("AnimManager"));
+	ActionSysManager = CreateDefaultSubobject<UActionSysManager>(TEXT("ActionSysManager"));
+	ActionSysManager->PlayerRef = this;
 
 	TargetLockingComponent = CreateDefaultSubobject<ULockTargetComponent>(TEXT("TargetLockingComponent"));
 
@@ -85,13 +83,25 @@ void ASoul_Like_ACTCharacter::BeginPlay()
 	TargetLockingComponent->InitComponent(TargetLockArrow);
 }
 
+
+void ASoul_Like_ACTCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+}
+
 void ASoul_Like_ACTCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
 
-	//Movement
-	MakeMove();
+void ASoul_Like_ACTCharacter::DoMeleeAttack()
+{
+	ActionSysManager->DoMeleeAttack();
+}
 
+void ASoul_Like_ACTCharacter::DoDodge()
+{
+	ActionSysManager->DoDodge();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -101,16 +111,6 @@ void ASoul_Like_ACTCharacter::SetupPlayerInputComponent(class UInputComponent* P
 {
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseLMB_Pressed);
-	PlayerInputComponent->BindAction("LMB", IE_Released, this, &ASoul_Like_ACTCharacter::UseLMB_Released);
-// 	PlayerInputComponent->BindAction("RMB", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseRMB_Pressed);
-// 	PlayerInputComponent->BindAction("RMB", IE_Released, this, &ASoul_Like_ACTCharacter::UseRMB_Released);
-// 	PlayerInputComponent->BindAction("Space", IE_Pressed, this, &ASoul_Like_ACTCharacter::UseDodge);
-
-	PlayerInputComponent->BindAxis("MoveForward", this, &ASoul_Like_ACTCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ASoul_Like_ACTCharacter::MoveRight);
 
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("Turn", this, &ASoul_Like_ACTCharacter::CalculateLeanValue);
@@ -129,11 +129,6 @@ void ASoul_Like_ACTCharacter::ResetRotation()
 }
 
 
-void ASoul_Like_ACTCharacter::SetActionState(const EInputState InpActionType)
-{
-	AnimManager->InputState = InpActionType;
-}
-
 AWeaponActor * ASoul_Like_ACTCharacter::EquipGear(TSubclassOf<AWeaponActor> WeaponClassRef, bool bShowTracelines)
 {
 	//UnEquip and delete the item
@@ -141,6 +136,7 @@ AWeaponActor * ASoul_Like_ACTCharacter::EquipGear(TSubclassOf<AWeaponActor> Weap
 
 	AWeaponActor *LocalWeapon = Cast<AWeaponActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), WeaponClassRef, FTransform::Identity, ESpawnActorCollisionHandlingMethod::AlwaysSpawn, this));
 	LocalWeapon->Instigator = this;
+	LocalWeapon->SetOwner(this);
 	LocalWeapon->bEnableDrawTraceLine = bShowTracelines;
 	InventoryManager->EquipGear(LocalWeapon);
 
@@ -151,43 +147,14 @@ void ASoul_Like_ACTCharacter::Exec_TryGetHit(float Damage, class UDamageType con
 {
 	if (UDamageType->GetClass() == UDamageType_MeleeHit::StaticClass())
 	{
-		if (Damage >= StatusComponent->MaxHealth)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Vulnerable"));
-			Outp = EOnHitRefelction::Vulnerable;
-
-			return;
-		}
-		else if (AnimManager->InputState == EInputState::Parry)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Parry"));
-			Outp = EOnHitRefelction::Parry;
-			return;
-		}
-		else if (AnimManager->InputState == EInputState::Block)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Blocking"));
-			Outp = EOnHitRefelction::Block;
-			return;
-		}
-		else if (AnimManager->InputState == EInputState::Dodge)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Dodging"));
-			Outp = EOnHitRefelction::Immune;
-			return;
-		}
-	}
-	else if (UDamageType->GetClass() == UDamageType_ParryRefelction::StaticClass())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Vulnerable"));
+		Outp = EOnHitRefelction::Parry;
+		return;
+		Outp = EOnHitRefelction::Block;
+		Outp = EOnHitRefelction::Immune;
 		Outp = EOnHitRefelction::Vulnerable;
-
+		Outp = EOnHitRefelction::OnHit;
 		return;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("OnHit"));
-	Outp = EOnHitRefelction::OnHit;
-
-	return;
 }
 
 void ASoul_Like_ACTCharacter::TurnAtRate(float Rate)
@@ -202,44 +169,6 @@ void ASoul_Like_ACTCharacter::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
-void ASoul_Like_ACTCharacter::UseLMB_Pressed()
-{
-	bIsLeftMouseButtonPressed = 1;
-	
-	if (InventoryManager->CurrentWeapon)
-	{
-		FString DebugMessage;
-		AnimManager->TryUseDequeMotion(EInputState::Attack_Pre, 0, DebugMessage);
-		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, DebugMessage);
-	}
-}
-
-
-/*
-	Make light attack only
-*/
-void ASoul_Like_ACTCharacter::UseLMB_Released()
-{
-	if (!bIsLeftMouseButtonPressed)
-		return;
-
-	AnimManager->TryTriggerAttack();
-}
-
-
-void ASoul_Like_ACTCharacter::UseRMB_Pressed()
-{
-	FString DebugMessage;
-	AnimManager->TryUseDequeMotion(EInputState::Block, 0, DebugMessage);
-}
-
-
-void ASoul_Like_ACTCharacter::UseRMB_Released()
-{
-	FString DebugMessage;
-	AnimManager->PlayParryMontage_Released();
-}
-
 void ASoul_Like_ACTCharacter::ZoomCamera(float Rate)
 {
 	float &ArmLength = CameraBoom->TargetArmLength;
@@ -249,7 +178,6 @@ void ASoul_Like_ACTCharacter::ZoomCamera(float Rate)
 void ASoul_Like_ACTCharacter::UseDodge()
 {
 	FString DebugMessage;
-	AnimManager->TryUseDequeMotion(EInputState::Dodge, 0, DebugMessage);
 }
 
 void ASoul_Like_ACTCharacter::CalculateLeanValue(float TurnValue)
@@ -268,6 +196,19 @@ void ASoul_Like_ACTCharacter::CalculateLeanValue(float TurnValue)
 	LeanAmount_Anim = FMath::FInterpTo(LeanAmount_Anim, LeanAmount_Char, GetWorld()->GetDeltaSeconds(), LeanSpeed_Char);
 }
 
+FVector ASoul_Like_ACTCharacter::PredictMovement()
+{
+	const FRotator Rotation = Controller->GetControlRotation();
+
+	const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+	const FVector Direction =
+		(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X) * ForwardAxisValue
+			+ FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y) * RightAxisValue).GetSafeNormal();
+
+	return Direction;
+}
+
 void ASoul_Like_ACTCharacter::MoveForward(float Value)
 {
 	//Axis Value for AnimManager
@@ -284,13 +225,7 @@ void ASoul_Like_ACTCharacter::MakeMove()
 {
 	if (Controller)
 	{
-		const FRotator Rotation = Controller->GetControlRotation();
-
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		const FVector Direction =
-			(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X) * ForwardAxisValue
-				+ FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y) * RightAxisValue).GetSafeNormal();
+		FVector Direction = PredictMovement();
 
 		if (TargetLockingComponent->GetIsTargetingEnabled())
 			AddMovementInput(Direction, BattleMovementScale);

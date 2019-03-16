@@ -7,6 +7,8 @@
 #include "Types/DA_Gear.h"
 #include "WeaponActor.generated.h"
 
+class ASoulCharacterBase;
+
 UCLASS()
 class SOUL_LIKE_ACT_API AWeaponActor : public AActor
 {
@@ -15,7 +17,7 @@ class SOUL_LIKE_ACT_API AWeaponActor : public AActor
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = 1))
 	class USkeletalMeshComponent *MeshComp;
 
-	class ATargetableActor *OwnerRef;
+	ASoulCharacterBase *OwnerRef;
 
 public:	
 	// Sets default values for this actor's properties
@@ -33,14 +35,10 @@ protected:
 
 	bool bIsTracingCollision;
 
-	FTimerHandle SwingHandle, TracingHandle;
-
-
-
 	TArray<FVector>PrevVecs;
 	TArray<FVector>CurrVecs;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	TArray<AActor*> MyTargets;
 
 public:	
@@ -65,4 +63,18 @@ public:
 		void EndSwing();
 
 	bool GetIsSwinging() const { return bIsTracingCollision; }
+
+	//When OnHit
+	//Send HitInformation back to GA
+	UFUNCTION(BlueprintImplementableEvent)
+	bool ApplyGAOnHit(ASoulCharacterBase *Target);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SpawnSFX(const FHitResult &HitResult);
+	UFUNCTION(BlueprintImplementableEvent)
+	void SpawnVFX(const FHitResult &HitResult);
+	UFUNCTION(BlueprintImplementableEvent)
+	void TriggerSlowMotion(const FHitResult &HitResult);
+	UFUNCTION(BlueprintImplementableEvent)
+	void ApplySpecialEffect(const FHitResult &HitResult);
 };
