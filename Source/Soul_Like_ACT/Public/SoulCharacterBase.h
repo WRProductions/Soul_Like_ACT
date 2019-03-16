@@ -60,12 +60,20 @@ protected:
 		class USoulAbilitySystemComponent *AbilitySystemComponent;
 
 	/** List of attributes modified by the ability system */
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY()
 		USoulAttributeSet* AttributeSet;
 
 	/** If true we have initialized our abilities */
 	UPROPERTY()
 		bool bAbilitiesInitialized;
+
+	/** Temp Gameplay Abilities */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = AnimGA)
+		TArray<TSubclassOf<UGameplayAbility>> AbilityArray;
+
+	/** Passive gameplay effects applied on creation */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Abilities)
+		TArray<TSubclassOf<UGameplayEffect>> PassiveGameplayEffects;
 
 	FTimerHandle Handle_SlowMotion, Handler_SlowMotionDelay;
 

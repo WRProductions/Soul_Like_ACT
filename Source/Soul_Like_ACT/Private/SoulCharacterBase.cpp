@@ -18,7 +18,6 @@ ASoulCharacterBase::ASoulCharacterBase()
 	// Create the attribute set, this replicates by default
 	AttributeSet = CreateDefaultSubobject<USoulAttributeSet>(TEXT("AttributeSet"));
 
-	bAbilitiesInitialized = false;
 
 	FXManager = CreateDefaultSubobject<UActorFXManager>(TEXT("FXManager"));
 
@@ -57,6 +56,38 @@ void ASoulCharacterBase::TriggerSlowMotion_WithDelay(float Delay)
 void ASoulCharacterBase::Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp)
 {
 	return;
+}
+
+void ASoulCharacterBase::AddStartupGameplayAbilities()
+{
+	check(AbilitySystemComponent);
+
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+	if (Role == ROLE_Authority)
+	{
+		for (auto TempAbility : AbilityArray)
+		{
+			if (TempAbility)
+				AbilitySystemComponent->GiveAbility(TempAbility);
+		}
+
+		// Now apply passives
+		for (TSubclassOf<UGameplayEffect>& GameplayEffect : PassiveGameplayEffects)
+		{
+			FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+			EffectContext.AddSourceObject(this);
+
+			FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, GetCharacterLevel(), EffectContext);
+			if (NewHandle.IsValid())
+			{
+				FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
+			}
+		}
+
+	}
+
+	bAbilitiesInitialized = true;
 }
 
 void ASoulCharacterBase::HandleDamage(float DamageAmount, const FHitResult & HitInfo, const FGameplayTagContainer & DamageTags, ASoulCharacterBase * InstigatorCharacter, AActor * DamageCauser)
@@ -110,6 +141,8 @@ const bool ASoulCharacterBase::IsInRivalFaction(ASoulCharacterBase *DamageDealer
 void ASoulCharacterBase::PossessedBy(AController * NewController)
 {
 	Super::PossessedBy(NewController);
+
+	AddStartupGameplayAbilities();
 }
 
 void ASoulCharacterBase::UnPossessed()

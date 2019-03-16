@@ -27,5 +27,6 @@ public:
 	/** Version of function in AbilitySystemGlobals that returns correct type */
 	static USoulAbilitySystemComponent* GetAbilitySystemComponentFromActor(const AActor* Actor, bool LookForComponent = false);
 
-
+	UFUNCTION(BlueprintCallable)
+	static void ApplyGE_ToSelf(const AActor* Actor, const TSubclassOf<UGameplayEffect> GameplayEffect, const int32 CharLevel=1);
 };

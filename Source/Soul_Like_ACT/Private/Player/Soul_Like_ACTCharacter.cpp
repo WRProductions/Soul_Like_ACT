@@ -83,23 +83,10 @@ void ASoul_Like_ACTCharacter::BeginPlay()
 	TargetLockingComponent->InitComponent(TargetLockArrow);
 }
 
+
 void ASoul_Like_ACTCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-
-	if (AbilitySystemComponent)
-	{
-		if (HasAuthority() && AbilityArray.Num() > 0)
-		{
-			for (auto TempAbility : AbilityArray)
-			{
-				if(TempAbility)
-					AbilitySystemComponent->GiveAbility(TempAbility);
-			}
-
-		}
-		AbilitySystemComponent->InitAbilityActorInfo(this, this);
-	}
 }
 
 void ASoul_Like_ACTCharacter::Tick(float DeltaTime)

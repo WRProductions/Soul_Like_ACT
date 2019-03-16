@@ -39,11 +39,6 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void PossessedBy(AController* NewController) override;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = AnimGA)
-		TArray<TSubclassOf<UGameplayAbility>> AbilityArray;
-
-
 public:
 
 	static const float BattleMovementScale;

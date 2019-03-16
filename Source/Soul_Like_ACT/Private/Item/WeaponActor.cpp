@@ -67,10 +67,12 @@ void AWeaponActor::DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawT
 			{
 				ApplyGAOnHit(TargetPawn);
 
-				TriggerSlowMotion();
+				TriggerSlowMotion(Hit);
 
 				SpawnVFX(Hit);
 				SpawnSFX(Hit);
+
+				ApplySpecialEffect(Hit);
 			}
 		}
 	}

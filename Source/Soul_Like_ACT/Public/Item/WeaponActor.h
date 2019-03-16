@@ -74,5 +74,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SpawnVFX(const FHitResult &HitResult);
 	UFUNCTION(BlueprintImplementableEvent)
-	void TriggerSlowMotion();
+	void TriggerSlowMotion(const FHitResult &HitResult);
+	UFUNCTION(BlueprintImplementableEvent)
+	void ApplySpecialEffect(const FHitResult &HitResult);
 };
