@@ -37,25 +37,34 @@ public:
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, MaxHealth)
 
-	/** Current Mana, used to execute special abilities. Capped by MaxMana */
-	UPROPERTY(BlueprintReadOnly, Category = "Mana")
-	FGameplayAttributeData Mana;
-	ATTRIBUTE_ACCESSORS(USoulAttributeSet, Mana)
-
-	/** MaxMana is its own attribute, since GameplayEffects may modify it */
-	UPROPERTY(BlueprintReadOnly, Category = "Mana")
-	FGameplayAttributeData MaxMana;
-	ATTRIBUTE_ACCESSORS(USoulAttributeSet, MaxMana)
+	/** Current Health, when 0 we expect owner to die. Capped by MaxHealth */
+	UPROPERTY(BlueprintReadOnly, Category = "Stamina")
+	FGameplayAttributeData Stamina;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, Stamina)
+		
+	UPROPERTY(BlueprintReadOnly, Category = "Stamina")
+	FGameplayAttributeData MaxStamina;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, MaxStamina)
 
 	/** AttackPower of the attacker is multiplied by the base Damage to reduce health, so 1.0 means no bonus */
 	UPROPERTY(BlueprintReadOnly, Category = "Damage")
 	FGameplayAttributeData AttackPower;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, AttackPower)
 
+	/** AttackPower of the attacker is multiplied by the base Damage to reduce health, so 1.0 means no bonus */
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+	FGameplayAttributeData Leech;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, Leech)
+
 	/** Base Damage is divided by DefensePower to get actual damage done, so 1.0 means no bonus */
 	UPROPERTY(BlueprintReadOnly, Category = "Damage")
 	FGameplayAttributeData DefensePower;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, DefensePower)
+
+	/** Base Damage is divided by DefensePower to get actual damage done, so 1.0 means no bonus */
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+	FGameplayAttributeData Tenacity;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, Tenacity)
 
 	/** MoveSpeed affects how fast characters can move */
 	UPROPERTY(BlueprintReadOnly, Category = "MoveSpeed")
@@ -63,9 +72,10 @@ public:
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, MoveSpeed)
 
 	/** Damage is a 'temporary' attribute used by the DamageExecution to calculate final damage, which then turns into -Health */
-	UPROPERTY(BlueprintReadOnly, Category = "Mana", meta = (HideFromLevelInfos))
+	UPROPERTY(BlueprintReadOnly, Category = "Output", meta = (HideFromLevelInfos))
 	FGameplayAttributeData Damage;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, Damage)
+
 
 protected:
 	/** Helper function to proportionally adjust the value of an attribute when it's associated max attribute changes. (i.e. When MaxHealth increases, Health increases by an amount that maintains the same percentage as before) */

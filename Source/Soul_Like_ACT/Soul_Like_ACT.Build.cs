@@ -18,6 +18,6 @@ public class Soul_Like_ACT : ModuleRules
             "GameplayTags",
             "GameplayTasks",
             "UMG",
-            "NavigationSystem" });
-    }
+            "NavigationSystem"});
+	}
 }

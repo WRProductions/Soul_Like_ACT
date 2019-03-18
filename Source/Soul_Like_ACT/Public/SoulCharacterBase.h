@@ -120,23 +120,30 @@ public:
 	//Warning: Link this to AnyPointDamage node in BP
 	virtual void Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp);
 
-	/** Returns current health, will be 0 if dead */
 	UFUNCTION(BlueprintCallable)
 		virtual float GetHealth() const { return AttributeSet->GetHealth(); }
 
-	/** Returns maximum health, health will never be greater than this */
 	UFUNCTION(BlueprintCallable)
 		virtual float GetMaxHealth() const { return AttributeSet->GetMaxHealth(); }
 
-	/** Returns current mana */
 	UFUNCTION(BlueprintCallable)
-		virtual float GetMana() const { return AttributeSet->GetMana(); }
+		virtual float GetStamina() const { return AttributeSet->GetMaxHealth(); }
 
-	/** Returns maximum mana, mana will never be greater than this */
 	UFUNCTION(BlueprintCallable)
-		virtual float GetMaxMana() const { return AttributeSet->GetMaxMana(); }
+		virtual float GetMaxStamina() const { return AttributeSet->GetMaxHealth(); }
 
-	/** Returns current movement speed */
+	UFUNCTION(BlueprintCallable)
+		virtual float GetLeech() const { return AttributeSet->GetMaxHealth(); }
+
+	UFUNCTION(BlueprintCallable)
+		virtual float GetDefensePower() const { return AttributeSet->GetDefensePower(); }
+	
+	UFUNCTION(BlueprintCallable)
+		virtual float GetAttackPower() const { return AttributeSet->GetAttackPower(); }
+
+	UFUNCTION(BlueprintCallable)
+		virtual float GetTenacity() const { return AttributeSet->GetTenacity(); }
+
 	UFUNCTION(BlueprintCallable)
 		virtual float GetMoveSpeed() const { return AttributeSet->GetMoveSpeed(); }
 
@@ -146,7 +153,7 @@ public:
 
 
 protected:
-	/** Apply the startup gameplay abilities and effects */
+	/** Apply the startup GAs and GEs */
 	void AddStartupGameplayAbilities();
 
 	/**
@@ -161,39 +168,41 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnDamaged(float DamageAmount, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 
-	/**
-	 * Called when health is changed, either from healing or from being damaged
-	 * For damage this is called in addition to OnDamaged/OnKilled
-	 *
-	 * @param DeltaValue Change in health value, positive for heal, negative for cost. If 0 the delta is unknown
-	 * @param EventTags The gameplay tags of the event that changed mana
-	 */
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
-	/**
-	 * Called when mana is changed, either from healing or from being used as a cost
-	 *
-	 * @param DeltaValue Change in mana value, positive for heal, negative for cost. If 0 the delta is unknown
-	 * @param EventTags The gameplay tags of the event that changed mana
-	 */
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnManaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
-	/**
-	 * Called when movement speed is changed
-	 *
-	 * @param DeltaValue Change in move speed
-	 * @param EventTags The gameplay tags of the event that changed mana
-	 */
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnStaminaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnLeechChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnTenacityChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnDefensePowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnAttackPowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
 	// Called from RPGAttributeSet, these call BP events above
 	virtual void HandleDamage(float DamageAmount, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 	virtual void HandleHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 	virtual void HandleManaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 	virtual void HandleMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	virtual void HandleStaminaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	virtual void HandleLeechChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	virtual void HandleTenacityChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	virtual void HandleDefensePowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	virtual void HandleAttackPowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
 	friend USoulAttributeSet;
 
 public:

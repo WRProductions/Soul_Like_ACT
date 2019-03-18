@@ -7,6 +7,7 @@
 #include "Types/DA_ComboMontage.h"
 #include "Abilities/SoulAbilitySystemComponent.h"
 #include "TimerManager.h"
+#include "SoulGameplayAbility.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -32,15 +33,28 @@ bool UActionSysManager::DoMeleeAttack()
  	if (bIsUsingMelee())
  		return TryEnableJumpSection();
 	
-	return PlayerRef->AbilitySystemComponent->TryActivateAbilitiesByTag(
-		FGameplayTagContainer{ FGameplayTag::RequestGameplayTag(FName{"Ability.Melee"}, true) },
-		true);
+	else
+		return PlayerRef->AbilitySystemComponent->TryActivateAbilitiesByTag(
+			FGameplayTagContainer{ FGameplayTag::RequestGameplayTag(FName{"Ability.Melee"}, true) },
+			true);
 }
 
 bool UActionSysManager::DoDodge()
 {
 	if (!bCanUseAnyGA())
+	{
+		TArray<USoulGameplayAbility*> tempGAs;
+		PlayerRef->AbilitySystemComponent->GetActiveAbilitiesWithTags(
+			FGameplayTagContainer{ FGameplayTag::RequestGameplayTag(FName{"Ability.Skill"}, true) },
+			tempGAs);
+
+		for (USoulGameplayAbility * localGA : tempGAs)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Current GA: %s"), *localGA->GetName());
+		}
+		
 		return 0;
+	}
 
 	return PlayerRef->AbilitySystemComponent->TryActivateAbilitiesByTag(
 		FGameplayTagContainer{ FGameplayTag::RequestGameplayTag(FName{"Ability.Skill.Evade"}, true) },
@@ -68,6 +82,7 @@ bool UActionSysManager::JumpSectionForCombo()
 
 	UAnimInstance *AnimInstance = PlayerRef->GetMesh()->GetAnimInstance();
 	UAnimMontage *CurrentMontage = AnimInstance->GetCurrentActiveMontage();
+	//FName CurrentSection = AnimInstance->Montage_GetCurrentSection(CurrentMontage);
 	
 	if (!JumpMontage || JumpMontage == CurrentMontage)
 	{
@@ -148,12 +163,13 @@ bool UActionSysManager::bIsUsingMelee() const
 	USoulAbilitySystemComponent *LocalComp = Cast<USoulAbilitySystemComponent>(PlayerRef->GetAbilitySystemComponent());
 
 	if (!LocalComp) return 0;
+
 	else
 	{
 		TArray<class USoulGameplayAbility*> LocalAbilities;
 
 		LocalComp->GetActiveAbilitiesWithTags(
-			FGameplayTagContainer{FGameplayTag::RequestGameplayTag(FName{"Ability.Melee"}, true)},
+			FGameplayTagContainer{ FGameplayTag::RequestGameplayTag(FName{"Ability.Melee"}, true) },
 			LocalAbilities);
 
 		return LocalAbilities.Num() > 0;
@@ -162,13 +178,12 @@ bool UActionSysManager::bIsUsingMelee() const
 
 bool UActionSysManager::bIsUsingAbility() const
 {
-	USoulAbilitySystemComponent *localComp = Cast<USoulAbilitySystemComponent>(PlayerRef->GetAbilitySystemComponent());
+	UAbilitySystemComponent *localComp = PlayerRef->GetAbilitySystemComponent();
 	
 	if (!localComp) return 0;
 
 	return (localComp->HasMatchingGameplayTag(
-		FGameplayTag::RequestGameplayTag(FName{ "Ability.Skill" }, true)
-	));
+		FGameplayTag::RequestGameplayTag(FName{ "Ability.Skill" }, true)));
 }
 
 bool UActionSysManager::bCanUseAnyGA() const

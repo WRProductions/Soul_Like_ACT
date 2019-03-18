@@ -9,10 +9,12 @@
 USoulAttributeSet::USoulAttributeSet()
 	: Health(1.f)
 	, MaxHealth(1.f)
-	, Mana(0.f)
-	, MaxMana(0.f)
+	, Stamina(1.f)
+	, MaxStamina(1.f)
 	, AttackPower(1.0f)
+	, Leech(0.0f)
 	, DefensePower(1.0f)
+	, Tenacity(0.0f)
 	, MoveSpeed(1.0f)
 	, Damage(0.0f)
 {
@@ -45,10 +47,10 @@ void USoulAttributeSet::PreAttributeChange(const FGameplayAttribute & Attribute,
 	{
 		AdjustAttributeForMaxChange(Health, MaxHealth, NewValue, GetHealthAttribute());
 	}
-	else if (Attribute == GetMaxManaAttribute())
-	{
-		AdjustAttributeForMaxChange(Mana, MaxMana, NewValue, GetManaAttribute());
-	}
+// 	else if (Attribute == GetMaxStaminaAttribute())
+// 	{
+// 		AdjustAttributeForMaxChange(Stamina, MaxStamina, NewValue, GetStaminaAttribute());
+// 	}
 }
 
 
@@ -153,23 +155,46 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			TargetCharacter->HandleHealthChanged(DeltaValue, SourceTags);
 		}
 	}
-	else if (Data.EvaluatedData.Attribute == GetManaAttribute())
+	else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
 	{
-		// Clamp mana
-		SetMana(FMath::Clamp(GetMana(), 0.0f, GetMaxMana()));
+		SetStamina(FMath::Clamp(GetStamina(), 0.0f, GetMaxStamina()));
 
 		if (TargetCharacter)
-		{
-			// Call for all mana changes
-			TargetCharacter->HandleManaChanged(DeltaValue, SourceTags);
-		}
+			TargetCharacter->HandleStaminaChanged(DeltaValue, SourceTags);
+	}
+	else if (Data.EvaluatedData.Attribute == GetLeechAttribute())
+	{
+		SetLeech(FMath::Clamp(GetLeech (), 0.0f, 100.0f));
+
+		if (TargetCharacter)
+			TargetCharacter->HandleLeechChanged(DeltaValue, SourceTags);
 	}
 	else if (Data.EvaluatedData.Attribute == GetMoveSpeedAttribute())
 	{
+		SetMoveSpeed(FMath::Clamp(GetMoveSpeed(), 0.0f, 2000.0f));
 		if (TargetCharacter)
 		{
 			// Call for all movespeed changes
 			TargetCharacter->HandleMoveSpeedChanged(DeltaValue, SourceTags);
 		}
+	}
+	else if (Data.EvaluatedData.Attribute == GetTenacityAttribute())
+	{
+		SetTenacity(FMath::Clamp(GetTenacity(), 0.0f, 9999.0f));
+
+		if (TargetCharacter)
+			TargetCharacter->HandleTenacityChanged(DeltaValue, SourceTags);
+	}
+	else if (Data.EvaluatedData.Attribute == GetAttackPowerAttribute())
+	{
+		SetAttackPower(FMath::Clamp(GetAttackPower(), 0.0f, 9999.0f));
+		if (TargetCharacter)
+			TargetCharacter->HandleAttackPowerChanged(DeltaValue, SourceTags);
+	}
+	else if (Data.EvaluatedData.Attribute == GetDefensePowerAttribute())
+	{
+		SetDefensePower(FMath::Clamp(GetDefensePower(), 0.0f, 9999.0f));
+		if (TargetCharacter)
+			TargetCharacter->HandleDefensePowerChanged(DeltaValue, SourceTags);
 	}
 }
