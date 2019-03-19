@@ -14,7 +14,7 @@
 // Sets default values for this component's properties
 UActionSysManager::UActionSysManager()
 {
-	PrimaryComponentTick.bCanEverTick = 0;
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 
@@ -25,6 +25,23 @@ void UActionSysManager::BeginPlay()
 	check(PlayerRef);
 }
 
+void UActionSysManager::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (bIsLeftButtonPressed){
+		if (ChargingPoints <= MaxPressedDuration)
+		{
+			ChargingPoints += DeltaTime;
+		}
+		else
+		{
+			//Try Trigger the attack automatically when pressed duration is longer than 1 second
+			OnLeftButtonRelease();
+		}
+	}
+}
+
 bool UActionSysManager::DoMeleeAttack()
 {
 	if (!bCanUseAnyGA())
@@ -33,10 +50,25 @@ bool UActionSysManager::DoMeleeAttack()
  	if (bIsUsingMelee())
  		return TryEnableJumpSection();
 	
-	else
-		return PlayerRef->AbilitySystemComponent->TryActivateAbilitiesByTag(
-			FGameplayTagContainer{ FGameplayTag::RequestGameplayTag(FName{"Ability.Melee"}, true) },
-			true);
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Normal Attack");
+	
+	return PlayerRef->AbilitySystemComponent->TryActivateAbilitiesByTag(
+		FGameplayTagContainer{ FGameplayTag::RequestGameplayTag(FName{"Ability.Melee.Normal"}, true) },
+		true);
+}
+
+bool UActionSysManager::DoSpecialMeleeAttack()
+{
+	if (!bCanUseAnyGA())
+		return 0;
+
+	if (bIsUsingMelee())
+		return TryEnableJumpSection();
+
+	return PlayerRef->AbilitySystemComponent->TryActivateAbilitiesByTag(
+		FGameplayTagContainer{ FGameplayTag::RequestGameplayTag(FName{"Ability.Melee.ParryBreak"}, true) },
+		true);
+
 }
 
 bool UActionSysManager::DoDodge()
@@ -191,4 +223,32 @@ bool UActionSysManager::bCanUseAnyGA() const
 	return (PlayerRef->GetHealth() > 0.f &&
 		!UGameplayStatics::IsGamePaused(GetWorld()) &&
 		!bIsUsingAbility());
+}
+
+void UActionSysManager::OnLeftButtonPressed()
+{
+	bIsLeftButtonPressed = true;
+}
+
+void UActionSysManager::OnLeftButtonRelease()
+{
+	const float localChargingPoints = ChargingPoints;
+	
+	//Reset charging status
+	bIsLeftButtonPressed = false;
+	ChargingPoints = 0.f;
+
+	if (localChargingPoints <= MaxChargingPoints)
+	{
+		DoMeleeAttack();
+	}
+	else
+	{
+		DoSpecialMeleeAttack();
+	}
+}
+
+void UActionSysManager::OnSpaceBarPressed()
+{
+	DoDodge();
 }

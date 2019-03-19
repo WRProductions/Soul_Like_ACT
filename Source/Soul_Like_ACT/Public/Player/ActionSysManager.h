@@ -25,6 +25,8 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
+
 	bool ActivateAbilitiesWithWeapon(bool bAllowRemoteActivation) const;
 
 	void GetActiveAbilitiesWithTags(struct FGameplayTagContainer AbilityTags, TArray<USoulGameplayAbility*>& ActiveAbilities);
@@ -34,13 +36,44 @@ protected:
 	FName JumpSectionName;
 	UAnimMontage *JumpMontage;
 
+	/**
+	 * For Input only
+	 */
+	bool bIsLeftButtonPressed;
+	float ChargingPoints;
+	const float MaxChargingPoints = .6f;
+	const float MaxPressedDuration = 1.f;
+
 public:
-	bool bBlockMovement;
 	bool bIsUsingMelee() const;
 	bool bIsUsingAbility() const;
 	bool bCanUseAnyGA() const;
 
+	/**
+	 * When pressed, charging starts
+	 */
+	UFUNCTION(BlueprintCallable)
+	void OnLeftButtonPressed();
+	
+	/**
+	 * When released, check charging points
+	 * if charging points < 0.6, trigger normal melee attack
+	 * else, trigger charge attack
+	 */
+	UFUNCTION(BlueprintCallable)
+	void OnLeftButtonRelease();
+
+	/**
+	 * Dodge when SpaceBar pressed
+	 */
+	UFUNCTION(BlueprintCallable)
+	void OnSpaceBarPressed();
+
+	/**
+	 * GA Trigger
+	 */
 	bool DoMeleeAttack();
+	bool DoSpecialMeleeAttack();
 	bool DoDodge();
 
 	UFUNCTION(BlueprintCallable)
