@@ -74,18 +74,11 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void MakeMove();
 
-	UFUNCTION(BlueprintCallable)
-	void DoMeleeAttack();
-	UFUNCTION(BlueprintCallable)
-	void DoDodge();
-
 	void TurnAtRate(float Rate);
 
 	void LookUpAtRate(float Rate);
 
 	void ZoomCamera(float Rate);
-
-	void UseDodge();
 
 	UFUNCTION(BlueprintCallable)
 	void CalculateLeanValue(float TurnValue);

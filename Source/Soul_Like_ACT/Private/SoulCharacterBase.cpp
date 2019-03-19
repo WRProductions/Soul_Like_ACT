@@ -84,7 +84,6 @@ void ASoulCharacterBase::AddStartupGameplayAbilities()
 				FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
 			}
 		}
-
 	}
 
 	bAbilitiesInitialized = true;
@@ -119,6 +118,40 @@ void ASoulCharacterBase::HandleMoveSpeedChanged(float DeltaValue, const FGamepla
 	{
 		OnMoveSpeedChanged(DeltaValue, EventTags);
 	}
+}
+
+void ASoulCharacterBase::HandleStaminaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+{
+	if (bAbilitiesInitialized)
+	{
+		OnStaminaChanged(DeltaValue, EventTags);
+	}
+}
+
+void ASoulCharacterBase::HandleLeechChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+{
+	if (bAbilitiesInitialized)
+	{
+		OnLeechChanged(DeltaValue, EventTags);
+	}
+}
+
+void ASoulCharacterBase::HandleTenacityChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+{
+	if (bAbilitiesInitialized)
+		OnTenacityChanged(DeltaValue, EventTags);
+}
+
+void ASoulCharacterBase::HandleDefensePowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+{
+	if (bAbilitiesInitialized)
+		OnDefensePowerChanged(DeltaValue, EventTags);
+}
+
+void ASoulCharacterBase::HandleAttackPowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+{
+	if (bAbilitiesInitialized)
+		OnAttackPowerChanged(DeltaValue, EventTags);
 }
 
 UAbilitySystemComponent* ASoulCharacterBase::GetAbilitySystemComponent() const

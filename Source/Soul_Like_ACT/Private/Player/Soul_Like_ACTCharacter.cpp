@@ -94,15 +94,6 @@ void ASoul_Like_ACTCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ASoul_Like_ACTCharacter::DoMeleeAttack()
-{
-	ActionSysManager->DoMeleeAttack();
-}
-
-void ASoul_Like_ACTCharacter::DoDodge()
-{
-	ActionSysManager->DoDodge();
-}
 
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -173,11 +164,6 @@ void ASoul_Like_ACTCharacter::ZoomCamera(float Rate)
 {
 	float &ArmLength = CameraBoom->TargetArmLength;
 	ArmLength += Rate * -100.f;
-}
-
-void ASoul_Like_ACTCharacter::UseDodge()
-{
-	FString DebugMessage;
 }
 
 void ASoul_Like_ACTCharacter::CalculateLeanValue(float TurnValue)
