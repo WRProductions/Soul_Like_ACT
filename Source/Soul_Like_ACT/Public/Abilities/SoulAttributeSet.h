@@ -4,7 +4,6 @@
 
 #include "EngineMinimal.h"
 #include "Engine/Engine.h"
-
 #include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
 #include "SoulAttributeSet.generated.h"
@@ -50,6 +49,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Damage")
 	FGameplayAttributeData AttackPower;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, AttackPower)
+
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+	FGameplayAttributeData AttackSpeed;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, AttackSpeed)
 
 	/** AttackPower of the attacker is multiplied by the base Damage to reduce health, so 1.0 means no bonus */
 	UPROPERTY(BlueprintReadOnly, Category = "Damage")

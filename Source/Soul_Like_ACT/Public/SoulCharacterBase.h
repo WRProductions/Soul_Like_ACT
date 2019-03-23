@@ -192,6 +192,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnAttackPowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnAttackSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
 	// Called from RPGAttributeSet, these call BP events above
 	virtual void HandleDamage(float DamageAmount, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 	virtual void HandleHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
@@ -202,6 +205,7 @@ protected:
 	virtual void HandleTenacityChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 	virtual void HandleDefensePowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 	virtual void HandleAttackPowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	virtual void HandleAttackSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
 	friend USoulAttributeSet;
 

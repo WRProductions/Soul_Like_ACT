@@ -154,6 +154,12 @@ void ASoulCharacterBase::HandleAttackPowerChanged(float DeltaValue, const struct
 		OnAttackPowerChanged(DeltaValue, EventTags);
 }
 
+void ASoulCharacterBase::HandleAttackSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+{
+	if (bAbilitiesInitialized)
+		OnAttackSpeedChanged(DeltaValue, EventTags);
+}
+
 UAbilitySystemComponent* ASoulCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;

@@ -41,8 +41,8 @@ protected:
 	 */
 	bool bIsLeftButtonPressed;
 	float ChargingPoints;
-	const float MaxChargingPoints = .6f;
-	const float MaxPressedDuration = 1.f;
+	const float MaxChargingPoints = .35f;
+	const float MaxPressedDuration = .5f;
 
 public:
 	bool bIsUsingMelee() const;

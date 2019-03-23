@@ -11,11 +11,12 @@ USoulAttributeSet::USoulAttributeSet()
 	, MaxHealth(1.f)
 	, Stamina(1.f)
 	, MaxStamina(1.f)
-	, AttackPower(1.0f)
+	, AttackPower(0.0f)
+	, AttackSpeed(0.0f)
 	, Leech(0.0f)
-	, DefensePower(1.0f)
+	, DefensePower(0.0f)
 	, Tenacity(0.0f)
-	, MoveSpeed(1.0f)
+	, MoveSpeed(400.0f)
 	, Damage(0.0f)
 {
 }
@@ -168,6 +169,13 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 
 		if (TargetCharacter)
 			TargetCharacter->HandleLeechChanged(DeltaValue, SourceTags);
+	}
+	else if (Data.EvaluatedData.Attribute == GetAttackSpeedAttribute())
+	{
+		SetLeech(FMath::Clamp(GetAttackSpeed(), 0.0f, 999.0f));
+
+		if (TargetCharacter)
+			TargetCharacter->HandleAttackSpeedChanged(DeltaValue, SourceTags);
 	}
 	else if (Data.EvaluatedData.Attribute == GetMoveSpeedAttribute())
 	{
