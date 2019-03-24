@@ -5,6 +5,7 @@
 #include "Abilities/SoulAttributeSet.h"
 #include "Abilities/SoulAbilitySystemComponent.h"
 
+
 void UAttributeSlot::SetAttributeType()
 {
 	if (MyAttribute == USoulAttributeSet::GetHealthAttribute())
@@ -32,12 +33,15 @@ void UAttributeSlot::SetAttributeType()
 		AttributeType->SetText(FText::FromString("Attack Speed:"));
 }
 
-void UAttributeSlot::OnAttributeChanged(TArray<float> values)
+void UAttributeSlot::OnAttributeChanged(const TArray<float> & values)
 {
 	if (MyAttribute == USoulAttributeSet::GetHealthAttribute()
 		|| MyAttribute == USoulAttributeSet::GetStaminaAttribute())
 	{
-		FText localText = FText::Format(FText::FromString("%i/%i"), (int32)values[0], (int32)values[1]);
+		FFormatOrderedArguments Args;
+		Args.Add((int32)values[0]);
+		Args.Add((int32)values[1]);
+		FText localText = FText::Format(NSLOCTEXT("OnAttributeChanging", "ChangingKey", "{0}/{1}"), Args);
 		AttributeValue->SetText(localText);
 	}
 	else if (MyAttribute == USoulAttributeSet::GetLeechAttribute()
@@ -50,3 +54,4 @@ void UAttributeSlot::OnAttributeChanged(TArray<float> values)
 		AttributeValue->SetText(FText::FromString(FString::FromInt((int32)values[0])));
 	}
 }
+

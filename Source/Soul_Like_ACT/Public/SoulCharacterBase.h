@@ -10,16 +10,14 @@
 #include "Interfaces/Targetable.h"
 #include "SoulCharacterBase.generated.h"
 
-
 #define ATTRIBUTE_GETTER(PropertyName) \
-	UFUNCTION(BlueprintCallable) \
 	virtual float Get##PropertyName() const \
 	{ \
 		return AttributeSet->Get##PropertyName(); \
 	}
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChanged, TArray<float>, values);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChanged, const TArray<float> &, values);
 
 //Exec only
 UENUM(BlueprintType)

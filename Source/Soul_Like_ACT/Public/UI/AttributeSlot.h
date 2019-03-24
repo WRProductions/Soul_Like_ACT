@@ -23,7 +23,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 		UTextBlock *AttributeValue = nullptr;
 
-public:
 	/** The Attribute we modify or the GE we modify modifies. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default, meta = (ExposeOnSpawn = true), meta = (FilterMetaTag = "HideFromModifiers"))
 	FGameplayAttribute MyAttribute;
@@ -32,5 +31,5 @@ public:
 	void SetAttributeType();
 
 	UFUNCTION(BlueprintCallable)
-	void OnAttributeChanged(TArray<float> values);
+	void OnAttributeChanged(const TArray<float> & values);
 };
