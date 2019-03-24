@@ -6,7 +6,6 @@
 #include "SoulCharacterBase.h"
 #include "Soul_Like_ACTCharacter.generated.h"
 
-
 UCLASS(config=Game)
 class ASoul_Like_ACTCharacter : public ASoulCharacterBase
 {

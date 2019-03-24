@@ -7,65 +7,46 @@
 
 void UAttributeSlot::SetAttributeType()
 {
-	if (MyAttribute == AttributeSetRef->GetHealthAttribute())
+	if (MyAttribute == USoulAttributeSet::GetHealthAttribute())
 		AttributeType->SetText(FText::FromString("Health:"));
 
-	else if (MyAttribute == AttributeSetRef->GetStaminaAttribute())
+	else if (MyAttribute == USoulAttributeSet::GetStaminaAttribute())
 		AttributeType->SetText(FText::FromString("Stamina:"));
 	
-	else if (MyAttribute == AttributeSetRef->GetLeechAttribute())
+	else if (MyAttribute == USoulAttributeSet::GetLeechAttribute())
 		AttributeType->SetText(FText::FromString("Leech:"));
 
-	else if (MyAttribute == AttributeSetRef->GetMoveSpeedAttribute())
+	else if (MyAttribute == USoulAttributeSet::GetMoveSpeedAttribute())
 		AttributeType->SetText(FText::FromString("Move Speed:"));
 
-	else if (MyAttribute == AttributeSetRef->GetTenacityAttribute())
+	else if (MyAttribute == USoulAttributeSet::GetTenacityAttribute())
 		AttributeType->SetText(FText::FromString("Tenacity:"));
 
-	else if (MyAttribute == AttributeSetRef->GetAttackPowerAttribute())
+	else if (MyAttribute == USoulAttributeSet::GetAttackPowerAttribute())
 		AttributeType->SetText(FText::FromString("Attack Power:"));
 
-	else if (MyAttribute == AttributeSetRef->GetDefensePowerAttribute())
+	else if (MyAttribute == USoulAttributeSet::GetDefensePowerAttribute())
 		AttributeType->SetText(FText::FromString("Defense:"));
 
-	else if (MyAttribute == AttributeSetRef->GetAttackSpeedAttribute())
+	else if (MyAttribute == USoulAttributeSet::GetAttackSpeedAttribute())
 		AttributeType->SetText(FText::FromString("Attack Speed:"));
 }
 
-void UAttributeSlot::OnAttributeChanged()
+void UAttributeSlot::OnAttributeChanged(TArray<float> values)
 {
-	if (MyAttribute == AttributeSetRef->GetHealthAttribute())
+	if (MyAttribute == USoulAttributeSet::GetHealthAttribute()
+		|| MyAttribute == USoulAttributeSet::GetStaminaAttribute())
 	{
-		FText localText = FText::Format(FText::FromString("%i/%i"), (int32)AttributeSetRef->GetHealth(), (int32)AttributeSetRef->GetMaxHealth());
+		FText localText = FText::Format(FText::FromString("%i/%i"), (int32)values[0], (int32)values[1]);
 		AttributeValue->SetText(localText);
 	}
-	else if (MyAttribute == AttributeSetRef->GetStaminaAttribute())
+	else if (MyAttribute == USoulAttributeSet::GetLeechAttribute()
+		|| MyAttribute == USoulAttributeSet::GetMoveSpeedAttribute()
+		|| MyAttribute == USoulAttributeSet::GetTenacityAttribute()
+		|| MyAttribute == USoulAttributeSet::GetAttackPowerAttribute()
+		|| MyAttribute == USoulAttributeSet::GetAttackSpeedAttribute()
+		|| MyAttribute == USoulAttributeSet::GetDefensePowerAttribute())
 	{
-		FText localText = FText::Format(FText::FromString("%i/%i"), (int32)AttributeSetRef->GetStamina(), (int32)AttributeSetRef->GetMaxStamina());
-		AttributeValue->SetText(localText);
-	}
-	else if (MyAttribute == AttributeSetRef->GetLeechAttribute())
-	{
-		AttributeValue->SetText(FText::FromString(FString::FromInt((int)AttributeSetRef->GetLeech())));
-	}
-	else if (MyAttribute == AttributeSetRef->GetMoveSpeedAttribute())
-	{
-		AttributeValue->SetText(FText::FromString(FString::FromInt((int)AttributeSetRef->GetMoveSpeed())));
-	}
-	else if (MyAttribute == AttributeSetRef->GetTenacityAttribute())
-	{
-		AttributeValue->SetText(FText::FromString(FString::FromInt((int)AttributeSetRef->GetTenacity())));
-	}
-	else if (MyAttribute == AttributeSetRef->GetAttackPowerAttribute())
-	{
-		AttributeValue->SetText(FText::FromString(FString::FromInt((int)AttributeSetRef->GetAttackPower())));
-	}
-	else if (MyAttribute == AttributeSetRef->GetAttackSpeedAttribute())
-	{
-		AttributeValue->SetText(FText::FromString(FString::FromInt((int)AttributeSetRef->GetAttackSpeed())));
-	}
-	else if (MyAttribute == AttributeSetRef->GetDefensePowerAttribute())
-	{
-		AttributeValue->SetText(FText::FromString(FString::FromInt((int)AttributeSetRef->GetDefensePower())));
+		AttributeValue->SetText(FText::FromString(FString::FromInt((int32)values[0])));
 	}
 }

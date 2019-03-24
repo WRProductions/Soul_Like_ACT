@@ -36,44 +36,16 @@ protected:
 	FName JumpSectionName;
 	UAnimMontage *JumpMontage;
 
-	/**
-	 * For Input only
-	 */
-	bool bIsLeftButtonPressed;
-	float ChargingPoints;
-	const float MaxChargingPoints = .35f;
-	const float MaxPressedDuration = .5f;
-
 public:
 	bool bIsUsingMelee() const;
 	bool bIsUsingAbility() const;
 	bool bCanUseAnyGA() const;
 
-	/**
-	 * When pressed, charging starts
-	 */
 	UFUNCTION(BlueprintCallable)
-	void OnLeftButtonPressed();
-	
-	/**
-	 * When released, check charging points
-	 * if charging points < 0.6, trigger normal melee attack
-	 * else, trigger charge attack
-	 */
-	UFUNCTION(BlueprintCallable)
-	void OnLeftButtonRelease();
-
-	/**
-	 * Dodge when SpaceBar pressed
-	 */
-	UFUNCTION(BlueprintCallable)
-	void OnSpaceBarPressed();
-
-	/**
-	 * GA Trigger
-	 */
 	bool DoMeleeAttack();
+	UFUNCTION(BlueprintCallable)
 	bool DoSpecialMeleeAttack();
+	UFUNCTION(BlueprintCallable)
 	bool DoDodge();
 
 	UFUNCTION(BlueprintCallable)

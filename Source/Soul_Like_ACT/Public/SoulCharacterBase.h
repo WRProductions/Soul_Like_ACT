@@ -10,7 +10,16 @@
 #include "Interfaces/Targetable.h"
 #include "SoulCharacterBase.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDead);
+
+#define ATTRIBUTE_GETTER(PropertyName) \
+	UFUNCTION(BlueprintCallable) \
+	virtual float Get##PropertyName() const \
+	{ \
+		return AttributeSet->Get##PropertyName(); \
+	}
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChanged, TArray<float>, values);
 
 //Exec only
 UENUM(BlueprintType)
@@ -100,9 +109,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EActorFaction Faction;
 
-	UPROPERTY(BlueprintAssignable)
-	FOnDead OnDead_Delegate;
-
 //Static
 public:
 	static const bool IsInRivalFaction(ASoulCharacterBase *DamageDealer, ASoulCharacterBase *DamageReceiver);
@@ -120,32 +126,16 @@ public:
 	//Warning: Link this to AnyPointDamage node in BP
 	virtual void Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp);
 
-	UFUNCTION(BlueprintCallable)
-		virtual float GetHealth() const { return AttributeSet->GetHealth(); }
-
-	UFUNCTION(BlueprintCallable)
-		virtual float GetMaxHealth() const { return AttributeSet->GetMaxHealth(); }
-
-	UFUNCTION(BlueprintCallable)
-		virtual float GetStamina() const { return AttributeSet->GetMaxHealth(); }
-
-	UFUNCTION(BlueprintCallable)
-		virtual float GetMaxStamina() const { return AttributeSet->GetMaxHealth(); }
-
-	UFUNCTION(BlueprintCallable)
-		virtual float GetLeech() const { return AttributeSet->GetMaxHealth(); }
-
-	UFUNCTION(BlueprintCallable)
-		virtual float GetDefensePower() const { return AttributeSet->GetDefensePower(); }
-	
-	UFUNCTION(BlueprintCallable)
-		virtual float GetAttackPower() const { return AttributeSet->GetAttackPower(); }
-
-	UFUNCTION(BlueprintCallable)
-		virtual float GetTenacity() const { return AttributeSet->GetTenacity(); }
-
-	UFUNCTION(BlueprintCallable)
-		virtual float GetMoveSpeed() const { return AttributeSet->GetMoveSpeed(); }
+	ATTRIBUTE_GETTER(Health)
+	ATTRIBUTE_GETTER(MaxHealth)
+	ATTRIBUTE_GETTER(Stamina)
+	ATTRIBUTE_GETTER(MaxStamina)
+	ATTRIBUTE_GETTER(Leech)
+	ATTRIBUTE_GETTER(DefensePower)
+	ATTRIBUTE_GETTER(AttackPower)
+	ATTRIBUTE_GETTER(Tenacity)
+	ATTRIBUTE_GETTER(MoveSpeed)
+	ATTRIBUTE_GETTER(AttackSpeed)
 
 	/** Returns the character level that is passed to the ability system */
 	UFUNCTION(BlueprintCallable)
@@ -168,37 +158,26 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 		void OnDamaged(float DamageAmount, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnManaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnStaminaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnLeechChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnTenacityChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnDefensePowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnAttackPowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnAttackSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	UPROPERTY(BlueprintAssignable)
+		FOnChanged OnHealthChanged;
+	UPROPERTY(BlueprintAssignable)
+		FOnChanged OnMoveSpeedChanged;
+	UPROPERTY(BlueprintAssignable)
+		FOnChanged OnStaminaChanged;
+	UPROPERTY(BlueprintAssignable)
+		FOnChanged OnLeechChanged;
+	UPROPERTY(BlueprintAssignable)
+		FOnChanged OnTenacityChanged;
+	UPROPERTY(BlueprintAssignable)
+		FOnChanged OnDefensePowerChanged;
+	UPROPERTY(BlueprintAssignable)
+		FOnChanged OnAttackPowerChanged;
+	UPROPERTY(BlueprintAssignable)
+		FOnChanged OnAttackSpeedChanged;
 
 	// Called from RPGAttributeSet, these call BP events above
 	virtual void HandleDamage(float DamageAmount, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 	virtual void HandleHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-	virtual void HandleManaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 	virtual void HandleMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 	virtual void HandleStaminaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 	virtual void HandleLeechChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);

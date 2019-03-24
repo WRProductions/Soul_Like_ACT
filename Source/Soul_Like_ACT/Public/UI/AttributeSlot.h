@@ -28,12 +28,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default, meta = (ExposeOnSpawn = true), meta = (FilterMetaTag = "HideFromModifiers"))
 	FGameplayAttribute MyAttribute;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default, meta = (ExposeOnSpawn = true))
-	class USoulAttributeSet *AttributeSetRef;
-
 	UFUNCTION(BlueprintCallable)
 	void SetAttributeType();
 
 	UFUNCTION(BlueprintCallable)
-	void OnAttributeChanged();
+	void OnAttributeChanged(TArray<float> values);
 };

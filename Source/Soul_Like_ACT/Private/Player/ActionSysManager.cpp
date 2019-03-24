@@ -28,18 +28,6 @@ void UActionSysManager::BeginPlay()
 void UActionSysManager::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (bIsLeftButtonPressed){
-		if (ChargingPoints <= MaxPressedDuration)
-		{
-			ChargingPoints += DeltaTime;
-		}
-		else
-		{
-			//Try Trigger the attack automatically when pressed duration is longer than 1 second
-			OnLeftButtonRelease();
-		}
-	}
 }
 
 bool UActionSysManager::DoMeleeAttack()
@@ -223,32 +211,4 @@ bool UActionSysManager::bCanUseAnyGA() const
 	return (PlayerRef->GetHealth() > 0.f &&
 		!UGameplayStatics::IsGamePaused(GetWorld()) &&
 		!bIsUsingAbility());
-}
-
-void UActionSysManager::OnLeftButtonPressed()
-{
-	bIsLeftButtonPressed = true;
-}
-
-void UActionSysManager::OnLeftButtonRelease()
-{
-	const float localChargingPoints = ChargingPoints;
-	
-	//Reset charging status
-	bIsLeftButtonPressed = false;
-	ChargingPoints = 0.f;
-
-	if (localChargingPoints <= MaxChargingPoints)
-	{
-		DoMeleeAttack();
-	}
-	else
-	{
-		DoSpecialMeleeAttack();
-	}
-}
-
-void UActionSysManager::OnSpaceBarPressed()
-{
-	DoDodge();
 }

@@ -97,17 +97,13 @@ void ASoulCharacterBase::HandleDamage(float DamageAmount, const FHitResult & Hit
 void ASoulCharacterBase::HandleHealthChanged(float DeltaValue, const FGameplayTagContainer & EventTags)
 {
 	if (bAbilitiesInitialized)
-	{
-		OnHealthChanged(DeltaValue, EventTags);
-	}
+		OnHealthChanged.Broadcast(TArray<float>{GetHealth(), GetMaxHealth()});
 }
 
-void ASoulCharacterBase::HandleManaChanged(float DeltaValue, const FGameplayTagContainer & EventTags)
+void ASoulCharacterBase::HandleStaminaChanged(float DeltaValue, const FGameplayTagContainer & EventTags)
 {
 	if (bAbilitiesInitialized)
-	{
-		OnManaChanged(DeltaValue, EventTags);
-	}
+		OnStaminaChanged.Broadcast(TArray<float>{GetStamina(), GetMaxStamina()});
 }
 
 void ASoulCharacterBase::HandleMoveSpeedChanged(float DeltaValue, const FGameplayTagContainer & EventTags)
@@ -115,49 +111,39 @@ void ASoulCharacterBase::HandleMoveSpeedChanged(float DeltaValue, const FGamepla
 	GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed();
 
 	if (bAbilitiesInitialized)
-	{
-		OnMoveSpeedChanged(DeltaValue, EventTags);
-	}
-}
-
-void ASoulCharacterBase::HandleStaminaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
-{
-	if (bAbilitiesInitialized)
-	{
-		OnStaminaChanged(DeltaValue, EventTags);
-	}
+		OnMoveSpeedChanged.Broadcast(TArray<float>{GetMoveSpeed(), -1.f});
 }
 
 void ASoulCharacterBase::HandleLeechChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
 {
 	if (bAbilitiesInitialized)
 	{
-		OnLeechChanged(DeltaValue, EventTags);
+		OnLeechChanged.Broadcast(TArray<float>{GetLeech(), -1.f});
 	}
 }
 
 void ASoulCharacterBase::HandleTenacityChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
 {
 	if (bAbilitiesInitialized)
-		OnTenacityChanged(DeltaValue, EventTags);
+		OnTenacityChanged.Broadcast(TArray<float>{GetTenacity(), -1.f});
 }
 
 void ASoulCharacterBase::HandleDefensePowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
 {
 	if (bAbilitiesInitialized)
-		OnDefensePowerChanged(DeltaValue, EventTags);
+		OnDefensePowerChanged.Broadcast(TArray<float>{GetDefensePower(), -1.f});
 }
 
 void ASoulCharacterBase::HandleAttackPowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
 {
 	if (bAbilitiesInitialized)
-		OnAttackPowerChanged(DeltaValue, EventTags);
+		OnAttackPowerChanged.Broadcast(TArray<float>{GetAttackPower(), -1.f});
 }
 
 void ASoulCharacterBase::HandleAttackSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
 {
 	if (bAbilitiesInitialized)
-		OnAttackSpeedChanged(DeltaValue, EventTags);
+		OnAttackSpeedChanged.Broadcast(TArray<float>{GetAttackSpeed(), -1.f});
 }
 
 UAbilitySystemComponent* ASoulCharacterBase::GetAbilitySystemComponent() const
