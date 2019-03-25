@@ -53,11 +53,6 @@ void ASoulCharacterBase::TriggerSlowMotion_WithDelay(float Delay)
 	}
 }
 
-void ASoulCharacterBase::Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp)
-{
-	return;
-}
-
 void ASoulCharacterBase::AddStartupGameplayAbilities()
 {
 	check(AbilitySystemComponent);
@@ -192,5 +187,4 @@ void ASoulCharacterBase::Tick(float DeltaTime)
 void ASoulCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }

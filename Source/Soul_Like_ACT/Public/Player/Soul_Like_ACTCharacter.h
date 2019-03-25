@@ -98,15 +98,14 @@ public:
 
 	FORCEINLINE class UActionSysManager* GetActionSysManager() const { return ActionSysManager; }
 
+	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = "Outp"))
+	void GetMyPlayerController(class APlayerController *&MyController, EIsControllerValid& Outp);
+
 	UFUNCTION(BlueprintCallable)
-		void ResetRotation();
+	void ResetRotation();
 
 	UFUNCTION(BlueprintCallable)
 		AWeaponActor *EquipGear(TSubclassOf<AWeaponActor> WeaponClassRef, bool bShowTracelines);
-
-	//Warning: Link this to AnyDamage node in BP
-	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = Outp))
-		virtual void Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp) override;
 
 	//Use this to remove tag like Ability.Melee
 	//So we can force to use Evade while attacking

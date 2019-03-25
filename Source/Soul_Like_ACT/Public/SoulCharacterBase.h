@@ -10,25 +10,21 @@
 #include "Interfaces/Targetable.h"
 #include "SoulCharacterBase.generated.h"
 
+UENUM(BlueprintType)
+enum class EIsControllerValid : uint8
+{
+	IsValid,
+	IsNotValid,
+};
+
 #define ATTRIBUTE_GETTER(PropertyName) \
 	virtual float Get##PropertyName() const \
 	{ \
 		return AttributeSet->Get##PropertyName(); \
 	}
 
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChanged, const TArray<float> &, values);
 
-//Exec only
-UENUM(BlueprintType)
-enum class EOnHitRefelction: uint8
-{
-	Immune,
-	Parry,
-	Block,
-	OnHit,
-	Vulnerable,
-};
 
 UENUM(BlueprintType)
 enum class EActorFaction : uint8
@@ -117,12 +113,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void ToggleLockIcon(bool LockOn) override;
 
+	UFUNCTION(BlueprintCallable)
+		virtual bool IsAlive() const { return GetHealth() > 0.f; }
+
 	//Called by WeaponActor and OnHit
 	UFUNCTION(BlueprintCallable)
 	void TriggerSlowMotion_WithDelay(float Delay);
-
-	//Warning: Link this to AnyPointDamage node in BP
-	virtual void Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp);
 
 	ATTRIBUTE_GETTER(Health)
 	ATTRIBUTE_GETTER(MaxHealth)

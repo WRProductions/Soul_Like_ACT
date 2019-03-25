@@ -113,6 +113,21 @@ void ASoul_Like_ACTCharacter::SetupPlayerInputComponent(class UInputComponent* P
 	PlayerInputComponent->BindAxis("Zoom", this, &ASoul_Like_ACTCharacter::ZoomCamera);
 }
 
+void ASoul_Like_ACTCharacter::GetMyPlayerController(class APlayerController *&MyController, EIsControllerValid& Outp)
+{
+	if (!GetController())
+	{
+		Outp = EIsControllerValid::IsNotValid;
+	}
+	else
+	{
+		MyController = Cast<APlayerController>(GetController());
+		if (MyController)
+			Outp = EIsControllerValid::IsValid;
+		else
+			Outp = EIsControllerValid::IsNotValid;
+	}
+}
 
 void ASoul_Like_ACTCharacter::ResetRotation()
 {
@@ -132,20 +147,6 @@ AWeaponActor * ASoul_Like_ACTCharacter::EquipGear(TSubclassOf<AWeaponActor> Weap
 	InventoryManager->EquipGear(LocalWeapon);
 
 	return LocalWeapon;
-}
-
-void ASoul_Like_ACTCharacter::Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp)
-{
-	if (UDamageType->GetClass() == UDamageType_MeleeHit::StaticClass())
-	{
-		Outp = EOnHitRefelction::Parry;
-		return;
-		Outp = EOnHitRefelction::Block;
-		Outp = EOnHitRefelction::Immune;
-		Outp = EOnHitRefelction::Vulnerable;
-		Outp = EOnHitRefelction::OnHit;
-		return;
-	}
 }
 
 void ASoul_Like_ACTCharacter::TurnAtRate(float Rate)
