@@ -10,6 +10,8 @@
 #include "Interfaces/Targetable.h"
 #include "SoulCharacterBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChanged, const TArray<float> &, values);
+
 UENUM(BlueprintType)
 enum class EIsControllerValid : uint8
 {
@@ -18,12 +20,14 @@ enum class EIsControllerValid : uint8
 };
 
 #define ATTRIBUTE_GETTER(PropertyName) \
-	virtual float Get##PropertyName() const \
+	virtual float Get##PropertyName##() const \
 	{ \
-		return AttributeSet->Get##PropertyName(); \
+		return AttributeSet->Get##PropertyName##(); \
 	}
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChanged, const TArray<float> &, values);
+#define ATTRIBUTE_GETTER_AND_HANDLECHANGED(PropertyName) \
+	ATTRIBUTE_GETTER(##PropertyName##) \
+	virtual void Handle##PropertyName##Changed(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
 
 UENUM(BlueprintType)
@@ -120,16 +124,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TriggerSlowMotion_WithDelay(float Delay);
 
-	ATTRIBUTE_GETTER(Health)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(Health)
 	ATTRIBUTE_GETTER(MaxHealth)
-	ATTRIBUTE_GETTER(Stamina)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(Stamina)
 	ATTRIBUTE_GETTER(MaxStamina)
-	ATTRIBUTE_GETTER(Leech)
-	ATTRIBUTE_GETTER(DefensePower)
-	ATTRIBUTE_GETTER(AttackPower)
-	ATTRIBUTE_GETTER(Tenacity)
-	ATTRIBUTE_GETTER(MoveSpeed)
-	ATTRIBUTE_GETTER(AttackSpeed)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(Leech)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(DefensePower)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(AttackPower)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(Tenacity)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(MoveSpeed)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(AttackSpeed)
 
 	/** Returns the character level that is passed to the ability system */
 	UFUNCTION(BlueprintCallable)
@@ -171,15 +175,7 @@ protected:
 
 	// Called from RPGAttributeSet, these call BP events above
 	virtual void HandleDamage(float DamageAmount, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
-	virtual void HandleHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-	virtual void HandleMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-	virtual void HandleStaminaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-	virtual void HandleLeechChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-	virtual void HandleTenacityChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-	virtual void HandleDefensePowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-	virtual void HandleAttackPowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-	virtual void HandleAttackSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
+	
 	friend USoulAttributeSet;
 
 public:
