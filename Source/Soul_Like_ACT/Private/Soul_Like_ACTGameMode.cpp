@@ -9,8 +9,8 @@
 ASoul_Like_ACTGameMode::ASoul_Like_ACTGameMode()
 {
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<ASoul_Like_ACTCharacter> PlayerPawnBPClass(TEXT("/Game/Player/Player_Character_BP"));
-	static ConstructorHelpers::FClassFinder<ASoulPlayerController> PlayerControllerBPClass(TEXT("/Game/Player/SoulPlayerController_BP"));
+	static ConstructorHelpers::FClassFinder<ASoul_Like_ACTCharacter> PlayerPawnBPClass(TEXT("/Game/Blueprints/Player/Player_Character_BP"));
+	static ConstructorHelpers::FClassFinder<ASoulPlayerController> PlayerControllerBPClass(TEXT("/Game/Blueprints/Player/SoulPlayerController_BP"));
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;

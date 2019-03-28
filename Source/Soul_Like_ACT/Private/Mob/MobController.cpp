@@ -36,8 +36,6 @@ void AMobController::BeginPlay()
 	//FActorPerceptionUpdatedDelegate, AActor*, Actor, FAIStimulus, Stimulus
 }
 
-
-
 void AMobController::Possess(APawn* InPawn)
 {
 	Super::Possess(InPawn);

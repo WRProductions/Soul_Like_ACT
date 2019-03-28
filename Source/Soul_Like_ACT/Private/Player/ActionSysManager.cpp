@@ -113,13 +113,6 @@ bool UActionSysManager::JumpSectionForCombo()
 		UE_LOG(LogTemp, Warning, TEXT("Current Montage: %s"),
 			*(CurrentMontage->GetName()));
 	}
-	else
-	{
-		//TODO: use other ability
-		UE_LOG(LogTemp, Warning, TEXT("Current Montage: %s, Jump Montage: %s"),
-			*(CurrentMontage->GetName()),
-			*(JumpMontage->GetName()));
-	}
 	return true;
 }
 

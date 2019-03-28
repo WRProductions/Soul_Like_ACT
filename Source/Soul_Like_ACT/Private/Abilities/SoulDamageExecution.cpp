@@ -75,7 +75,7 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	float Damage = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DamageDef, EvaluationParameters, Damage);
 
-	float DamageDone = Damage * AttackPower / DefensePower;
+	float DamageDone = Damage + AttackPower - DefensePower;
 	if (DamageDone > 0.f)
 	{
 		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().DamageProperty, EGameplayModOp::Additive, DamageDone));
