@@ -84,9 +84,20 @@ void ASoulCharacterBase::AddStartupGameplayAbilities()
 	bAbilitiesInitialized = true;
 }
 
-void ASoulCharacterBase::HandleDamage(float DamageAmount, const FHitResult & HitInfo, const FGameplayTagContainer & DamageTags, ASoulCharacterBase * InstigatorCharacter, AActor * DamageCauser)
+void ASoulCharacterBase::HandleDamage(float DamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
 {
-	OnDamaged(DamageAmount, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
+	OnDamaged(DamageAmount, IsCriticaled, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
+
+}
+
+void ASoulCharacterBase::MakeStepDecelAndSound_Notify(ASoulCharacterBase *CharacterRef)
+{
+	CharacterRef->MakeStepDecelAndSound();
+}
+
+void ASoulCharacterBase::MakeStepDecelAndSound_Implementation()
+{
+	return;
 }
 
 void ASoulCharacterBase::HandleHealthChanged(float DeltaValue, const FGameplayTagContainer & EventTags)
@@ -103,8 +114,7 @@ void ASoulCharacterBase::HandleMoveSpeedChanged(float DeltaValue, const FGamepla
 {
 	GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed();
 
-	if (bAbilitiesInitialized)
-		OnMoveSpeedChanged.Broadcast(TArray<float>{GetMoveSpeed(), -1.f});
+	OnMoveSpeedChanged.Broadcast(TArray<float>{GetMoveSpeed(), -1.f});
 }
 
 void ASoulCharacterBase::HandleLeechChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
@@ -122,10 +132,19 @@ void ASoulCharacterBase::HandleDefensePowerChanged(float DeltaValue, const struc
 	OnDefensePowerChanged.Broadcast(TArray<float>{GetDefensePower(), -1.f});
 }
 
+void ASoulCharacterBase::HandleCriticalStrikeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+{
+	OnCriticalStrikeChanged.Broadcast(TArray<float>{GetCriticalStrike(), -1.f});
+}
+
+void ASoulCharacterBase::HandleCriticalMultiChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+{
+	OnCriticalMultiChanged.Broadcast(TArray<float>{GetCriticalMulti(), -1.f});
+}
+
 void ASoulCharacterBase::HandleAttackPowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
 {
-	if (bAbilitiesInitialized)
-		OnAttackPowerChanged.Broadcast(TArray<float>{GetAttackPower(), -1.f});
+	OnAttackPowerChanged.Broadcast(TArray<float>{GetAttackPower(), -1.f});
 }
 
 void ASoulCharacterBase::HandleAttackSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)

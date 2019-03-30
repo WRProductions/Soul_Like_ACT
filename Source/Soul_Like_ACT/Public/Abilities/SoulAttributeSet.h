@@ -74,10 +74,25 @@ public:
 	FGameplayAttributeData MoveSpeed;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, MoveSpeed)
 
+	/** MoveSpeed affects how fast characters can move */
+	UPROPERTY(BlueprintReadOnly, Category = "MoveSpeed")
+	FGameplayAttributeData CriticalStrike;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, CriticalStrike)
+
+	/** MoveSpeed affects how fast characters can move */
+	UPROPERTY(BlueprintReadOnly, Category = "MoveSpeed")
+	FGameplayAttributeData CriticalMulti;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, CriticalMulti)
+
 	/** Damage is a 'temporary' attribute used by the DamageExecution to calculate final damage, which then turns into -Health */
 	UPROPERTY(BlueprintReadOnly, Category = "Output", meta = (HideFromLevelInfos))
 	FGameplayAttributeData Damage;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, Damage)
+
+	/** Damage is a 'temporary' attribute used by the DamageExecution to calculate final damage, which then turns into -Health */
+	UPROPERTY(BlueprintReadOnly, Category = "Output", meta = (HideFromLevelInfos))
+	FGameplayAttributeData IsCriticalDamageTaken;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, IsCriticalDamageTaken)
 
 
 protected:

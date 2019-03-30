@@ -17,6 +17,8 @@ USoulAttributeSet::USoulAttributeSet()
 	, DefensePower(0.0f)
 	, Tenacity(0.0f)
 	, MoveSpeed(400.0f)
+	, CriticalStrike(5.0f)
+	, CriticalMulti(50.f)
 	, Damage(0.0f)
 {
 }
@@ -81,7 +83,10 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
 		TargetCharacter = Cast<ASoulCharacterBase>(TargetActor);
 	}
-
+	if (Data.EvaluatedData.Attribute == GetIsCriticalDamageTakenAttribute())
+	{
+		return;
+	}
 	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{
 		// Get the Source actor
@@ -128,6 +133,9 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		const float LocalDamageDone = GetDamage();
 		SetDamage(0.f);
 
+		const bool bIsCriticalDamageTaken = GetIsCriticalDamageTaken() > 0.f ? true : false;
+		SetIsCriticalDamageTaken(0.f);
+
 		if (LocalDamageDone > 0)
 		{
 			// Apply the health change and then clamp it
@@ -137,7 +145,7 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			if (TargetCharacter)
 			{
 				// This is proper damage
-				TargetCharacter->HandleDamage(LocalDamageDone, HitResult, SourceTags, SourceCharacter, SourceActor);
+				TargetCharacter->HandleDamage(LocalDamageDone, bIsCriticalDamageTaken, HitResult, SourceTags, SourceCharacter, SourceActor);
 
 				// Call for all health changes
 				TargetCharacter->HandleHealthChanged(-LocalDamageDone, SourceTags);
@@ -204,5 +212,17 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		SetDefensePower(FMath::Clamp(GetDefensePower(), 0.0f, 9999.0f));
 		if (TargetCharacter)
 			TargetCharacter->HandleDefensePowerChanged(DeltaValue, SourceTags);
+	}
+	else if (Data.EvaluatedData.Attribute == GetCriticalStrikeAttribute())
+	{
+	SetDefensePower(FMath::Clamp(GetCriticalStrike(), -999.f, 999.f));
+	if (TargetCharacter)
+		TargetCharacter->HandleCriticalStrikeChanged(DeltaValue, SourceTags);
+	}
+	else if (Data.EvaluatedData.Attribute == GetCriticalMultiAttribute())
+	{
+	SetDefensePower(FMath::Clamp(GetCriticalMulti(), -999.f, 999.f));
+	if (TargetCharacter)
+		TargetCharacter->HandleCriticalMultiChanged(DeltaValue, SourceTags);
 	}
 }

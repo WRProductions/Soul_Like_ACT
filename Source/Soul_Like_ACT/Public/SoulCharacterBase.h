@@ -134,6 +134,9 @@ public:
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED(Tenacity)
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED(MoveSpeed)
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED(AttackSpeed)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(CriticalStrike)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(CriticalMulti)
+
 
 	/** Returns the character level that is passed to the ability system */
 	UFUNCTION(BlueprintCallable)
@@ -154,29 +157,34 @@ protected:
 	 * @param DamageCauser The actual actor that did the damage, might be a weapon or projectile
 	 */
 	UFUNCTION(BlueprintImplementableEvent)
-		void OnDamaged(float DamageAmount, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+		void OnDamaged(float DamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 
 	UPROPERTY(BlueprintAssignable)
-		FOnChanged OnHealthChanged;
+	FOnChanged OnHealthChanged;
 	UPROPERTY(BlueprintAssignable)
-		FOnChanged OnMoveSpeedChanged;
+	FOnChanged OnMoveSpeedChanged;
 	UPROPERTY(BlueprintAssignable)
-		FOnChanged OnStaminaChanged;
+	FOnChanged OnStaminaChanged;
 	UPROPERTY(BlueprintAssignable)
-		FOnChanged OnLeechChanged;
+	FOnChanged OnLeechChanged;
 	UPROPERTY(BlueprintAssignable)
-		FOnChanged OnTenacityChanged;
+	FOnChanged OnTenacityChanged;
 	UPROPERTY(BlueprintAssignable)
-		FOnChanged OnDefensePowerChanged;
+	FOnChanged OnDefensePowerChanged;
 	UPROPERTY(BlueprintAssignable)
-		FOnChanged OnAttackPowerChanged;
+	FOnChanged OnAttackPowerChanged;
 	UPROPERTY(BlueprintAssignable)
-		FOnChanged OnAttackSpeedChanged;
+	FOnChanged OnAttackSpeedChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnChanged OnCriticalStrikeChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnChanged OnCriticalMultiChanged;
 
 	// Called from RPGAttributeSet, these call BP events above
-	virtual void HandleDamage(float DamageAmount, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+	virtual void HandleDamage(float DamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 	
-	friend USoulAttributeSet;
+	UFUNCTION(BlueprintNativeEvent)
+	void MakeStepDecelAndSound();
 
 public:
 	
@@ -185,4 +193,9 @@ public:
 	{
 		Outp = Container.ToString();
 	}
+
+	UFUNCTION(BlueprintCallable)
+	static void MakeStepDecelAndSound_Notify(ASoulCharacterBase *CharacterRef);
+
+	friend USoulAttributeSet;
 };
