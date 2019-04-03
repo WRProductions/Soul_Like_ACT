@@ -38,8 +38,6 @@ bool UActionSysManager::DoMeleeAttack()
  	if (bIsUsingMelee())
  		return TryEnableJumpSection();
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Normal Attack");
-	
 	return PlayerRef->AbilitySystemComponent->TryActivateAbilitiesByTag(
 		FGameplayTagContainer{ FGameplayTag::RequestGameplayTag(FName{"Ability.Melee.Normal"}, true) },
 		true);

@@ -4,6 +4,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Types/DamageTypes.h"
+#include "Abilities/SoulAbilitySysBPLib.h"
 #include "SoulCharacterBase.h"
 #include "DrawDebugHelpers.h"
 
@@ -65,12 +66,9 @@ void AWeaponActor::DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawT
 				&& ASoulCharacterBase::IsInRivalFaction(OwnerRef, TargetPawn) 
 				&& TryExcludeActor(TargetPawn))
 			{
-				ApplyGAOnHit(TargetPawn);
+				ApplyGAOnHit(TargetPawn, Hit);
 
 				TriggerSlowMotion(Hit);
-
-				SpawnVFX(Hit);
-				SpawnSFX(Hit);
 
 				ApplySpecialEffect(Hit);
 			}
@@ -115,6 +113,11 @@ void AWeaponActor::StartSwing()
 void AWeaponActor::EndSwing()
 {
 	bIsTracingCollision = 0;
+}
+
+bool AWeaponActor::ApplyGAOnHit_Implementation(ASoulCharacterBase *Target, const FHitResult &InpHitResult)
+{
+	return true;
 }
 
 // Called every frame

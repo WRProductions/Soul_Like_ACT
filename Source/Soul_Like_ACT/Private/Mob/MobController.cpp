@@ -47,8 +47,7 @@ void AMobController::Possess(APawn* InPawn)
 	//set up bb and bt
 	check(BlockBoardData);
 	check(BehaviorTreeAsset);
-	UseBlackboard(BlockBoardData, BlockBoardComp);
-	RunBehaviorTree(BehaviorTreeAsset);
+
 }
 
 void AMobController::UnPossess()

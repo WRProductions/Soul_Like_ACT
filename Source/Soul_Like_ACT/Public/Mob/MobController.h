@@ -6,7 +6,6 @@
 #include "AIController.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISenseConfig.h"
-
 #include "MobController.generated.h"
 
 /**
