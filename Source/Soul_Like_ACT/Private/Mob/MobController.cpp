@@ -36,9 +36,9 @@ void AMobController::BeginPlay()
 	//FActorPerceptionUpdatedDelegate, AActor*, Actor, FAIStimulus, Stimulus
 }
 
-void AMobController::Possess(APawn* InPawn)
+void AMobController::OnPossess(APawn* InPawn)
 {
-	Super::Possess(InPawn);
+	Super::OnPossess(InPawn);
 
 	PossessedMob = Cast<AMobBasic>(InPawn);
 
@@ -50,9 +50,9 @@ void AMobController::Possess(APawn* InPawn)
 
 }
 
-void AMobController::UnPossess()
+void AMobController::OnUnPossess()
 {
-	Super::UnPossess();
+	Super::OnUnPossess();
 
 	PossessedMob = nullptr;
 }
