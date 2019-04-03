@@ -36,8 +36,6 @@ void AMobController::BeginPlay()
 	//FActorPerceptionUpdatedDelegate, AActor*, Actor, FAIStimulus, Stimulus
 }
 
-
-
 void AMobController::Possess(APawn* InPawn)
 {
 	Super::Possess(InPawn);
@@ -49,8 +47,7 @@ void AMobController::Possess(APawn* InPawn)
 	//set up bb and bt
 	check(BlockBoardData);
 	check(BehaviorTreeAsset);
-	UseBlackboard(BlockBoardData, BlockBoardComp);
-	RunBehaviorTree(BehaviorTreeAsset);
+
 }
 
 void AMobController::UnPossess()

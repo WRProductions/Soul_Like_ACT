@@ -10,18 +10,25 @@
 #include "Interfaces/Targetable.h"
 #include "SoulCharacterBase.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDead);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChanged, const TArray<float> &, values);
 
-//Exec only
 UENUM(BlueprintType)
-enum class EOnHitRefelction: uint8
+enum class EIsControllerValid : uint8
 {
-	Immune,
-	Parry,
-	Block,
-	OnHit,
-	Vulnerable,
+	IsValid,
+	IsNotValid,
 };
+
+#define ATTRIBUTE_GETTER(PropertyName) \
+	virtual float Get##PropertyName##() const \
+	{ \
+		return AttributeSet->Get##PropertyName##(); \
+	}
+
+#define ATTRIBUTE_GETTER_AND_HANDLECHANGED(PropertyName) \
+	ATTRIBUTE_GETTER(##PropertyName##) \
+	virtual void Handle##PropertyName##Changed(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
 
 UENUM(BlueprintType)
 enum class EActorFaction : uint8
@@ -100,9 +107,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EActorFaction Faction;
 
-	UPROPERTY(BlueprintAssignable)
-	FOnDead OnDead_Delegate;
-
 //Static
 public:
 	static const bool IsInRivalFaction(ASoulCharacterBase *DamageDealer, ASoulCharacterBase *DamageReceiver);
@@ -113,39 +117,26 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void ToggleLockIcon(bool LockOn) override;
 
+	UFUNCTION(BlueprintCallable)
+		virtual bool IsAlive() const { return GetHealth() > 0.f; }
+
 	//Called by WeaponActor and OnHit
 	UFUNCTION(BlueprintCallable)
 	void TriggerSlowMotion_WithDelay(float Delay);
 
-	//Warning: Link this to AnyPointDamage node in BP
-	virtual void Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(Health)
+	ATTRIBUTE_GETTER(MaxHealth)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(Stamina)
+	ATTRIBUTE_GETTER(MaxStamina)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(Leech)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(DefensePower)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(AttackPower)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(Tenacity)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(MoveSpeed)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(AttackSpeed)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(CriticalStrike)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED(CriticalMulti)
 
-	UFUNCTION(BlueprintCallable)
-		virtual float GetHealth() const { return AttributeSet->GetHealth(); }
-
-	UFUNCTION(BlueprintCallable)
-		virtual float GetMaxHealth() const { return AttributeSet->GetMaxHealth(); }
-
-	UFUNCTION(BlueprintCallable)
-		virtual float GetStamina() const { return AttributeSet->GetMaxHealth(); }
-
-	UFUNCTION(BlueprintCallable)
-		virtual float GetMaxStamina() const { return AttributeSet->GetMaxHealth(); }
-
-	UFUNCTION(BlueprintCallable)
-		virtual float GetLeech() const { return AttributeSet->GetMaxHealth(); }
-
-	UFUNCTION(BlueprintCallable)
-		virtual float GetDefensePower() const { return AttributeSet->GetDefensePower(); }
-	
-	UFUNCTION(BlueprintCallable)
-		virtual float GetAttackPower() const { return AttributeSet->GetAttackPower(); }
-
-	UFUNCTION(BlueprintCallable)
-		virtual float GetTenacity() const { return AttributeSet->GetTenacity(); }
-
-	UFUNCTION(BlueprintCallable)
-		virtual float GetMoveSpeed() const { return AttributeSet->GetMoveSpeed(); }
 
 	/** Returns the character level that is passed to the ability system */
 	UFUNCTION(BlueprintCallable)
@@ -166,44 +157,34 @@ protected:
 	 * @param DamageCauser The actual actor that did the damage, might be a weapon or projectile
 	 */
 	UFUNCTION(BlueprintImplementableEvent)
-		void OnDamaged(float DamageAmount, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+		void OnDamaged(float DamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnManaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnStaminaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnLeechChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnTenacityChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnDefensePowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void OnAttackPowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	UPROPERTY(BlueprintAssignable)
+	FOnChanged OnHealthChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnChanged OnMoveSpeedChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnChanged OnStaminaChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnChanged OnLeechChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnChanged OnTenacityChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnChanged OnDefensePowerChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnChanged OnAttackPowerChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnChanged OnAttackSpeedChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnChanged OnCriticalStrikeChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnChanged OnCriticalMultiChanged;
 
 	// Called from RPGAttributeSet, these call BP events above
-	virtual void HandleDamage(float DamageAmount, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
-	virtual void HandleHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-	virtual void HandleManaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-	virtual void HandleMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-	virtual void HandleStaminaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-	virtual void HandleLeechChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-	virtual void HandleTenacityChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-	virtual void HandleDefensePowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-	virtual void HandleAttackPowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	friend USoulAttributeSet;
+	virtual void HandleDamage(float DamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void MakeStepDecelAndSound();
 
 public:
 	
@@ -212,4 +193,9 @@ public:
 	{
 		Outp = Container.ToString();
 	}
+
+	UFUNCTION(BlueprintCallable)
+	static void MakeStepDecelAndSound_Notify(ASoulCharacterBase *CharacterRef);
+
+	friend USoulAttributeSet;
 };

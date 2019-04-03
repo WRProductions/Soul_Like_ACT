@@ -4,7 +4,6 @@
 
 #include "EngineMinimal.h"
 #include "Engine/Engine.h"
-
 #include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
 #include "SoulAttributeSet.generated.h"
@@ -51,6 +50,10 @@ public:
 	FGameplayAttributeData AttackPower;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, AttackPower)
 
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+	FGameplayAttributeData AttackSpeed;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, AttackSpeed)
+
 	/** AttackPower of the attacker is multiplied by the base Damage to reduce health, so 1.0 means no bonus */
 	UPROPERTY(BlueprintReadOnly, Category = "Damage")
 	FGameplayAttributeData Leech;
@@ -71,10 +74,25 @@ public:
 	FGameplayAttributeData MoveSpeed;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, MoveSpeed)
 
+	/** MoveSpeed affects how fast characters can move */
+	UPROPERTY(BlueprintReadOnly, Category = "MoveSpeed")
+	FGameplayAttributeData CriticalStrike;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, CriticalStrike)
+
+	/** MoveSpeed affects how fast characters can move */
+	UPROPERTY(BlueprintReadOnly, Category = "MoveSpeed")
+	FGameplayAttributeData CriticalMulti;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, CriticalMulti)
+
 	/** Damage is a 'temporary' attribute used by the DamageExecution to calculate final damage, which then turns into -Health */
 	UPROPERTY(BlueprintReadOnly, Category = "Output", meta = (HideFromLevelInfos))
 	FGameplayAttributeData Damage;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, Damage)
+
+	/** Damage is a 'temporary' attribute used by the DamageExecution to calculate final damage, which then turns into -Health */
+	UPROPERTY(BlueprintReadOnly, Category = "Output", meta = (HideFromLevelInfos))
+	FGameplayAttributeData IsCriticalDamageTaken;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, IsCriticalDamageTaken)
 
 
 protected:

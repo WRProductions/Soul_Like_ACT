@@ -53,11 +53,6 @@ void ASoulCharacterBase::TriggerSlowMotion_WithDelay(float Delay)
 	}
 }
 
-void ASoulCharacterBase::Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp)
-{
-	return;
-}
-
 void ASoulCharacterBase::AddStartupGameplayAbilities()
 {
 	check(AbilitySystemComponent);
@@ -89,69 +84,72 @@ void ASoulCharacterBase::AddStartupGameplayAbilities()
 	bAbilitiesInitialized = true;
 }
 
-void ASoulCharacterBase::HandleDamage(float DamageAmount, const FHitResult & HitInfo, const FGameplayTagContainer & DamageTags, ASoulCharacterBase * InstigatorCharacter, AActor * DamageCauser)
+void ASoulCharacterBase::HandleDamage(float DamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
 {
-	OnDamaged(DamageAmount, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
+	OnDamaged(DamageAmount, IsCriticaled, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
+
+}
+
+void ASoulCharacterBase::MakeStepDecelAndSound_Notify(ASoulCharacterBase *CharacterRef)
+{
+	CharacterRef->MakeStepDecelAndSound();
+}
+
+void ASoulCharacterBase::MakeStepDecelAndSound_Implementation()
+{
+	return;
 }
 
 void ASoulCharacterBase::HandleHealthChanged(float DeltaValue, const FGameplayTagContainer & EventTags)
 {
-	if (bAbilitiesInitialized)
-	{
-		OnHealthChanged(DeltaValue, EventTags);
-	}
+	OnHealthChanged.Broadcast(TArray<float>{GetHealth(), GetMaxHealth()});
 }
 
-void ASoulCharacterBase::HandleManaChanged(float DeltaValue, const FGameplayTagContainer & EventTags)
+void ASoulCharacterBase::HandleStaminaChanged(float DeltaValue, const FGameplayTagContainer & EventTags)
 {
-	if (bAbilitiesInitialized)
-	{
-		OnManaChanged(DeltaValue, EventTags);
-	}
+	OnStaminaChanged.Broadcast(TArray<float>{GetStamina(), GetMaxStamina()});
 }
 
 void ASoulCharacterBase::HandleMoveSpeedChanged(float DeltaValue, const FGameplayTagContainer & EventTags)
 {
 	GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed();
 
-	if (bAbilitiesInitialized)
-	{
-		OnMoveSpeedChanged(DeltaValue, EventTags);
-	}
-}
-
-void ASoulCharacterBase::HandleStaminaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
-{
-	if (bAbilitiesInitialized)
-	{
-		OnStaminaChanged(DeltaValue, EventTags);
-	}
+	OnMoveSpeedChanged.Broadcast(TArray<float>{GetMoveSpeed(), -1.f});
 }
 
 void ASoulCharacterBase::HandleLeechChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
 {
-	if (bAbilitiesInitialized)
-	{
-		OnLeechChanged(DeltaValue, EventTags);
-	}
+	OnLeechChanged.Broadcast(TArray<float>{GetLeech(), -1.f});
 }
 
 void ASoulCharacterBase::HandleTenacityChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
 {
-	if (bAbilitiesInitialized)
-		OnTenacityChanged(DeltaValue, EventTags);
+	OnTenacityChanged.Broadcast(TArray<float>{GetTenacity(), -1.f});
 }
 
 void ASoulCharacterBase::HandleDefensePowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
 {
-	if (bAbilitiesInitialized)
-		OnDefensePowerChanged(DeltaValue, EventTags);
+	OnDefensePowerChanged.Broadcast(TArray<float>{GetDefensePower(), -1.f});
+}
+
+void ASoulCharacterBase::HandleCriticalStrikeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+{
+	OnCriticalStrikeChanged.Broadcast(TArray<float>{GetCriticalStrike(), -1.f});
+}
+
+void ASoulCharacterBase::HandleCriticalMultiChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+{
+	OnCriticalMultiChanged.Broadcast(TArray<float>{GetCriticalMulti(), -1.f});
 }
 
 void ASoulCharacterBase::HandleAttackPowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
 {
-	if (bAbilitiesInitialized)
-		OnAttackPowerChanged(DeltaValue, EventTags);
+	OnAttackPowerChanged.Broadcast(TArray<float>{GetAttackPower(), -1.f});
+}
+
+void ASoulCharacterBase::HandleAttackSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+{
+	OnAttackSpeedChanged.Broadcast(TArray<float>{GetAttackSpeed(), -1.f});
 }
 
 UAbilitySystemComponent* ASoulCharacterBase::GetAbilitySystemComponent() const
@@ -200,5 +198,4 @@ void ASoulCharacterBase::Tick(float DeltaTime)
 void ASoulCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }

@@ -363,7 +363,7 @@ void ULockTargetComponent::Tick_UpdateRotation()
 	if (!bFreeCamera)
 	{
 		FRotator LookedAtCameraRotation = FMath::RInterpConstantTo(PlayerRef->GetControlRotation(),
-			LookAtRotation + FRotator{ -30.f, 0.f, 0.f }, GetWorld()->GetDeltaSeconds(), 300.f);
+			LookAtRotation + FRotator{ -20.f, 0.f, 0.f }, GetWorld()->GetDeltaSeconds(), 300.f);
 
 		PlayerRef->GetInstigator()->GetController()->SetControlRotation(LookedAtCameraRotation);
 	}

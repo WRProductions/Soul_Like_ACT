@@ -66,13 +66,9 @@ public:
 
 	//When OnHit
 	//Send HitInformation back to GA
-	UFUNCTION(BlueprintImplementableEvent)
-	bool ApplyGAOnHit(ASoulCharacterBase *Target);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool ApplyGAOnHit(ASoulCharacterBase *Target, const FHitResult &InpHitResult);
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void SpawnSFX(const FHitResult &HitResult);
-	UFUNCTION(BlueprintImplementableEvent)
-	void SpawnVFX(const FHitResult &HitResult);
 	UFUNCTION(BlueprintImplementableEvent)
 	void TriggerSlowMotion(const FHitResult &HitResult);
 	UFUNCTION(BlueprintImplementableEvent)

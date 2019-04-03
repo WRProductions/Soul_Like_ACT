@@ -28,18 +28,6 @@ void UActionSysManager::BeginPlay()
 void UActionSysManager::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (bIsLeftButtonPressed){
-		if (ChargingPoints <= MaxPressedDuration)
-		{
-			ChargingPoints += DeltaTime;
-		}
-		else
-		{
-			//Try Trigger the attack automatically when pressed duration is longer than 1 second
-			OnLeftButtonRelease();
-		}
-	}
 }
 
 bool UActionSysManager::DoMeleeAttack()
@@ -49,8 +37,6 @@ bool UActionSysManager::DoMeleeAttack()
  
  	if (bIsUsingMelee())
  		return TryEnableJumpSection();
-	
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Normal Attack");
 	
 	return PlayerRef->AbilitySystemComponent->TryActivateAbilitiesByTag(
 		FGameplayTagContainer{ FGameplayTag::RequestGameplayTag(FName{"Ability.Melee.Normal"}, true) },
@@ -124,13 +110,6 @@ bool UActionSysManager::JumpSectionForCombo()
 
 		UE_LOG(LogTemp, Warning, TEXT("Current Montage: %s"),
 			*(CurrentMontage->GetName()));
-	}
-	else
-	{
-		//TODO: use other ability
-		UE_LOG(LogTemp, Warning, TEXT("Current Montage: %s, Jump Montage: %s"),
-			*(CurrentMontage->GetName()),
-			*(JumpMontage->GetName()));
 	}
 	return true;
 }
@@ -223,32 +202,4 @@ bool UActionSysManager::bCanUseAnyGA() const
 	return (PlayerRef->GetHealth() > 0.f &&
 		!UGameplayStatics::IsGamePaused(GetWorld()) &&
 		!bIsUsingAbility());
-}
-
-void UActionSysManager::OnLeftButtonPressed()
-{
-	bIsLeftButtonPressed = true;
-}
-
-void UActionSysManager::OnLeftButtonRelease()
-{
-	const float localChargingPoints = ChargingPoints;
-	
-	//Reset charging status
-	bIsLeftButtonPressed = false;
-	ChargingPoints = 0.f;
-
-	if (localChargingPoints <= MaxChargingPoints)
-	{
-		DoMeleeAttack();
-	}
-	else
-	{
-		DoSpecialMeleeAttack();
-	}
-}
-
-void UActionSysManager::OnSpaceBarPressed()
-{
-	DoDodge();
 }

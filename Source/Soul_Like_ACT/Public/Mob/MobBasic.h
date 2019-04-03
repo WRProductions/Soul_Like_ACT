@@ -52,7 +52,4 @@ public:
 	void SetFocus(bool Enable, AActor * Target);
 
 	bool GetIsTargetingEnabled() const;
-
-	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = Outp))
-		virtual void Exec_TryGetHit(float Damage, class UDamageType const* UDamageType, AController* EventInstigator, AActor* DamageCauser, const FHitResult &HitInfo, EOnHitRefelction &Outp) override;
 };
