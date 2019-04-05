@@ -225,4 +225,14 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	if (TargetCharacter)
 		TargetCharacter->HandleCriticalMultiChanged(DeltaValue, SourceTags);
 	}
+	if (Data.EvaluatedData.Attribute == GetMaxHealthAttribute())
+	{
+		if (TargetCharacter)
+			TargetCharacter->HandleHealthChanged(DeltaValue, SourceTags);
+	}	
+	if (Data.EvaluatedData.Attribute == GetMaxStaminaAttribute())
+	{
+		if (TargetCharacter)
+			TargetCharacter->HandleStaminaChanged(DeltaValue, SourceTags);
+	}
 }
