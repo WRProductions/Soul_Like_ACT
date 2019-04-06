@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Item/ItemBasic.h"
+#include "Types/SoulItemTypes.h"
 #include "GameFramework/SaveGame.h"
 #include "SoulSaveGame.generated.h"
 
@@ -25,15 +25,14 @@ public:
 	}
 
 	/** Map of items to item data */
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
-		TMap<FPrimaryAssetId, FSoulItemData> InventoryData;
-
-	/** Map of slotted items */
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
-		TMap<FSoulItemSlot, FPrimaryAssetId> SlottedItems;
+ 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
+ 		TMap<FPrimaryAssetId, FSoulItemData> InventoryData;
+ 
+ 	/** Map of slotted items */
+ 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
+ 		TMap<FSoulItemSlot, FPrimaryAssetId> SlottedItems;
 
 	/** User's unique id */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
 		FString UserId;
-
 };

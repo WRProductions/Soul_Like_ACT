@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "Types/SoulItemTypes.h"
 #include "SoulGameInstanceBase.generated.h"
 
 class USoulItem;
@@ -24,8 +25,8 @@ public:
 	USoulGameInstanceBase();
 
 	/** List of inventory items to add to new players */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
-		TMap<FPrimaryAssetId, FSoulItemData> DefaultInventory;
+ 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
+ 		TMap<FPrimaryAssetId, FSoulItemData> DefaultInventory;
 
 	/** Number of slots for each type of item */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
@@ -48,8 +49,8 @@ public:
 		void AddDefaultInventory(USoulSaveGame* SaveGame, bool bRemoveExtra = false);
 
 	/** Returns true if this is a valid inventory slot */
-	UFUNCTION(BlueprintCallable, Category = Inventory)
-		bool IsValidItemSlot(FSoulItemSlot ItemSlot) const;
+ 	UFUNCTION(BlueprintCallable, Category = Inventory)
+ 		bool IsValidItemSlot(FSoulItemSlot ItemSlot) const;
 
 	/** Returns the current save game, so it can be used to initialize state. Changes are not written until WriteSaveGame is called */
 	UFUNCTION(BlueprintCallable, Category = Save)

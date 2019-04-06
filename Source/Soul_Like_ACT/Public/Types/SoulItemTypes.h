@@ -1,33 +1,27 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
-// ----------------------------------------------------------------------------------------------------------------
-// This header is for enums and structs used by classes and blueprints accross the game
-// Collecting these in a single header helps avoid problems with recursive header includes
-// It's also a good place to put things like data table row structs
-// ----------------------------------------------------------------------------------------------------------------
-
-#include "UObject/PrimaryAssetId.h"
+#include "CoreMinimal.h"
+#include "Item/ItemBasic.h"
 #include "SoulItemTypes.generated.h"
 
-class URPGItem;
-
-/** Struct representing a slot for an item, shown in the UI */
 USTRUCT(BlueprintType)
 struct SOUL_LIKE_ACT_API FSoulItemSlot
 {
 	GENERATED_BODY()
 
 		/** Constructor, -1 means an invalid slot */
-		FRPGItemSlot()
+	FSoulItemSlot()
 		: SlotNumber(-1)
-	{}
+	{
+	}
 
-	FRPGItemSlot(const FPrimaryAssetType& InItemType, int32 InSlotNumber)
+	FSoulItemSlot(const FPrimaryAssetType& InItemType, int32 InSlotNumber)
 		: ItemType(InItemType)
 		, SlotNumber(InSlotNumber)
-	{}
+	{
+	}
 
 	/** The type of items that can go in this slot */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
@@ -38,17 +32,17 @@ struct SOUL_LIKE_ACT_API FSoulItemSlot
 		int32 SlotNumber;
 
 	/** Equality operators */
-	bool operator==(const FRPGItemSlot& Other) const
+	bool operator==(const FSoulItemSlot& Other) const
 	{
 		return ItemType == Other.ItemType && SlotNumber == Other.SlotNumber;
 	}
-	bool operator!=(const FRPGItemSlot& Other) const
+	bool operator!=(const FSoulItemSlot& Other) const
 	{
 		return !(*this == Other);
 	}
 
 	/** Implemented so it can be used in Maps/Sets */
-	friend inline uint32 GetTypeHash(const FRPGItemSlot & Key)
+	friend inline uint32 GetTypeHash(const FSoulItemSlot & Key)
 	{
 		uint32 Hash = 0;
 
@@ -67,20 +61,22 @@ struct SOUL_LIKE_ACT_API FSoulItemSlot
 
 /** Extra information about a URPGItem that is in a player's inventory */
 USTRUCT(BlueprintType)
-struct ACTIONRPG_API FRPGItemData
+struct SOUL_LIKE_ACT_API FSoulItemData
 {
 	GENERATED_BODY()
 
-		/** Constructor, default to count/level 1 so declaring them in blueprints gives you the expected behavior */
-		FRPGItemData()
+	/** Constructor, default to count/level 1 so declaring them in blueprints gives you the expected behavior */
+	FSoulItemData()
 		: ItemCount(1)
 		, ItemLevel(1)
-	{}
+	{
+	}
 
-	FRPGItemData(int32 InItemCount, int32 InItemLevel)
+	FSoulItemData(int32 InItemCount, int32 InItemLevel)
 		: ItemCount(InItemCount)
 		, ItemLevel(InItemLevel)
-	{}
+	{
+	}
 
 	/** The number of instances of this item in the inventory, can never be below 1 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
@@ -91,11 +87,11 @@ struct ACTIONRPG_API FRPGItemData
 		int32 ItemLevel;
 
 	/** Equality operators */
-	bool operator==(const FRPGItemData& Other) const
+	bool operator==(const FSoulItemData& Other) const
 	{
 		return ItemCount == Other.ItemCount && ItemLevel == Other.ItemLevel;
 	}
-	bool operator!=(const FRPGItemData& Other) const
+	bool operator!=(const FSoulItemData& Other) const
 	{
 		return !(*this == Other);
 	}
@@ -107,7 +103,7 @@ struct ACTIONRPG_API FRPGItemData
 	}
 
 	/** Append an item data, this adds the count and overrides everything else */
-	void UpdateItemData(const FRPGItemData & Other, int32 MaxCount, int32 MaxLevel)
+	void UpdateItemData(const FSoulItemData & Other, int32 MaxCount, int32 MaxLevel)
 	{
 		if (MaxCount <= 0)
 		{
@@ -125,12 +121,12 @@ struct ACTIONRPG_API FRPGItemData
 };
 
 /** Delegate called when an inventory item changes */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChanged, bool, bAdded, URPGItem*, Item);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChangedNative, bool, URPGItem*);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChanged, bool, bAdded, USoulItem*, Item);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChangedNative, bool, USoulItem*);
 
 /** Delegate called when the contents of an inventory slot change */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSlottedItemChanged, FRPGItemSlot, ItemSlot, URPGItem*, Item);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSlottedItemChangedNative, FRPGItemSlot, URPGItem*);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSlottedItemChanged, FSouItemSlot, ItemSlot, USoulItem*, Item);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSlottedItemChangedNative, FSoulItemSlot, USoulItem*);
 
 /** Delegate called when the entire inventory has been loaded, all items may have been replaced */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryLoaded);
