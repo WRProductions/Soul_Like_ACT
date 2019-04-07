@@ -125,7 +125,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChanged, bool, bAdd
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChangedNative, bool, USoulItem*);
 
 /** Delegate called when the contents of an inventory slot change */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSlottedItemChanged, FSouItemSlot, ItemSlot, USoulItem*, Item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSlottedItemChanged, FSoulItemSlot, ItemSlot, USoulItem*, Item);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSlottedItemChangedNative, FSoulItemSlot, USoulItem*);
 
 /** Delegate called when the entire inventory has been loaded, all items may have been replaced */

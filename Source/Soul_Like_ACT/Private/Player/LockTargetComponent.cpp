@@ -380,4 +380,3 @@ void ULockTargetComponent::Tick_UpdateRotation()
 			800.f));
 	}
 }
-

@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameState.h"
 #include "GameFramework/Actor.h"
-#include "SLA_GameState.generated.h"
+#include "SoulGameState.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SOUL_LIKE_ACT_API ASLA_GameState : public AGameState
+class SOUL_LIKE_ACT_API ASoulGameState : public AGameState
 {
 	GENERATED_BODY()
 

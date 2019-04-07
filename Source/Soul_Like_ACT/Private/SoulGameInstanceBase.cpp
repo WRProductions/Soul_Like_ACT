@@ -4,11 +4,28 @@
 #include "SoulGameInstanceBase.h"
 #include "SoulSaveGame.h"
 #include "Item/ItemBasic.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "SoulAssetManager.h"
 
 USoulGameInstanceBase::USoulGameInstanceBase()
 	: SaveSlot(TEXT("SaveGame"))
 	, SaveUserIndex(0)
 {}
+
+void USoulGameInstanceBase::GetItemsIDWithType(const TArray<FPrimaryAssetType> ItemTypes, TMap<FPrimaryAssetId, FSoulItemData>& OutpItems)
+{
+	TArray<FPrimaryAssetId> TempAssetIds;
+	USoulAssetManager& CurrentAssetManager = USoulAssetManager::Get();
+
+	for (auto AssetType : ItemTypes)
+	{
+		CurrentAssetManager.GetPrimaryAssetIdList(AssetType, TempAssetIds);
+		for (auto TempObj : TempAssetIds) 
+		{
+			OutpItems.Add(TempObj);
+		}
+	}
+}
 
 void USoulGameInstanceBase::AddDefaultInventory(USoulSaveGame* SaveGame, bool bRemoveExtra)
 {
@@ -16,8 +33,7 @@ void USoulGameInstanceBase::AddDefaultInventory(USoulSaveGame* SaveGame, bool bR
  	if (bRemoveExtra)
  	{
  		SaveGame->InventoryData.Reset();
- 	}
- 
+ 	} 
  	// Now add the default inventory, this only adds if not already in hte inventory
  	for (const TPair<FPrimaryAssetId, FSoulItemData>& Pair : DefaultInventory)
  	{
@@ -54,4 +70,8 @@ bool USoulGameInstanceBase::WriteSaveGame()
 
 void USoulGameInstanceBase::ResetSaveGame()
 {
+	bool bWasSavingEnabled = bSavingEnabled;
+	bSavingEnabled = false;
+	LoadOrCreateSaveGame();
+	bSavingEnabled = bWasSavingEnabled;
 }

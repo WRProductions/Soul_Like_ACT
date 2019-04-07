@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
-#include "Soul_Like_ACTGameMode.generated.h"
+#include "SoulGameMode.generated.h"
 
 UCLASS(minimalapi)
-class ASoul_Like_ACTGameMode : public AGameMode
+class ASoulGameMode : public AGameMode
 {
 	GENERATED_BODY()
 
 public:
-	ASoul_Like_ACTGameMode();
+	ASoulGameMode();
 };
 
 

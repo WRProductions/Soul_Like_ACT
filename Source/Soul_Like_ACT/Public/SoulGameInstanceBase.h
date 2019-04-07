@@ -28,9 +28,11 @@ public:
  	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
  		TMap<FPrimaryAssetId, FSoulItemData> DefaultInventory;
 
-	/** Number of slots for each type of item */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
+		TArray<FPrimaryAssetType> AllItemTypes;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
-		TMap<FPrimaryAssetType, int32> ItemSlotsPerType;
+		TArray<USoulItem*> AllItems;
 
 	/** The slot name used for saving */
 	UPROPERTY(BlueprintReadWrite, Category = Save)
@@ -39,6 +41,13 @@ public:
 	/** The platform-specific user index */
 	UPROPERTY(BlueprintReadWrite, Category = Save)
 		int32 SaveUserIndex;
+
+	/** Load all the sotre items up front */
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = Inventory)
+		void InitializeAllItems();
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+		void GetItemsIDWithType(const TArray<FPrimaryAssetType> ItemTypes, TMap<FPrimaryAssetId, FSoulItemData> & OutpItems);
 
 	/**
 	 * Adds the default inventory to the inventory array

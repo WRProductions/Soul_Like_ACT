@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "SLA_GameState.h"
+#include "SoulGameState.h"
 #include "Kismet/GameplayStatics.h"
-void ASLA_GameState::BeginPlay()
+void ASoulGameState::BeginPlay()
 {
 	Super::BeginPlay();
 }
