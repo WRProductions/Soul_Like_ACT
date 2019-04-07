@@ -44,8 +44,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AISenseUpdateMessage(AActor* Actor, FAIStimulus Stimulus);
 
-	virtual void Possess(APawn* InPawn) override;
-	virtual void UnPossess() override;
+	virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnUnPossess() override;
 
 	virtual void Tick(float DeltaTime) override;
 

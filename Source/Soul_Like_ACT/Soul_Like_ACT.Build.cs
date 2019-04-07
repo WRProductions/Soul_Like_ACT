@@ -12,6 +12,7 @@ public class Soul_Like_ACT : ModuleRules
             "Core",
             "CoreUObject",
             "Slate",
+            "SlateCore",
             "Engine",
             "InputCore",
             "GameplayAbilities",
