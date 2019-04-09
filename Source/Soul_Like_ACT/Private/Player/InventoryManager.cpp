@@ -1,8 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "InventoryManager.h"
-#include "Item/ItemBasic.h"
-#include "Types/SoulItemTypes.h"
+
 #include "GameFramework/Character.h"
 
 UInventoryManager::UInventoryManager()

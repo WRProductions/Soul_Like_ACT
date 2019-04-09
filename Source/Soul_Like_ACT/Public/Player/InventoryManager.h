@@ -4,13 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "WeaponActor.h"
+#include "Item/ItemBasic.h"
+#include "Types/SoulItemTypes.h"
 #include "Components/ActorComponent.h"
 #include "InventoryManager.generated.h"
 
 class AWeaponActor;
-class USoulItem;
-struct FSoulItemData;
-struct FSoulItemSlot;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SOUL_LIKE_ACT_API UInventoryManager : public UActorComponent
@@ -23,11 +22,11 @@ class SOUL_LIKE_ACT_API UInventoryManager : public UActorComponent
 protected:
 	/** Map of all items owned by this player, from definition to data */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
-		TMap<USoulItem*, FSoulItemData> InventoryData;
+	TMap<USoulItem*, FSoulItemData> InventoryData;
 
 	/** Map of slot, from type/num to item, initialized from ItemSlotsPerType on RPGGameInstanceBase */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
-		TMap<FSoulItemSlot, USoulItem*> SlottedItems;
+	TMap<FSoulItemSlot, USoulItem*> SlottedItems;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		AWeaponActor* CurrentWeapon;
