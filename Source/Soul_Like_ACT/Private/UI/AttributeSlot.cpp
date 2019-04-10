@@ -9,7 +9,7 @@
 void UAttributeSlot::SetAttributeType()
 {
 	if (MyAttribute == USoulAttributeSet::GetHealthAttribute())
-		AttributeType->SetText(FText::FromString("Health:"));
+		AttributeType->SetText(FText::FromString("Health:")); 
 
 	else if (MyAttribute == USoulAttributeSet::GetStaminaAttribute())
 		AttributeType->SetText(FText::FromString("Stamina:"));

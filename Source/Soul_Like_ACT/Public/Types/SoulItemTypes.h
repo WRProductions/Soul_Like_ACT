@@ -36,6 +36,7 @@ struct SOUL_LIKE_ACT_API FSoulItemSlot
 	{
 		return ItemType == Other.ItemType && SlotNumber == Other.SlotNumber;
 	}
+	
 	bool operator!=(const FSoulItemSlot& Other) const
 	{
 		return !(*this == Other);

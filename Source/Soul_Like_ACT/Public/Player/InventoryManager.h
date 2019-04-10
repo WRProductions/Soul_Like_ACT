@@ -10,7 +10,9 @@
 #include "InventoryManager.generated.h"
 
 class AWeaponActor;
-
+/**
+ * This component is only been used to handle Items
+ */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SOUL_LIKE_ACT_API UInventoryManager : public UActorComponent
 {
