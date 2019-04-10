@@ -6,8 +6,10 @@
 #include "Blueprint/UserWidget.h"
 #include "ModifierSlot.generated.h"
 
+class UTextBlock;
+
 /**
- * 
+ * The 
  */
 UCLASS()
 class SOUL_LIKE_ACT_API UModifierSlot : public UUserWidget
@@ -18,11 +20,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 		UTextBlock* GA_Name = nullptr;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-		UTextBlock* GA_Value = nullptr;
+		UTextBlock* GA_Level = nullptr;
 
 // 	UFUNCTION(BlueprintCallable)
 // 	void OnSlottedItemChanged(const struct FSoulItemSlot &ItemSlot, const class USoulItem*& Item);
 
+public:
 	UFUNCTION(BlueprintCallable)
-		void Setup(const TSubClassOf<USoulItem>& ItemInfo);
+	void Setup(FString &inp_Name, FString &inp_Level);
 };
