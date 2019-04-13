@@ -20,7 +20,7 @@ class SOUL_LIKE_ACT_API USoulSerializerBpLib: public UBlueprintFunctionLibrary
 public:
 
 	UFUNCTION(BlueprintCallable)
-		static void ToString_Modifier(const TSubclassOf<USoulItem>& ItemRef, TArray<FString>& ModifierNames, TArray<FString>& ModifierLevels, bool& Successful);
+		static void ToString_Modifier(const USoulItem* ItemRef, TArray<FString>& ModifierNames, TArray<FString>& ModifierLevels, bool& Successful);
 
 	static void ToString_Modifier(const TPair<TSubclassOf<USoulGameplayAbility>, int32>& InputAbilityInfo, FString& ModifierName, FString& ModifierLevel);
 };

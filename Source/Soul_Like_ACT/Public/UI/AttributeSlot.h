@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
 #include "Blueprint/UserWidget.h"
-#include "Widget_AttributeSlot.generated.h"
+#include "AttributeSlot.generated.h"
 
 class UTextBlock;
 
@@ -13,7 +13,7 @@ class UTextBlock;
  * 
  */
 UCLASS(Abstract)
-class SOUL_LIKE_ACT_API UWidget_AttributeSlot : public UUserWidget
+class SOUL_LIKE_ACT_API UAttributeSlot : public UUserWidget
 {
 	GENERATED_BODY()
 	

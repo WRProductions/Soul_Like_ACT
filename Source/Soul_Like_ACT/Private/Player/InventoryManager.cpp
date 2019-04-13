@@ -29,11 +29,11 @@ void UInventoryManager::EquipGear(AWeaponActor *const Inp)
 
 	FAttachmentTransformRules LocalTransRules{ EAttachmentRule::SnapToTarget, 1 };
 	if(Inp->GearInfo->WeaponType == EWeaponType::VE_1HSword)
-		Inp->AttachToComponent(Cast<ACharacter>(GetOwner())->GetMesh(), LocalTransRules, TEXT("Sword_1"));
+		Inp->AttachToComponent(Cast<ACharacter>(GetOwner())->GetMesh(), LocalTransRules, TEXT("2H_Mace"));
 	else if (Inp->GearInfo->WeaponType == EWeaponType::VE_2HMace)
 		Inp->AttachToComponent(Cast<ACharacter>(GetOwner())->GetMesh(), LocalTransRules, TEXT("2H_Mace"));
 	else if (Inp->GearInfo->WeaponType == EWeaponType::VE_Fist)
-		Inp->AttachToComponent(Cast<ACharacter>(GetOwner())->GetMesh(), LocalTransRules, TEXT("Sword_1"));
+		Inp->AttachToComponent(Cast<ACharacter>(GetOwner())->GetMesh(), LocalTransRules, TEXT("2H_Mace"));
 }
 
 bool UInventoryManager::AddInventoryItem(USoulItem* NewItem, int32 ItemCount, int32 ItemLevel, bool bAutoSlot)

@@ -7,24 +7,29 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "SoulAssetManager.h"
 
+
+
 USoulGameInstanceBase::USoulGameInstanceBase()
 	: SaveSlot(TEXT("SaveGame"))
 	, SaveUserIndex(0)
 {}
 
-void USoulGameInstanceBase::GetItemsIDWithType(const TArray<FPrimaryAssetType> ItemTypes, TMap<FPrimaryAssetId, FSoulItemData>& OutpItems)
+void USoulGameInstanceBase::GetAllAccessibleItemID(TArray<FPrimaryAssetId>& OutpId)
 {
-	TArray<FPrimaryAssetId> TempAssetIds;
+	//Clear the assets id if we already called this before
+	OutpId.Reset();
+
+	for (auto AssetType : AllItemTypes)
+	{
+		GetItemIDWithType(AssetType, OutpId);
+	}
+}
+
+void USoulGameInstanceBase::GetItemIDWithType(const FPrimaryAssetType ItemType, TArray<FPrimaryAssetId>& OutpId)
+{
 	USoulAssetManager& CurrentAssetManager = USoulAssetManager::Get();
 
-	for (auto AssetType : ItemTypes)
-	{
-		CurrentAssetManager.GetPrimaryAssetIdList(AssetType, TempAssetIds);
-		for (auto TempObj : TempAssetIds) 
-		{
-			OutpItems.Add(TempObj);
-		}
-	}
+	CurrentAssetManager.GetPrimaryAssetIdList(ItemType, OutpId);
 }
 
 void USoulGameInstanceBase::AddDefaultInventory(USoulSaveGame* SaveGame, bool bRemoveExtra)

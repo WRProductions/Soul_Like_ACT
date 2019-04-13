@@ -28,11 +28,8 @@ public:
  	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
  		TMap<FPrimaryAssetId, FSoulItemData> DefaultInventory;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
-		TArray<FPrimaryAssetType> AllItemTypes;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
-		TArray<USoulItem*> AllItems;
+	//By Default, It contains all accessible Item Types
+	const TArray<FPrimaryAssetType> AllItemTypes{USoulAssetManager::ArmourItemType, USoulAssetManager::WeaponItemType,USoulAssetManager::PotionItemType,USoulAssetManager::JewelItemType};
 
 	/** The slot name used for saving */
 	UPROPERTY(BlueprintReadWrite, Category = Save)
@@ -42,12 +39,11 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = Save)
 		int32 SaveUserIndex;
 
-	/** Load all the sotre items up front */
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = Inventory)
-		void InitializeAllItems();
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+		void GetAllAccessibleItemID(TArray<FPrimaryAssetId>& OutpId);
 
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-		void GetItemsIDWithType(const TArray<FPrimaryAssetType> ItemTypes, TMap<FPrimaryAssetId, FSoulItemData> & OutpItems);
+		void GetItemIDWithType(const FPrimaryAssetType ItemType, TArray<FPrimaryAssetId> & OutpId);
 
 	/**
 	 * Adds the default inventory to the inventory array

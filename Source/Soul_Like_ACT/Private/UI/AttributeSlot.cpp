@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "UI/Widget_AttributeSlot.h"
+#include "UI/AttributeSlot.h"
 #include "Components/TextBlock.h"
 #include "Abilities/SoulAttributeSet.h"
 #include "Abilities/SoulAbilitySystemComponent.h"
 
 
-void UWidget_AttributeSlot::SetAttributeType()
+void UAttributeSlot::SetAttributeType()
 {
 	if (MyAttribute == USoulAttributeSet::GetHealthAttribute())
 		AttributeType->SetText(FText::FromString("Health:")); 
@@ -39,7 +39,7 @@ void UWidget_AttributeSlot::SetAttributeType()
 		AttributeType->SetText(FText::FromString("Critical Multiplier:"));
 }
 
-void UWidget_AttributeSlot::OnAttributeChanged(const TArray<float> & values)
+void UAttributeSlot::OnAttributeChanged(const TArray<float> & values)
 {
 	if (MyAttribute == USoulAttributeSet::GetHealthAttribute()
 		|| MyAttribute == USoulAttributeSet::GetStaminaAttribute())

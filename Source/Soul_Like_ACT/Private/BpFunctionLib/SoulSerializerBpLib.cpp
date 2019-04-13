@@ -13,10 +13,10 @@ void USoulSerializerBpLib::ToString_Modifier(const TPair<TSubclassOf<USoulGamepl
 	ModifierLevel = FString::FromInt(InputAbilityInfo.Value);
 }
 
-void USoulSerializerBpLib::ToString_Modifier(const TSubclassOf<class USoulItem>& ItemRef,
+void USoulSerializerBpLib::ToString_Modifier(const USoulItem* ItemRef,
 	TArray<FString>& ModifierNames, TArray<FString>& ModifierLevels, bool& Successful)
 {
-	const TMap<TSubclassOf<USoulGameplayAbility>, int>& TargetGA = ItemRef.GetDefaultObject()->GrantedAbility;
+	const TMap<TSubclassOf<USoulGameplayAbility>, int>& TargetGA = ItemRef->GrantedAbility;
 	int32 GA_Size = TargetGA.Num();
 	if (GA_Size <= 0)
 	{

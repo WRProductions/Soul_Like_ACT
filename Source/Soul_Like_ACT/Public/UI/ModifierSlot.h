@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Widget_ModifierSlot.generated.h"
+#include "ModifierSlot.generated.h"
 
 class UTextBlock;
 
@@ -12,7 +12,7 @@ class UTextBlock;
  * The 
  */
 UCLASS()
-class SOUL_LIKE_ACT_API UWidget_ModifierSlot : public UUserWidget
+class SOUL_LIKE_ACT_API UModifierSlot : public UUserWidget
 {
 	GENERATED_BODY()
 
@@ -24,6 +24,10 @@ protected:
 
 // 	UFUNCTION(BlueprintCallable)
 // 	void OnSlottedItemChanged(const struct FSoulItemSlot &ItemSlot, const class USoulItem*& Item);
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn))
+		FString AbilityName;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn))
+		FString AbilityMagnitude;
 
 public:
 	UFUNCTION(BlueprintCallable)
