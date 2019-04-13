@@ -6,6 +6,10 @@
 #include "Blueprint/UserWidget.h"
 #include "Widget_ItemInfo.generated.h"
 
+class UTextBlock;
+class UImage;
+class UVerticalBox;
+
 /**
  * 
  */
@@ -17,17 +21,23 @@ class SOUL_LIKE_ACT_API UWidget_ItemInfo : public UUserWidget
 protected:
 	//Edit in BP
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-	class UVerticalBox* ModifierBox;
-	
+	UVerticalBox* ModifierBox;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-	class UTextBlock* ItemType;
+	UTextBlock* ItemType;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-	class UTextBlock* ItemMainStat;
+	UTextBlock* ItemMainStat;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-	class UTextBlock* ItemStat;
+	UTextBlock* ItemStat;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-	class UTextBlock* ItemLevel;
-	
+	UTextBlock* ItemStatPlus;
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UTextBlock* ItemLevel;
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UTextBlock* ItemName;
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UImage* ItemIcon;
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UTextBlock* ItemQuantity;
 
 	/**
 	 * Temp Variables
