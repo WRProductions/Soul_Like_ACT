@@ -35,6 +35,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UTextBlock* ItemName;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UTextBlock* ItemDescription;
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UImage* ItemIcon;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UTextBlock* ItemQuantity;

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "Styling/SlateBrush.h"
+#include "Engine/Texture.h"
 #include "SoulAssetManager.h"
 #include "ItemBasic.generated.h"
 
@@ -37,7 +37,7 @@ public:
 
 	/** Icon to display */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
-		FSlateBrush ItemIcon;
+		UTexture* ItemIcon;
 
 	/** Maximum number of instances that can be in inventory at once, <= 0 means infinite */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Max)

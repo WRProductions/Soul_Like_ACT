@@ -9,14 +9,14 @@
 
 void UWidget_ItemInfo::MakeItemInfo_Implementation(USoulItem* ItemToRead, const FSoulItemData& ItemData)
 {
-	ItemName->SetText(FText::FromString(ItemToRead->ItemName));
+	ItemName->SetText(ItemToRead->ItemName);
 	
 	ItemType->SetText(FText::FromString(ItemToRead->ItemType.ToString()));
 
 	ItemLevel->SetText(FText::FromString(FString::FromInt(ItemData.ItemLevel)));
 
 	//Item level
-	if (ItemData.ItemLevel <= 0)
+	if (ItemData.ItemLevel <= 1)
 	{
 		ItemStat->SetVisibility(ESlateVisibility::Hidden);
 		ItemStatPlus->SetVisibility(ESlateVisibility::Hidden);
@@ -25,7 +25,7 @@ void UWidget_ItemInfo::MakeItemInfo_Implementation(USoulItem* ItemToRead, const 
 	{
 		ItemStat->SetVisibility(ESlateVisibility::Visible);
 		ItemStatPlus->SetVisibility(ESlateVisibility::Visible);
-		ItemStat->SetText(FText::FromString((ItemData.ItemLevel * 2).ToString()));
+		ItemStat->SetText(FText::FromString(FString::FromInt(ItemData.ItemLevel * 2)));
 	}
 
 	//Item Count
@@ -36,10 +36,21 @@ void UWidget_ItemInfo::MakeItemInfo_Implementation(USoulItem* ItemToRead, const 
 	else
 	{
 		ItemQuantity->SetVisibility(ESlateVisibility::Visible);
-		ItemQuantity->(FText::FromString((ItemData.ItemCount).ToString()));
+		ItemQuantity->SetText(FText::FromString(FString::FromInt(ItemData.ItemCount)));
 	}
 
 	//Icon
 	UMaterialInstanceDynamic* DynIcon = ItemIcon->GetDynamicMaterial();
-	DynIcon->SetTextureParameterValue(Icon, ItemToRead->ItemIcon.)
+	DynIcon->SetTextureParameterValue(FName("IconTexture"), ItemToRead->ItemIcon);
+
+	//Description
+	if (ItemToRead->ItemDescription.IsEmpty())
+	{
+		ItemDescription->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		ItemDescription->SetVisibility(ESlateVisibility::Visible);
+		ItemDescription->SetText(ItemToRead->ItemDescription);
+	}
 }
