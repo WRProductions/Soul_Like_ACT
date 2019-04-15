@@ -5,16 +5,8 @@
 #include "Item/ItemBasic.h"
 #include "Abilities/SoulGameplayAbility.h"
 
-void USoulSerializerBpLib::ToString_Modifier(const TPair<TSubclassOf<USoulGameplayAbility>, int32>& InputAbilityInfo,
-                                             FString& ModifierName, FString& ModifierLevel)
-{
-	ModifierName = (InputAbilityInfo.Key)->GetName();
-
-	ModifierLevel = FString::FromInt(InputAbilityInfo.Value);
-}
-
-void USoulSerializerBpLib::ToString_Modifier(const USoulItem* ItemRef,
-	TArray<FString>& ModifierNames, TArray<FString>& ModifierLevels, bool& Successful)
+void USoulSerializerBpLib::GetModifiersFromItem(const USoulItem* ItemRef, TArray<FString>& ModifierNames,
+                                                TArray<FString>& ModifierLevels, bool& Successful)
 {
 	const TMap<TSubclassOf<USoulGameplayAbility>, int>& TargetGA = ItemRef->GrantedAbility;
 	int32 GA_Size = TargetGA.Num();
@@ -31,11 +23,52 @@ void USoulSerializerBpLib::ToString_Modifier(const USoulItem* ItemRef,
 		uint8 i = 0;
 		for (auto Element : TargetGA)
 		{
-			ToString_Modifier(Element, ModifierNames[i], ModifierLevels[i]);
+			ModiferToString(Element, ModifierNames[i], ModifierLevels[i]);
 
 			++i;
 		}
 
 		Successful = true;
 	}
+}
+
+void USoulSerializerBpLib::ModiferToString(const TPair<TSubclassOf<USoulGameplayAbility>, int32>& InputAbilityInfo,
+                                           FString& ModifierName, FString& ModifierLevel)
+{
+	ModifierName = (InputAbilityInfo.Key)->GetName();
+
+	ModifierLevel = FString::FromInt(InputAbilityInfo.Value);
+}
+
+void USoulSerializerBpLib::AttributeToString(FGameplayAttribute Attribute, FString& Output)
+{
+	if (Attribute == USoulAttributeSet::GetHealthAttribute())
+		Output = "Health";
+
+	else if (Attribute == USoulAttributeSet::GetStaminaAttribute())
+		Output = "Stamina";
+
+	else if (Attribute == USoulAttributeSet::GetLeechAttribute())
+		Output = "Leech";
+
+	else if (Attribute == USoulAttributeSet::GetMoveSpeedAttribute())
+		Output = "Move Speed";
+
+	else if (Attribute == USoulAttributeSet::GetTenacityAttribute())
+		Output = "Tenacity";
+
+	else if (Attribute == USoulAttributeSet::GetAttackPowerAttribute())
+		Output = "Attack Power";
+
+	else if (Attribute == USoulAttributeSet::GetDefensePowerAttribute())
+		Output = "Defense";
+
+	else if (Attribute == USoulAttributeSet::GetAttackSpeedAttribute())
+		Output = "Attack Speed";
+
+	else if (Attribute == USoulAttributeSet::GetCriticalStrikeAttribute())
+		Output = "Critical Strike";
+
+	else if (Attribute == USoulAttributeSet::GetCriticalMultiAttribute())
+		Output = "Critical Multiplier";
 }

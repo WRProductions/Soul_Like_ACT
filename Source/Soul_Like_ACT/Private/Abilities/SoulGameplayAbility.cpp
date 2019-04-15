@@ -6,13 +6,15 @@
 #include "SoulCharacterBase.h"
 
 
-FSoulGameplayEffectContainerSpec USoulGameplayAbility::MakeEffectContainerSpecFromContainer(const FSoulGameplayEffectContainer & Container, const FGameplayEventData & EventData, int32 OverrideGameplayLevel)
+FSoulGameplayEffectContainerSpec USoulGameplayAbility::MakeEffectContainerSpecFromContainer(
+	const FSoulGameplayEffectContainer& Container, const FGameplayEventData& EventData, int32 OverrideGameplayLevel)
 {
 	// First figure out our actor info
 	FSoulGameplayEffectContainerSpec ReturnSpec;
 	AActor* OwningActor = GetOwningActorFromActorInfo();
 	ASoulCharacterBase* OwningCharacter = Cast<ASoulCharacterBase>(OwningActor);
-	USoulAbilitySystemComponent* OwningASC = USoulAbilitySystemComponent::GetAbilitySystemComponentFromActor(OwningActor);
+	USoulAbilitySystemComponent* OwningASC = USoulAbilitySystemComponent::
+		GetAbilitySystemComponentFromActor(OwningActor);
 
 	if (OwningASC)
 	{
@@ -36,13 +38,15 @@ FSoulGameplayEffectContainerSpec USoulGameplayAbility::MakeEffectContainerSpecFr
 		// Build GameplayEffectSpecs for each applied effect
 		for (const TSubclassOf<UGameplayEffect>& EffectClass : Container.TargetGameplayEffectClasses)
 		{
-			ReturnSpec.TargetGameplayEffectSpecs.Add(MakeOutgoingGameplayEffectSpec(EffectClass, OverrideGameplayLevel));
+			ReturnSpec.TargetGameplayEffectSpecs.
+			           Add(MakeOutgoingGameplayEffectSpec(EffectClass, OverrideGameplayLevel));
 		}
 	}
 	return ReturnSpec;
 }
 
-FSoulGameplayEffectContainerSpec USoulGameplayAbility::MakeEffectContainerSpec(FGameplayTag ContainerTag, const FGameplayEventData & EventData, int32 OverrideGameplayLevel)
+FSoulGameplayEffectContainerSpec USoulGameplayAbility::MakeEffectContainerSpec(
+	FGameplayTag ContainerTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel)
 {
 	FSoulGameplayEffectContainer* FoundContainer = EffectContainerMap.Find(ContainerTag);
 
@@ -53,7 +57,8 @@ FSoulGameplayEffectContainerSpec USoulGameplayAbility::MakeEffectContainerSpec(F
 	return FSoulGameplayEffectContainerSpec();
 }
 
-TArray<FActiveGameplayEffectHandle> USoulGameplayAbility::ApplyEffectContainerSpec(const FSoulGameplayEffectContainerSpec & ContainerSpec)
+TArray<FActiveGameplayEffectHandle> USoulGameplayAbility::ApplyEffectContainerSpec(
+	const FSoulGameplayEffectContainerSpec& ContainerSpec)
 {
 	TArray<FActiveGameplayEffectHandle> AllEffects;
 
@@ -65,7 +70,23 @@ TArray<FActiveGameplayEffectHandle> USoulGameplayAbility::ApplyEffectContainerSp
 	return AllEffects;
 }
 
-TArray<FActiveGameplayEffectHandle> USoulGameplayAbility::ApplyEffectContainer(FGameplayTag ContainerTag, const FGameplayEventData & EventData, int32 OverrideGameplayLevel)
+void USoulModifierGameplayAbility::GetModifierNameAndLevel(const USoulGameplayAbility* ModifierGA, FText& OutName,
+                                                           int32& OutMagnitude, bool& Successful)
+{
+	const USoulModifierGameplayAbility* TempGA = Cast<USoulModifierGameplayAbility>(ModifierGA);
+	if(TempGA->IsValidLowLevelFast())
+	{
+		OutName = TempGA->ModifierPrimaryName;
+		OutMagnitude = TempGA->GetAbilityLevel();
+		Successful = true;
+	}else
+	{
+		Successful = false;
+	}
+}
+
+TArray<FActiveGameplayEffectHandle> USoulGameplayAbility::ApplyEffectContainer(
+	FGameplayTag ContainerTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel)
 {
 	FSoulGameplayEffectContainerSpec Spec = MakeEffectContainerSpec(ContainerTag, EventData, OverrideGameplayLevel);
 	return ApplyEffectContainerSpec(Spec);

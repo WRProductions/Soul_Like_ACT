@@ -10,9 +10,9 @@
 
 class USoulGameplayAbility;
 
- /** Base class for all items, do not blueprint directly */
+/** Base class for all items, do not blueprint directly */
 UCLASS(Abstract, BlueprintType)
-class SOUL_LIKE_ACT_API USoulItem : public UPrimaryDataAsset
+	class SOUL_LIKE_ACT_API USoulItem : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
@@ -20,51 +20,52 @@ public:
 	/** Constructor */
 	USoulItem()
 		: MaxCount(1)
-		, MaxLevel(1)
-	{}
+		  , MaxLevel(1)
+	{
+	}
 
 	/** Type of this item, set in native parent class */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Item)
-		FPrimaryAssetType ItemType;
+	FPrimaryAssetType ItemType;
 
 	/** User-visible short name */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
-		FText ItemName;
+	FText ItemName;
 
 	/** User-visible long description */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
-		FText ItemDescription;
+	FText ItemDescription;
 
 	/** Icon to display */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
-		UTexture* ItemIcon;
+	UTexture* ItemIcon;
 
 	/** Maximum number of instances that can be in inventory at once, <= 0 means infinite */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Max)
-		int32 MaxCount;
+	int32 MaxCount;
 
 	/** Returns if the item is consumable (MaxCount <= 0)*/
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Max)
-		bool IsConsumable() const;
+	bool IsConsumable() const;
 
 	/** Maximum level this item can be, <= 0 means infinite */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Max)
-		int32 MaxLevel;
+	int32 MaxLevel;
 
 	/** Ability to grant if this item is slotted */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
-		TMap<TSubclassOf<USoulGameplayAbility>, int32> GrantedAbility;
+	TMap<TSubclassOf<USoulGameplayAbility>, int32> GrantedAbility;
 
 	/** Returns the logical name, equivalent to the primary asset id */
 	UFUNCTION(BlueprintCallable, Category = Item)
-		FString GetIdentifierString() const;
+	FString GetIdentifierString() const;
 
 	/** Overridden to use saved type */
 	virtual FPrimaryAssetId GetPrimaryAssetId() const override;
 };
 
 UCLASS()
-class SOUL_LIKE_ACT_API USoulWeaponItem : public USoulItem
+	class SOUL_LIKE_ACT_API USoulWeaponItem : public USoulItem
 {
 	GENERATED_BODY()
 
@@ -75,30 +76,36 @@ public:
 		ItemType = USoulAssetManager::WeaponItemType;
 	}
 
-	/** Weapon actor to spawn */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<class USoulPrimaryStatusGameplayAbility> PrimaryAbility;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 PrimaryAbilityLevel;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class AWeaponActor> WeaponActor;
 };
 
 UCLASS()
-class SOUL_LIKE_ACT_API USoulArmourItem : public USoulItem
+	class SOUL_LIKE_ACT_API USoulArmourItem : public USoulItem
 {
 	GENERATED_BODY()
 
 public:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<class USoulPrimaryStatusGameplayAbility> PrimaryAbility;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 PrimaryAbilityLevel;
+
 	/** Constructor */
 	USoulArmourItem()
 	{
 		ItemType = USoulAssetManager::ArmourItemType;
 	}
-
-	/** Weapon actor to spawn */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
-		TSubclassOf<AActor> WeaponActor;
 };
 
 UCLASS()
-class SOUL_LIKE_ACT_API USoulPotionItem : public USoulItem
+	class SOUL_LIKE_ACT_API USoulPotionItem : public USoulItem
 {
 	GENERATED_BODY()
 
@@ -112,7 +119,7 @@ public:
 };
 
 UCLASS()
-class SOUL_LIKE_ACT_API USoulJewelItem : public USoulItem
+	class SOUL_LIKE_ACT_API USoulJewelItem : public USoulItem
 {
 	GENERATED_BODY()
 

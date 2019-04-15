@@ -4,13 +4,14 @@
 #include "Widget_ItemInfo.h"
 #include "Types/SoulItemTypes.h"
 #include "Item/ItemBasic.h"
+#include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/Image.h"
 
 void UWidget_ItemInfo::MakeItemInfo_Implementation(USoulItem* ItemToRead, const FSoulItemData& ItemData)
 {
 	ItemName->SetText(ItemToRead->ItemName);
-	
+
 	ItemType->SetText(FText::FromString(ItemToRead->ItemType.ToString()));
 
 	ItemLevel->SetText(FText::FromString(FString::FromInt(ItemData.ItemLevel)));
