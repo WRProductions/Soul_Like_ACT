@@ -65,26 +65,18 @@ UCLASS()
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Defautl)
-	FText ModifierPrimaryName;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf<UGameplayEffect> EffectCollection;
+
 
 public:
 	USoulModifierGameplayAbility()
-		: ModifierPrimaryName(FText::FromString("Invalid Modifier"))
+		: DisplayName(FText::FromString("Invalid Modifier"))
 	{
 	}
 
-	/**
-	 * \brief 
-	 * \param ModifierGA The modifier GameplayAbility from the gear 
-	 * \param OutName Descriptive name of the GA
-	 * \param OutMagnitude GA primary level. Since the GA may contains more than 1 GE, primary level is the modifier of all GE's
-	 */
-	UFUNCTION(BlueprintCallable)
-	static void GetModifierNameAndLevel(const USoulGameplayAbility* ModifierGA, FText& OutName, int32& OutMagnitude,
-	                                    bool& Successful);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
+	FText DisplayName;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
+	TSubclassOf<UGameplayEffect> EffectCollection;
 };
 
 UCLASS()

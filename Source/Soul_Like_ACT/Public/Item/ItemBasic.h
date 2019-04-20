@@ -52,9 +52,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Max)
 	int32 MaxLevel;
 
-	/** Ability to grant if this item is slotted */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
-	TMap<TSubclassOf<USoulGameplayAbility>, int32> GrantedAbility;
+	TSubclassOf<class USoulPrimaryStatusGameplayAbility> PrimaryAbility;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
+	int32 PrimaryAbilityLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
+	TMap<TSubclassOf<class USoulModifierGameplayAbility>, int32> Modifiers;
 
 	/** Returns the logical name, equivalent to the primary asset id */
 	UFUNCTION(BlueprintCallable, Category = Item)
@@ -76,10 +80,7 @@ public:
 		ItemType = USoulAssetManager::WeaponItemType;
 	}
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<class USoulPrimaryStatusGameplayAbility> PrimaryAbility;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int32 PrimaryAbilityLevel;
+
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class AWeaponActor> WeaponActor;
@@ -91,11 +92,6 @@ UCLASS()
 	GENERATED_BODY()
 
 public:
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<class USoulPrimaryStatusGameplayAbility> PrimaryAbility;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int32 PrimaryAbilityLevel;
 
 	/** Constructor */
 	USoulArmourItem()

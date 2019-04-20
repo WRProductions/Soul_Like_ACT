@@ -5,10 +5,10 @@
 #include "Item/ItemBasic.h"
 #include "Abilities/SoulGameplayAbility.h"
 
-void USoulSerializerBpLib::GetModifiersFromItem(const USoulItem* ItemRef, TArray<FString>& ModifierNames,
-                                                TArray<FString>& ModifierLevels, bool& Successful)
+void USoulSerializerBpLib::GetModifiersFromItem(const USoulItem* ItemRef, TArray<FText>& ModifierNames,
+                                                TArray<FText>& ModifierLevels, bool& Successful)
 {
-	const TMap<TSubclassOf<USoulGameplayAbility>, int>& TargetGA = ItemRef->GrantedAbility;
+	const TMap<TSubclassOf<USoulModifierGameplayAbility>, int32>& TargetGA = ItemRef->Modifiersf;
 	int32 GA_Size = TargetGA.Num();
 	if (GA_Size <= 0)
 	{
@@ -23,21 +23,49 @@ void USoulSerializerBpLib::GetModifiersFromItem(const USoulItem* ItemRef, TArray
 		uint8 i = 0;
 		for (auto Element : TargetGA)
 		{
-			ModiferToString(Element, ModifierNames[i], ModifierLevels[i]);
+			ModiferToText(Element, ModifierNames[i], ModifierLevels[i]);
 
 			++i;
 		}
 
-		Successful = true;
+		Successful = ModifierNames.Num() > 0;
 	}
 }
 
-void USoulSerializerBpLib::ModiferToString(const TPair<TSubclassOf<USoulGameplayAbility>, int32>& InputAbilityInfo,
-                                           FString& ModifierName, FString& ModifierLevel)
+void USoulSerializerBpLib::GetPrimaryStatusFromItem(const USoulItem* ItemRef, TArray<FText>& ModifierNames, TArray<FText>& ModifierLevels, bool& Successful)
 {
-	ModifierName = (InputAbilityInfo.Key)->GetName();
+	if (!ItemRef->PrimaryAbility)
+	{
+		Successful = 0;
+		return;
+	}
 
-	ModifierLevel = FString::FromInt(InputAbilityInfo.Value);
+	USoulPrimaryStatusGameplayAbility *TempAbility = Cast<USoulPrimaryStatusGameplayAbility>(ItemRef->PrimaryAbility->GetDefaultObject(true));
+
+	if (!TempAbility)
+	{
+		Successful = 0;
+		return;
+	}
+	ModifierNames.Add(TempAbility->DisplayName);
+
+	ModifierLevels.Add(FText::FromString(FString::FromInt(ItemRef->PrimaryAbilityLevel)));
+
+	Successful = ModifierNames.Num() > 0;
+}
+
+void USoulSerializerBpLib::ModiferToText(const TPair<TSubclassOf<USoulModifierGameplayAbility>, int32>& InputAbilityInfo,
+                                           FText& ModifierName, FText& ModifierLevel)
+{
+	USoulModifierGameplayAbility* TempGA = Cast<USoulModifierGameplayAbility>((InputAbilityInfo.Key)->GetDefaultObject(true));
+
+	if (!TempGA)
+	{
+		return;
+	}
+
+	ModifierName = TempGA->DisplayName;
+	ModifierLevel =  FText::FromString(FString::FromInt(InputAbilityInfo.Value));
 }
 
 void USoulSerializerBpLib::AttributeToString(FGameplayAttribute Attribute, FString& Output)

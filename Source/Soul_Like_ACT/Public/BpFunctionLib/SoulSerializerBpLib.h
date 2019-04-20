@@ -21,12 +21,16 @@ UCLASS()
 public:
 
 	UFUNCTION(BlueprintCallable)
-	static void GetModifiersFromItem(const USoulItem* ItemRef, TArray<FString>& ModifierNames,
-	                              TArray<FString>& ModifierLevels, bool& Successful);
+	static void GetModifiersFromItem(const USoulItem* ItemRef, TArray<FText>& ModifierNames,
+	                              TArray<FText>& ModifierLevels, bool& Successful);
+
+	UFUNCTION(BlueprintCallable)
+	static void GetPrimaryStatusFromItem(const USoulItem* ItemRef, TArray<FText>& ModifierNames,
+								TArray<FText>& ModifierLevels, bool& Successful);
 
 	UFUNCTION(BlueprintCallable)
 	static void AttributeToString(FGameplayAttribute Attribute, FString& Output);
 
-	static void ModiferToString(const TPair<TSubclassOf<USoulGameplayAbility>, int32>& InputAbilityInfo,
-		FString& ModifierName, FString& ModifierLevel);
+	static void ModiferToText(const TPair<TSubclassOf<USoulModifierGameplayAbility>, int32>& InputAbilityInfo,
+		FText& ModifierName, FText& ModifierLevel);
 };

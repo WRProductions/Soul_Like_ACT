@@ -70,21 +70,6 @@ TArray<FActiveGameplayEffectHandle> USoulGameplayAbility::ApplyEffectContainerSp
 	return AllEffects;
 }
 
-void USoulModifierGameplayAbility::GetModifierNameAndLevel(const USoulGameplayAbility* ModifierGA, FText& OutName,
-                                                           int32& OutMagnitude, bool& Successful)
-{
-	const USoulModifierGameplayAbility* TempGA = Cast<USoulModifierGameplayAbility>(ModifierGA);
-	if(TempGA->IsValidLowLevelFast())
-	{
-		OutName = TempGA->ModifierPrimaryName;
-		OutMagnitude = TempGA->GetAbilityLevel();
-		Successful = true;
-	}else
-	{
-		Successful = false;
-	}
-}
-
 TArray<FActiveGameplayEffectHandle> USoulGameplayAbility::ApplyEffectContainer(
 	FGameplayTag ContainerTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel)
 {

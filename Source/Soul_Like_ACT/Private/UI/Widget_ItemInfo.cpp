@@ -16,6 +16,15 @@ void UWidget_ItemInfo::MakeItemInfo_Implementation(USoulItem* ItemToRead, const 
 
 	ItemLevel->SetText(FText::FromString(FString::FromInt(ItemData.ItemLevel)));
 
+	//TODO Set primary status name
+ 	TArray<FText> PrimStatNames, PrimStatValues;
+	bool bSuccessful;
+ 	USoulSerializerBpLib::GetPrimaryStatusFromItem(ItemToRead, PrimStatNames, PrimStatValues, bSuccessful);
+
+	if (bSuccessful)
+	{
+		ItemMainStat->SetText(PrimStatValues[0]);
+	}
 	//Item level
 	if (ItemData.ItemLevel <= 1)
 	{
