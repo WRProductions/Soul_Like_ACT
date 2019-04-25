@@ -60,7 +60,7 @@ public:
 	 * @param RemoveExtra If true, remove anything other than default inventory
 	 */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-		void AddDefaultInventory(USoulSaveGame* SaveGame, bool bRemoveExtra = false);
+		void AddDefaultInventory(bool bRemoveExtra = false);
 
 	/** Returns true if this is a valid inventory slot */
  	UFUNCTION(BlueprintCallable, Category = Inventory)
@@ -82,4 +82,12 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = UI)
 		void SpawnFloatingDamageTextWidget(const AActor* DamageReceiver, const float DamageInput);
 
+protected:
+
+
+
+	//FStreamableDelegate
+	void OnAsyncLoadingFinished();
+
+	TSharedPtr<FStreamableHandle> TempStreamableHandle;
 };

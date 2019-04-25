@@ -4,6 +4,7 @@
 #include "SoulGameInstanceBase.h"
 #include "SoulSaveGame.h"
 #include "Item/ItemBasic.h"
+#include "Item/SoulAssetManager.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "SoulAssetManager.h"
@@ -33,16 +34,24 @@ void USoulGameInstanceBase::GetItemIDWithType(const FPrimaryAssetType ItemType, 
 	CurrentAssetManager.GetPrimaryAssetIdList(ItemType, OutpId);
 }
 
-void USoulGameInstanceBase::AddDefaultInventory(USoulSaveGame* SaveGame, bool bRemoveExtra)
+void USoulGameInstanceBase::AddDefaultInventory(bool bRemoveExtra)
 {
 	// If we want to remove extra, clear out the existing inventokay
  	if (bRemoveExtra)
  	{
- 		//SaveGame->InventoryData.Reset();
+ 		CurrentSaveGame->InventoryItemData.Reset();
+		CurrentSaveGame->EquipedItemData.Reset();
  	}
 
- 	
+
+	USoulAssetManager &MyAssetManager = USoulAssetManager::Get();
+
+	MyAssetManager.LoadPrimaryAssets(DefaultInventory, TArray <FName> {}
+	, FStreamableDelegate::CreateUObject(this, &USoulGameInstanceBase::OnAsyncLoadingFinished)
+	, 0);
 }
+
+
 
 bool USoulGameInstanceBase::IsValidItemSlot(FSoulItemSlot ItemSlot) const
 {
@@ -62,7 +71,7 @@ bool USoulGameInstanceBase::LoadOrCreateSaveGame()
 	if (CurrentSaveGame)
 	{
 		// Make sure it has any newly added default inventory
-		AddDefaultInventory(CurrentSaveGame, false);
+		AddDefaultInventory(false);
 
 		return true;
 	}
@@ -71,7 +80,7 @@ bool USoulGameInstanceBase::LoadOrCreateSaveGame()
 		// This creates it on demand
 		CurrentSaveGame = Cast<USoulSaveGame>(UGameplayStatics::CreateSaveGameObject(USoulSaveGame::StaticClass()));
 
-		AddDefaultInventory(CurrentSaveGame, true);
+		AddDefaultInventory(true);
 
 		return false;
 	}
@@ -92,4 +101,23 @@ void USoulGameInstanceBase::ResetSaveGame()
 	bSavingEnabled = false;
 	LoadOrCreateSaveGame();
 	bSavingEnabled = bWasSavingEnabled;
+}
+
+
+
+void USoulGameInstanceBase::OnAsyncLoadingFinished()
+{
+	TArray<UObject*> LoadedAssets;
+
+	TempStreamableHandle->GetLoadedAssets(LoadedAssets);
+
+	for(UObject *a : LoadedAssets)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s is added as the default item"), *a->GetName());
+		
+		FSoulItemData newData(Cast<USoulItem>(a), 1, 1);
+		CurrentSaveGame->InventoryItemData.Add(newData);
+	}
+
+	//Load Items from game save	
 }

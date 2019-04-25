@@ -3,6 +3,7 @@
 #include "InventoryManager.h"
 #include "GameFramework/Character.h"
 #include "Engine/World.h"
+#include "SoulSaveGame.h"
 #include "SoulGameInstanceBase.h"
 
 UInventoryManager::UInventoryManager()
@@ -55,6 +56,15 @@ bool UInventoryManager::LoadInventory()
 
 	UWorld* World = GetWorld();
 	USoulGameInstanceBase* GI = World ? World->GetGameInstance<USoulGameInstanceBase>() : nullptr;
+	USoulSaveGame* CurrentSG = GI->CurrentSaveGame;
+
+	int32 LocalSlotNum = 0;
+
+	//Load Items from game save
+	for (auto Item : CurrentSG->InventoryItemData)
+	{
+		InventoryItems.Add(FSoulItemSlot(LocalSlotNum++), Item);
+	}
 
 	return false;
 }

@@ -106,7 +106,13 @@ struct SOUL_LIKE_ACT_API FSoulItemData
 	{
 	}
 
-	FSoulItemData(int32 InItemCount, int32 InItemLevel, USoulItem* InItemBase)
+	FSoulItemData(USoulItem* InItemBase)
+		: ItemBase(InItemBase)
+		, ItemCount(1)
+		, ItemLevel(1)
+	{}
+
+	FSoulItemData(USoulItem* InItemBase, int32 InItemCount, int32 InItemLevel)
 		: ItemBase(InItemBase)
 		  , ItemCount(InItemCount)
 		  , ItemLevel(InItemLevel)
@@ -130,7 +136,7 @@ struct SOUL_LIKE_ACT_API FSoulItemData
 	/** Equality operators */
 	bool operator==(const FSoulItemData& Other) const
 	{
-		return ItemCount == Other.ItemCount && ItemLevel == Other.ItemLevel && ItemBase == Other.ItemBase;
+		return ItemCount == Other.ItemCount && ItemLevel == Other.ItemLevel && ItemBase == Other.ItemBase && SlotedJewls == Other.SlotedJewls;
 	}
 
 	bool operator!=(const FSoulItemData& Other) const

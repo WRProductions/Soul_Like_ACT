@@ -91,5 +91,5 @@ public:
 
 	/** Map of slotted items */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
-	TMap<FSoulEquipmentSlot, FSoulItemData> SlottedItems;
+	TMap<FSoulEquipmentSlot, FSoulItemData> EquipedItemData;
 };
