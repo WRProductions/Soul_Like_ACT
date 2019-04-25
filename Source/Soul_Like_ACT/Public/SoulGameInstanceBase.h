@@ -26,7 +26,7 @@ public:
 
 	/** List of inventory items to add to new players */
  	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
- 		TMap<FPrimaryAssetId, FSoulItemData> DefaultInventory;
+ 		TArray<FPrimaryAssetId> DefaultInventory;
 
 	//By Default, It contains all accessible Item Types
 	const TArray<FPrimaryAssetType> AllItemTypes{USoulAssetManager::ArmourItemType, USoulAssetManager::WeaponItemType,USoulAssetManager::PotionItemType,USoulAssetManager::JewelItemType};
@@ -38,6 +38,15 @@ public:
 	/** The platform-specific user index */
 	UPROPERTY(BlueprintReadWrite, Category = Save)
 		int32 SaveUserIndex;
+
+	/** Rather it will attempt to actually save to disk */
+	/** Sets rather save/load is enabled. If disabled it will always count as a new character */
+	UPROPERTY()
+		bool bSavingEnabled;
+
+	/** The current save game object */
+	UPROPERTY()
+		USoulSaveGame* CurrentSaveGame;
 
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 		void GetAllAccessibleItemID(TArray<FPrimaryAssetId>& OutpId);
@@ -57,14 +66,6 @@ public:
  	UFUNCTION(BlueprintCallable, Category = Inventory)
  		bool IsValidItemSlot(FSoulItemSlot ItemSlot) const;
 
-	/** Returns the current save game, so it can be used to initialize state. Changes are not written until WriteSaveGame is called */
-	UFUNCTION(BlueprintCallable, Category = Save)
-		USoulSaveGame* GetCurrentSaveGame();
-
-	/** Sets rather save/load is enabled. If disabled it will always count as a new character */
-	UFUNCTION(BlueprintCallable, Category = Save)
-		void SetSavingEnabled(bool bEnabled);
-
 	/** Loads a save game. If it fails, it will create a new one for you. Returns true if it loaded, false if it created one */
 	UFUNCTION(BlueprintCallable, Category = Save)
 		bool LoadOrCreateSaveGame();
@@ -77,12 +78,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Save)
 		void ResetSaveGame();
 
-protected:
-	/** The current save game object */
-	UPROPERTY()
-		USoulSaveGame* CurrentSaveGame;
+	/** Spawn Floating Damage Widget on screen */
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = UI)
+		void SpawnFloatingDamageTextWidget(const AActor* DamageReceiver, const float DamageInput);
 
-	/** Rather it will attempt to actually save to disk */
-	UPROPERTY()
-		bool bSavingEnabled;
 };

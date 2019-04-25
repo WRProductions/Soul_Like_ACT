@@ -8,7 +8,7 @@
 void USoulSerializerBpLib::GetModifiersFromItem(const USoulItem* ItemRef, TArray<FText>& ModifierNames,
                                                 TArray<FText>& ModifierLevels, bool& Successful)
 {
-	const TMap<TSubclassOf<USoulModifierGameplayAbility>, int32>& TargetGA = ItemRef->Modifiersf;
+	const TMap<TSubclassOf<USoulModifierGameplayAbility>, int32>& TargetGA = ItemRef->Modifiers;
 	int32 GA_Size = TargetGA.Num();
 	if (GA_Size <= 0)
 	{

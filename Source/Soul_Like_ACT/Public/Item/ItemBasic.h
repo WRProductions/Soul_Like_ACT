@@ -10,6 +10,17 @@
 
 class USoulGameplayAbility;
 
+UENUM(BlueprintType)
+enum class EGearTypes : uint8
+{
+	Weapon,
+	BodyArmor,
+	Helmet,
+	Legs,
+	Boots,
+	Gloves,
+};
+
 /** Base class for all items, do not blueprint directly */
 UCLASS(Abstract, BlueprintType)
 	class SOUL_LIKE_ACT_API USoulItem : public UPrimaryDataAsset
@@ -53,6 +64,9 @@ public:
 	int32 MaxLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
+	int32 MaxSlots;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	TSubclassOf<class USoulPrimaryStatusGameplayAbility> PrimaryAbility;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	int32 PrimaryAbilityLevel;
@@ -79,11 +93,6 @@ public:
 	{
 		ItemType = USoulAssetManager::WeaponItemType;
 	}
-
-
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<class AWeaponActor> WeaponActor;
 };
 
 UCLASS()

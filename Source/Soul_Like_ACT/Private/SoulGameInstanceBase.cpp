@@ -5,6 +5,7 @@
 #include "SoulSaveGame.h"
 #include "Item/ItemBasic.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "SoulAssetManager.h"
 
 
@@ -34,42 +35,54 @@ void USoulGameInstanceBase::GetItemIDWithType(const FPrimaryAssetType ItemType, 
 
 void USoulGameInstanceBase::AddDefaultInventory(USoulSaveGame* SaveGame, bool bRemoveExtra)
 {
-	// If we want to remove extra, clear out the existing inventory
+	// If we want to remove extra, clear out the existing inventokay
  	if (bRemoveExtra)
  	{
- 		SaveGame->InventoryData.Reset();
- 	} 
- 	// Now add the default inventory, this only adds if not already in hte inventory
- 	for (const TPair<FPrimaryAssetId, FSoulItemData>& Pair : DefaultInventory)
- 	{
- 		if (!SaveGame->InventoryData.Contains(Pair.Key))
- 		{
- 			SaveGame->InventoryData.Add(Pair.Key, Pair.Value);
- 		}
+ 		//SaveGame->InventoryData.Reset();
  	}
+
+ 	
 }
 
 bool USoulGameInstanceBase::IsValidItemSlot(FSoulItemSlot ItemSlot) const
 {
-return false;
-}
-
-USoulSaveGame* USoulGameInstanceBase::GetCurrentSaveGame()
-{
-	return nullptr;
-}
-
-void USoulGameInstanceBase::SetSavingEnabled(bool bEnabled)
-{
+	return false;
 }
 
 bool USoulGameInstanceBase::LoadOrCreateSaveGame()
 {
-	return false;
+	// Drop reference to old save game, this will GC out
+	CurrentSaveGame = nullptr;
+
+	if (UGameplayStatics::DoesSaveGameExist(SaveSlot, SaveUserIndex) && bSavingEnabled)
+	{
+		CurrentSaveGame = Cast<USoulSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlot, SaveUserIndex));
+	}
+
+	if (CurrentSaveGame)
+	{
+		// Make sure it has any newly added default inventory
+		AddDefaultInventory(CurrentSaveGame, false);
+
+		return true;
+	}
+	else
+	{
+		// This creates it on demand
+		CurrentSaveGame = Cast<USoulSaveGame>(UGameplayStatics::CreateSaveGameObject(USoulSaveGame::StaticClass()));
+
+		AddDefaultInventory(CurrentSaveGame, true);
+
+		return false;
+	}
 }
 
 bool USoulGameInstanceBase::WriteSaveGame()
 {
+	if (bSavingEnabled)
+	{
+		return UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SaveSlot, SaveUserIndex);
+	}
 	return false;
 }
 
