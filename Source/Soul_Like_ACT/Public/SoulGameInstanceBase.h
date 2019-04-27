@@ -26,27 +26,18 @@ public:
 
 	/** List of inventory items to add to new players */
  	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
- 		TArray<FPrimaryAssetId> DefaultInventory;
+ 	TArray<FPrimaryAssetId> DefaultInventory;
 
 	//By Default, It contains all accessible Item Types
 	const TArray<FPrimaryAssetType> AllItemTypes{USoulAssetManager::ArmourItemType, USoulAssetManager::WeaponItemType,USoulAssetManager::PotionItemType,USoulAssetManager::JewelItemType};
 
-	/** The slot name used for saving */
-	UPROPERTY(BlueprintReadWrite, Category = Save)
-		FString SaveSlot;
-
-	/** The platform-specific user index */
-	UPROPERTY(BlueprintReadWrite, Category = Save)
-		int32 SaveUserIndex;
-
 	/** Rather it will attempt to actually save to disk */
 	/** Sets rather save/load is enabled. If disabled it will always count as a new character */
 	UPROPERTY()
-		bool bSavingEnabled;
+	bool bSavingEnabled;
 
-	/** The current save game object */
-	UPROPERTY()
-		USoulSaveGame* CurrentSaveGame;
+	UFUNCTION(BlueprintCallable)
+	USoulSaveGame* GetSaveSlot();
 
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 		void GetAllAccessibleItemID(TArray<FPrimaryAssetId>& OutpId);
@@ -59,12 +50,8 @@ public:
 	 * @param InventoryArray Inventory to modify
 	 * @param RemoveExtra If true, remove anything other than default inventory
 	 */
-	UFUNCTION(BlueprintCallable, Category = Inventory)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = Inventory)
 		void AddDefaultInventory(bool bRemoveExtra = false);
-
-	/** Returns true if this is a valid inventory slot */
- 	UFUNCTION(BlueprintCallable, Category = Inventory)
- 		bool IsValidItemSlot(FSoulItemSlot ItemSlot) const;
 
 	/** Loads a save game. If it fails, it will create a new one for you. Returns true if it loaded, false if it created one */
 	UFUNCTION(BlueprintCallable, Category = Save)
@@ -82,12 +69,23 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = UI)
 		void SpawnFloatingDamageTextWidget(const AActor* DamageReceiver, const float DamageInput);
 
+	UFUNCTION(BlueprintNativeEvent)
+		void OnStartGameClicked();
+
+
+
 protected:
+	/** The slot name used for saving */
+	UPROPERTY(BlueprintReadWrite, Category = Save)
+		FString SaveSlot;
 
+	/** The platform-specific user index */
+	UPROPERTY(BlueprintReadWrite, Category = Save)
+		int32 SaveUserIndex;
 
+	/** The current save game object */
+	USoulSaveGame* CurrentSaveGame;
 
-	//FStreamableDelegate
-	void OnAsyncLoadingFinished();
-
-	TSharedPtr<FStreamableHandle> TempStreamableHandle;
+	UFUNCTION(BlueprintCallable)
+	void OnAsyncLoadingFinished(const TArray<UObject*> &Outp);
 };

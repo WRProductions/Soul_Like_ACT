@@ -56,7 +56,7 @@ bool UInventoryManager::LoadInventory()
 
 	UWorld* World = GetWorld();
 	USoulGameInstanceBase* GI = World ? World->GetGameInstance<USoulGameInstanceBase>() : nullptr;
-	USoulSaveGame* CurrentSG = GI->CurrentSaveGame;
+	USoulSaveGame* CurrentSG = GI->GetSaveSlot();
 
 	int32 LocalSlotNum = 0;
 

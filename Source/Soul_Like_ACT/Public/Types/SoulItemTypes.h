@@ -99,25 +99,20 @@ struct SOUL_LIKE_ACT_API FSoulItemData
 {
 	GENERATED_BODY()
 
-	/** Constructor, default to count/level 1 so declaring them in blueprints gives you the expected behavior */
-	FSoulItemData()
-		: ItemCount(1)
-		  , ItemLevel(1)
-	{
-	}
-
-	FSoulItemData(USoulItem* InItemBase)
-		: ItemBase(InItemBase)
-		, ItemCount(1)
-		, ItemLevel(1)
-	{}
-
 	FSoulItemData(USoulItem* InItemBase, int32 InItemCount, int32 InItemLevel)
 		: ItemBase(InItemBase)
-		  , ItemCount(InItemCount)
-		  , ItemLevel(InItemLevel)
-	{
-	}
+		, ItemCount(InItemCount)
+		, ItemLevel(InItemLevel)
+	{}
+
+	/** Constructor, default to count/level 1 so declaring them in blueprints gives you the expected behavior */
+	FSoulItemData()
+		: FSoulItemData(nullptr, 1, 1)
+	{}
+
+	FSoulItemData(USoulItem* InItemBase)
+		: FSoulItemData(ItemBase, 1, 1)
+	{}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 	USoulItem* ItemBase;

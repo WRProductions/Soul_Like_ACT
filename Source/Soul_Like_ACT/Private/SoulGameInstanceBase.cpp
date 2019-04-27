@@ -14,7 +14,8 @@
 USoulGameInstanceBase::USoulGameInstanceBase()
 	: SaveSlot(TEXT("SaveGame"))
 	, SaveUserIndex(0)
-{}
+{
+}
 
 void USoulGameInstanceBase::GetAllAccessibleItemID(TArray<FPrimaryAssetId>& OutpId)
 {
@@ -34,7 +35,7 @@ void USoulGameInstanceBase::GetItemIDWithType(const FPrimaryAssetType ItemType, 
 	CurrentAssetManager.GetPrimaryAssetIdList(ItemType, OutpId);
 }
 
-void USoulGameInstanceBase::AddDefaultInventory(bool bRemoveExtra)
+void USoulGameInstanceBase::AddDefaultInventory_Implementation(bool bRemoveExtra)
 {
 	// If we want to remove extra, clear out the existing inventokay
  	if (bRemoveExtra)
@@ -42,20 +43,6 @@ void USoulGameInstanceBase::AddDefaultInventory(bool bRemoveExtra)
  		CurrentSaveGame->InventoryItemData.Reset();
 		CurrentSaveGame->EquipedItemData.Reset();
  	}
-
-
-	USoulAssetManager &MyAssetManager = USoulAssetManager::Get();
-
-	MyAssetManager.LoadPrimaryAssets(DefaultInventory, TArray <FName> {}
-	, FStreamableDelegate::CreateUObject(this, &USoulGameInstanceBase::OnAsyncLoadingFinished)
-	, 0);
-}
-
-
-
-bool USoulGameInstanceBase::IsValidItemSlot(FSoulItemSlot ItemSlot) const
-{
-	return false;
 }
 
 bool USoulGameInstanceBase::LoadOrCreateSaveGame()
@@ -66,22 +53,24 @@ bool USoulGameInstanceBase::LoadOrCreateSaveGame()
 	if (UGameplayStatics::DoesSaveGameExist(SaveSlot, SaveUserIndex) && bSavingEnabled)
 	{
 		CurrentSaveGame = Cast<USoulSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlot, SaveUserIndex));
+		CurrentSaveGame->UserId.AppendInt(FMath::FRandRange(0, 1000));
+		UE_LOG(LogTemp, Warning, TEXT("GI: Loaded Successful"));
 	}
 
 	if (CurrentSaveGame)
 	{
 		// Make sure it has any newly added default inventory
 		AddDefaultInventory(false);
-
 		return true;
 	}
 	else
 	{
 		// This creates it on demand
 		CurrentSaveGame = Cast<USoulSaveGame>(UGameplayStatics::CreateSaveGameObject(USoulSaveGame::StaticClass()));
-
-		AddDefaultInventory(true);
-
+		if (CurrentSaveGame)
+			AddDefaultInventory(true);
+		else
+			UE_LOG(LogTemp, Warning, TEXT("GI: Failed to create save game"));
 		return false;
 	}
 }
@@ -101,23 +90,44 @@ void USoulGameInstanceBase::ResetSaveGame()
 	bSavingEnabled = false;
 	LoadOrCreateSaveGame();
 	bSavingEnabled = bWasSavingEnabled;
+
+	UE_LOG(LogTemp, Warning, TEXT("GI: Save Slot Reset SUCCESSFUL"));
 }
 
-
-
-void USoulGameInstanceBase::OnAsyncLoadingFinished()
+USoulSaveGame* USoulGameInstanceBase::GetSaveSlot()
 {
-	TArray<UObject*> LoadedAssets;
-
-	TempStreamableHandle->GetLoadedAssets(LoadedAssets);
-
-	for(UObject *a : LoadedAssets)
+	if (!CurrentSaveGame)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s is added as the default item"), *a->GetName());
+		CurrentSaveGame = Cast<USoulSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlot, SaveUserIndex));
 		
-		FSoulItemData newData(Cast<USoulItem>(a), 1, 1);
-		CurrentSaveGame->InventoryItemData.Add(newData);
+		if (!CurrentSaveGame)
+			return nullptr;
 	}
+	
+	return CurrentSaveGame;
+}
 
-	//Load Items from game save	
+void USoulGameInstanceBase::OnStartGameClicked_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("GI: GAME START"));
+}
+
+void USoulGameInstanceBase::OnAsyncLoadingFinished(const TArray<UObject*>& Outp)
+{
+
+	for (UObject* a : Outp)
+	{
+		USoulItem* TempItem = Cast<USoulItem>(a);
+		if (TempItem->IsValidLowLevel()) {
+			UE_LOG(LogTemp, Warning, TEXT("GI: %s is added as the default item"), *a->GetName());
+
+			FSoulItemData newData(TempItem, 1, 1);
+			CurrentSaveGame->InventoryItemData.Add(newData);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("GI: Empty Slot"));
+			CurrentSaveGame->InventoryItemData.Add(FSoulItemData());
+		}
+	}
 }

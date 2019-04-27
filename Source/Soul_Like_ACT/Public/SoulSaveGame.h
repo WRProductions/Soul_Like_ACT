@@ -76,9 +76,10 @@ UCLASS(BlueprintType)
 public:
 	/** Constructor */
 	USoulSaveGame()
+		: UserId("Fresh Bird ")
+		, InventoryItemData()
+		, EquipedItemData()
 	{
-		// Set to current version, this will get overwritten during serialization when loading
-		// SavedDataVersion = ERPGSaveGameVersion::LatestVersion;
 	}
 
 	/** User's unique id */
