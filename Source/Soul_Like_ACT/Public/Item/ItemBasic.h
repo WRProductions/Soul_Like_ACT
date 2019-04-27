@@ -19,6 +19,9 @@ enum class EGearTypes : uint8
 	Legs,
 	Boots,
 	Gloves,
+	Ring,
+	Amulet,
+	Reliquary
 };
 
 /** Base class for all items, do not blueprint directly */

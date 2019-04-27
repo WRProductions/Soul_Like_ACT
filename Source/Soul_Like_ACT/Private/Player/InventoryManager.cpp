@@ -15,8 +15,6 @@ void UInventoryManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("Test UInventoryManager:: Hoho"));
-
 	LoadInventory();
 }
 
@@ -60,8 +58,11 @@ bool UInventoryManager::LoadInventory()
 
 	int32 LocalSlotNum = 0;
 
+	//Halt the program if there is NO SAVE GAME
+	check(CurrentSG);
+
 	//Load Items from game save
-	for (auto Item : CurrentSG->InventoryItemData)
+	for (FSoulItemData& Item : CurrentSG->InventoryItemData)
 	{
 		InventoryItems.Add(FSoulItemSlot(LocalSlotNum++), Item);
 	}

@@ -10,6 +10,8 @@
 class USoulItem;
 class USoulSaveGame;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadingFinished);
+
 /**
  * Base class for GameInstance, should be blueprinted
  * Most games will need to make a game-specific subclass of GameInstance
@@ -30,11 +32,6 @@ public:
 
 	//By Default, It contains all accessible Item Types
 	const TArray<FPrimaryAssetType> AllItemTypes{USoulAssetManager::ArmourItemType, USoulAssetManager::WeaponItemType,USoulAssetManager::PotionItemType,USoulAssetManager::JewelItemType};
-
-	/** Rather it will attempt to actually save to disk */
-	/** Sets rather save/load is enabled. If disabled it will always count as a new character */
-	UPROPERTY()
-	bool bSavingEnabled;
 
 	UFUNCTION(BlueprintCallable)
 	USoulSaveGame* GetSaveSlot();
@@ -72,20 +69,36 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 		void OnStartGameClicked();
 
-
-
 protected:
+	/** Rather it will attempt to actually save to disk */
+	/** Sets rather save/load is enabled. If disabled it will always count as a new character */
+	UPROPERTY()
+		bool bForceReset;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Levels)
+	FName GameplayLevelName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Levels)
+	FName LoginLevelName;
+
 	/** The slot name used for saving */
-	UPROPERTY(BlueprintReadWrite, Category = Save)
-		FString SaveSlot;
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Save)
+	FString SaveSlot;
 
 	/** The platform-specific user index */
-	UPROPERTY(BlueprintReadWrite, Category = Save)
-		int32 SaveUserIndex;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Save)
+	int32 SaveUserIndex;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = Save)
+	TSubclassOf<USaveGame> DefaultSaveGameBPClass;
 
 	/** The current save game object */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Save)
 	USoulSaveGame* CurrentSaveGame;
 
 	UFUNCTION(BlueprintCallable)
 	void OnAsyncLoadingFinished(const TArray<UObject*> &Outp);
+
+	UPROPERTY(BlueprintAssignable)
+	FOnLoadingFinished OnSaveGameLoadingFinished;
 };

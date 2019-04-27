@@ -77,9 +77,17 @@ public:
 	/** Constructor */
 	USoulSaveGame()
 		: UserId("Fresh Bird ")
-		, InventoryItemData()
-		, EquipedItemData()
 	{
+		InventoryItemData.Init(FSoulItemData(), 40);
+		EquipedItemData.Add(FSoulEquipmentSlot(EGearTypes::BodyArmor));
+		EquipedItemData.Add(FSoulEquipmentSlot(EGearTypes::Helmet));
+		EquipedItemData.Add(FSoulEquipmentSlot(EGearTypes::Weapon));
+		EquipedItemData.Add(FSoulEquipmentSlot(EGearTypes::Legs));
+		EquipedItemData.Add(FSoulEquipmentSlot(EGearTypes::Boots));
+		EquipedItemData.Add(FSoulEquipmentSlot(EGearTypes::Ring));
+		EquipedItemData.Add(FSoulEquipmentSlot(EGearTypes::Amulet));
+		EquipedItemData.Add(FSoulEquipmentSlot(EGearTypes::Reliquary));
+
 	}
 
 	/** User's unique id */

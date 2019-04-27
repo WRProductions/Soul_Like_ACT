@@ -10,11 +10,12 @@
 #include "SoulAssetManager.h"
 
 
-
 USoulGameInstanceBase::USoulGameInstanceBase()
 	: SaveSlot(TEXT("SaveGame"))
 	, SaveUserIndex(0)
 {
+	static ConstructorHelpers::FClassFinder<USoulSaveGame> DefaultSaveGame(TEXT("/Game/Blueprints/SoulSaveGame"));
+	DefaultSaveGameBPClass = DefaultSaveGame.Class;
 }
 
 void USoulGameInstanceBase::GetAllAccessibleItemID(TArray<FPrimaryAssetId>& OutpId)
@@ -50,25 +51,29 @@ bool USoulGameInstanceBase::LoadOrCreateSaveGame()
 	// Drop reference to old save game, this will GC out
 	CurrentSaveGame = nullptr;
 
-	if (UGameplayStatics::DoesSaveGameExist(SaveSlot, SaveUserIndex) && bSavingEnabled)
+	if (UGameplayStatics::DoesSaveGameExist(SaveSlot, SaveUserIndex) && !bForceReset)
 	{
 		CurrentSaveGame = Cast<USoulSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlot, SaveUserIndex));
-		CurrentSaveGame->UserId.AppendInt(FMath::FRandRange(0, 1000));
-		UE_LOG(LogTemp, Warning, TEXT("GI: Loaded Successful"));
 	}
 
 	if (CurrentSaveGame)
 	{
 		// Make sure it has any newly added default inventory
 		AddDefaultInventory(false);
+
+		UE_LOG(LogTemp, Warning, TEXT("GI: Loaded Successful"));
 		return true;
 	}
 	else
 	{
 		// This creates it on demand
-		CurrentSaveGame = Cast<USoulSaveGame>(UGameplayStatics::CreateSaveGameObject(USoulSaveGame::StaticClass()));
+		CurrentSaveGame = Cast<USoulSaveGame>(UGameplayStatics::CreateSaveGameObject(DefaultSaveGameBPClass));
 		if (CurrentSaveGame)
+		{
+			CurrentSaveGame->UserId.AppendInt(FMath::FRandRange(0, 1000));
 			AddDefaultInventory(true);
+			UE_LOG(LogTemp, Warning, TEXT("GI: New Save Slot"));
+		}
 		else
 			UE_LOG(LogTemp, Warning, TEXT("GI: Failed to create save game"));
 		return false;
@@ -77,19 +82,14 @@ bool USoulGameInstanceBase::LoadOrCreateSaveGame()
 
 bool USoulGameInstanceBase::WriteSaveGame()
 {
-	if (bSavingEnabled)
-	{
-		return UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SaveSlot, SaveUserIndex);
-	}
-	return false;
+	return UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SaveSlot, SaveUserIndex);
 }
 
 void USoulGameInstanceBase::ResetSaveGame()
 {
-	bool bWasSavingEnabled = bSavingEnabled;
-	bSavingEnabled = false;
+	bForceReset = true;
 	LoadOrCreateSaveGame();
-	bSavingEnabled = bWasSavingEnabled;
+	bForceReset = false;
 
 	UE_LOG(LogTemp, Warning, TEXT("GI: Save Slot Reset SUCCESSFUL"));
 }
@@ -109,6 +109,7 @@ USoulSaveGame* USoulGameInstanceBase::GetSaveSlot()
 
 void USoulGameInstanceBase::OnStartGameClicked_Implementation()
 {
+	WriteSaveGame();
 	UE_LOG(LogTemp, Warning, TEXT("GI: GAME START"));
 }
 
@@ -129,5 +130,10 @@ void USoulGameInstanceBase::OnAsyncLoadingFinished(const TArray<UObject*>& Outp)
 			UE_LOG(LogTemp, Warning, TEXT("GI: Empty Slot"));
 			CurrentSaveGame->InventoryItemData.Add(FSoulItemData());
 		}
+	}
+
+	if (OnSaveGameLoadingFinished.IsBound())
+	{
+		OnSaveGameLoadingFinished.Broadcast();
 	}
 }
