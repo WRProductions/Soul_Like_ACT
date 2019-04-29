@@ -20,31 +20,23 @@ class SOUL_LIKE_ACT_API UInventoryManager : public UActorComponent
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-protected:
+public:
+	// Sets default values for this component's properties
+	UInventoryManager();
+
 	/** Map of slot, from type/num to item, initialized from ItemSlotsPerType on RPGGameInstanceBase */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FSoulItemSlot, FSoulItemData> InventoryItems;
 
-		/** Map of slot, from type/num to item, initialized from ItemSlotsPerType on RPGGameInstanceBase */
+	/** Map of slot, from type/num to item, initialized from ItemSlotsPerType on RPGGameInstanceBase */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FSoulEquipmentSlot, FSoulItemData> EquipedItems;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	AWeaponActor* CurrentWeapon;
 
-public:	
-	// Sets default values for this component's properties
-	UInventoryManager();
-
 	UFUNCTION(BlueprintCallable)
 	void EquipGear(AWeaponActor * const Inp);
-
-	/** Delegate called when an inventory slot has changed */
-	UPROPERTY(BlueprintAssignable, Category = Inventory)
-	FOnSlottedItemChanged OnSlottedItemChanged;
-	/** Delegate called when the inventory has been loaded/reloaded */
-	UPROPERTY(BlueprintAssignable, Category = Inventory)
-	FOnInventoryLoaded OnInventoryLoaded;
 
 	/** Manually save the inventory, this is called from add/remove functions automatically */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
@@ -54,11 +46,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	bool LoadInventory();
 
+	/** Delegate called when an inventory slot has changed */
+	UPROPERTY(BlueprintAssignable, Category = Inventory)
+		FOnSlottedItemChanged OnSlottedItemChanged;
+	UPROPERTY(BlueprintAssignable, Category = Inventory)
+		FOnEquipmentChanged OnEquipmentChangedChanged;
+
 protected:
 	/** Auto slots a specific item, returns true if anything changed */
 	bool FillEmptySlotWithItem(FSoulItemData NewItemData);
 
 	/** Calls the inventory update callbacks */
 	void NotifySlottedItemChanged(FSoulItemSlot ItemSlot, FSoulItemData ItemData);
-	void NotifyInventoryLoaded();
+	void NotifyEquipmentChanged(FSoulEquipmentSlot EquipmentSlot, FSoulItemData ItemData);
 };

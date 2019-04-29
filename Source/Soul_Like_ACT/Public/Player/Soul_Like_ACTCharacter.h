@@ -98,9 +98,6 @@ public:
 
 	FORCEINLINE class UActionSysManager* GetActionSysManager() const { return ActionSysManager; }
 
-	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = "Outp"))
-	void GetMyPlayerController(class APlayerController *&MyController, EIsControllerValid& Outp);
-
 	UFUNCTION(BlueprintCallable)
 	void ResetRotation();
 
@@ -115,6 +112,15 @@ public:
 		AbilitySystemComponent->SetTagMapCount(GameplayTag, 0);
 	}
 	
+	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = "Outp"))
+	void GetMyPlayerController(class APlayerController*& MyController, EIsControllerValid & Outp);
+
+	UFUNCTION(BlueprintCallable)
+	UInventoryManager* GetInventoryManager() const;
+
+	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly))
+	static void GetPlayer(UWorld *InWorld, bool &Successful, ASoulPlayerController *&SoulPlayerController, ASoul_Like_ACTCharacter *&SoulCharacter, UInventoryManager *&SoulInventoryManager);
+
 	friend UActionSysManager;
 };
 

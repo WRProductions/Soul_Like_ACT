@@ -61,11 +61,15 @@ bool UInventoryManager::LoadInventory()
 	//Halt the program if there is NO SAVE GAME
 	check(CurrentSG);
 
-	//Load Items from game save
+	//Load slotted items from game save
 	for (FSoulItemData& Item : CurrentSG->InventoryItemData)
 	{
-		InventoryItems.Add(FSoulItemSlot(LocalSlotNum++), Item);
+		FSoulItemSlot LocalSlot = FSoulItemSlot(LocalSlotNum++);
+		InventoryItems.Add(LocalSlot, Item);
+		NotifySlottedItemChanged(LocalSlot, Item);
 	}
+
+	//Load Equipments
 
 	return false;
 }
@@ -104,7 +108,7 @@ void UInventoryManager::NotifySlottedItemChanged(FSoulItemSlot ItemSlot, FSoulIt
 	OnSlottedItemChanged.Broadcast(ItemSlot, ItemData);
 }
 
-void UInventoryManager::NotifyInventoryLoaded()
+void UInventoryManager::NotifyEquipmentChanged(FSoulEquipmentSlot EquipmentSlot, FSoulItemData ItemData)
 {
-	OnInventoryLoaded.Broadcast();
+	OnEquipmentChangedChanged.Broadcast(EquipmentSlot, ItemData);
 }

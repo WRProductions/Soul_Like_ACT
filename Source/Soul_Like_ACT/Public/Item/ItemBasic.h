@@ -11,12 +11,12 @@
 class USoulGameplayAbility;
 
 UENUM(BlueprintType)
-enum class EGearTypes : uint8
+enum class EGearType : uint8
 {
+	Non_Gear,
 	Weapon,
 	BodyArmor,
 	Helmet,
-	Legs,
 	Boots,
 	Gloves,
 	Ring,

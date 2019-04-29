@@ -60,18 +60,18 @@ struct SOUL_LIKE_ACT_API FSoulEquipmentSlot
 	GENERATED_BODY()
 
 	FSoulEquipmentSlot()
-		: SlotType(EGearTypes::Weapon)
+		: SlotType(EGearType::Weapon)
 	{
 	}
 
-	FSoulEquipmentSlot(EGearTypes InSlotType)
+	FSoulEquipmentSlot(EGearType InSlotType)
 		: SlotType(InSlotType)
 	{
 	}
 
 	/** The number of this slot, 0 indexed */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	EGearTypes SlotType;
+	EGearType SlotType;
 
 
 	friend bool operator==(const FSoulEquipmentSlot& Lhs, const FSoulEquipmentSlot& RHS)
@@ -165,6 +165,5 @@ struct SOUL_LIKE_ACT_API FSoulItemData
 
 /** Delegate called when the contents of an inventory slot change */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSlottedItemChanged, FSoulItemSlot, ItemSlot, FSoulItemData, Item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquipmentChanged, FSoulEquipmentSlot, EquipmentSlot, FSoulItemData, Item);
 
-/** Delegate called when the entire inventory has been loaded, all items may have been replaced */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryLoaded);

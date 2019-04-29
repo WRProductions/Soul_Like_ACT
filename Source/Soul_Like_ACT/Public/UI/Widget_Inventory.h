@@ -38,14 +38,19 @@ public:
 		class UWrapBox* InventorySlotWrapper;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
-	TSubclassOf<UWidget_InventorySlot> InventorySlot_BPClass;
+		TSubclassOf<UWidget_InventorySlot> InventorySlot_BPClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Units)
-	TArray<UWidget_InventorySlot*> InventorySlots;
+		TMap<FSoulItemSlot, UWidget_InventorySlot*> InventorySlots;
 
 	UFUNCTION(BlueprintCallable)
-	void ConstructInventorySlots();
+		void ConstructInventorySlots();
 
 	UFUNCTION(BlueprintCallable)
-		void BindWidgets();
-}
+		void PreCons_BindWidgets();
+
+	UFUNCTION()
+		void UpdateInventSlot(FSoulItemSlot ItemSlot, FSoulItemData Item);
+	UFUNCTION()
+		void UpdateGearSlot(FSoulEquipmentSlot EquipSlot, FSoulItemData Item);
+};

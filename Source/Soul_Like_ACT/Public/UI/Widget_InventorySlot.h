@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Widget_InventorySlot.generated.h"
-
 /**
  * 
  */
@@ -13,14 +12,16 @@ UCLASS()
 class SOUL_LIKE_ACT_API UWidget_InventorySlot : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 public:
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = Units)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	struct FSoulItemData CurrentItemData;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
 	class UBorder* ContentBorder;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
+	TSubclassOf<UUserWidget> BackWidget;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
-	UUserWidget* BackWidget;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
-	enum EGearTypes SlotType;
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetupSlot(FSoulItemData InItemData);
 };
