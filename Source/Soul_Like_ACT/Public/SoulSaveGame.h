@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Soul_Like_ACT.h"
 #include "CoreMinimal.h"
 #include "Types/SoulItemTypes.h"
 #include "GameFramework/SaveGame.h"
@@ -76,17 +77,8 @@ UCLASS(BlueprintType)
 public:
 	/** Constructor */
 	USoulSaveGame()
-		: UserId("Fresh Bird ")
 	{
-		InventoryItemData.Init(FSoulItemData(), 40);
-		EquipedItemData.Add(FSoulEquipmentSlot(EGearType::BodyArmor));
-		EquipedItemData.Add(FSoulEquipmentSlot(EGearType::Helmet));
-		EquipedItemData.Add(FSoulEquipmentSlot(EGearType::Weapon));
-		EquipedItemData.Add(FSoulEquipmentSlot(EGearType::Boots));
-		EquipedItemData.Add(FSoulEquipmentSlot(EGearType::Ring));
-		EquipedItemData.Add(FSoulEquipmentSlot(EGearType::Amulet));
-		EquipedItemData.Add(FSoulEquipmentSlot(EGearType::Reliquary));
-		EquipedItemData.Add(FSoulEquipmentSlot(EGearType::Gloves));
+		ResetSaveGame();
 	}
 
 	/** User's unique id */
@@ -100,4 +92,7 @@ public:
 	/** Map of slotted items */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
 	TMap<FSoulEquipmentSlot, FSoulItemData> EquipedItemData;
+
+	UFUNCTION(BlueprintCallable)
+		void ResetSaveGame();
 };

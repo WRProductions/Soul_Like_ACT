@@ -34,6 +34,9 @@ public:
 	const TArray<FPrimaryAssetType> AllItemTypes{USoulAssetManager::ArmourItemType, USoulAssetManager::WeaponItemType,USoulAssetManager::PotionItemType,USoulAssetManager::JewelItemType};
 
 	UFUNCTION(BlueprintCallable)
+		static void GetSoulPlayer(UObject* WorldContextObject, ASoulPlayerController*& MyController, ASoul_Like_ACTCharacter*& MyChar, UInventoryManager*& MyInentory, bool &Successful);
+
+	UFUNCTION(BlueprintCallable)
 	USoulSaveGame* GetSaveSlot();
 
 	UFUNCTION(BlueprintCallable, Category = Inventory)

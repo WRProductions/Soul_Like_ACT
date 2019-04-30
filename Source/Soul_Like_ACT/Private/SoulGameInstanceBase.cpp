@@ -41,8 +41,7 @@ void USoulGameInstanceBase::AddDefaultInventory_Implementation(bool bRemoveExtra
 	// If we want to remove extra, clear out the existing inventokay
  	if (bRemoveExtra)
  	{
- 		CurrentSaveGame->InventoryItemData.Reset();
-		CurrentSaveGame->EquipedItemData.Reset();
+		//CurrentSaveGame->ResetSaveGame();
  	}
 }
 
@@ -68,9 +67,9 @@ bool USoulGameInstanceBase::LoadOrCreateSaveGame()
 	{
 		// This creates it on demand
 		CurrentSaveGame = Cast<USoulSaveGame>(UGameplayStatics::CreateSaveGameObject(DefaultSaveGameBPClass));
+		WriteSaveGame();
 		if (CurrentSaveGame)
 		{
-			CurrentSaveGame->UserId.AppendInt(FMath::FRandRange(0, 1000));
 			AddDefaultInventory(true);
 			UE_LOG(LogTemp, Warning, TEXT("GI: New Save Slot"));
 		}
@@ -82,6 +81,8 @@ bool USoulGameInstanceBase::LoadOrCreateSaveGame()
 
 bool USoulGameInstanceBase::WriteSaveGame()
 {
+	LOG_FUNC_SUCCESS();
+
 	return UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SaveSlot, SaveUserIndex);
 }
 
@@ -91,7 +92,27 @@ void USoulGameInstanceBase::ResetSaveGame()
 	LoadOrCreateSaveGame();
 	bForceReset = false;
 
-	UE_LOG(LogTemp, Warning, TEXT("GI: Save Slot Reset SUCCESSFUL"));
+	LOG_FUNC_SUCCESS();
+}
+
+void USoulGameInstanceBase::GetSoulPlayer(UObject* WorldContextObject, ASoulPlayerController*& MyController, ASoul_Like_ACTCharacter*& MyChar, UInventoryManager*& MyInentory, bool &Successful)
+{
+	UWorld* MyWorld = WorldContextObject->GetWorld();
+	
+	MyController = Cast<ASoulPlayerController>(MyWorld->GetFirstPlayerController());
+	
+	if (MyController)
+	{
+		MyChar = Cast<ASoul_Like_ACTCharacter>(MyController->GetPawn());
+		if (MyChar)
+		{
+			MyInentory = MyChar->GetInventoryManager();
+			Successful = true;
+			return;
+		}
+	}
+	Successful = false;
+	return;
 }
 
 USoulSaveGame* USoulGameInstanceBase::GetSaveSlot()
@@ -115,7 +136,7 @@ void USoulGameInstanceBase::OnStartGameClicked_Implementation()
 
 void USoulGameInstanceBase::OnAsyncLoadingFinished(const TArray<UObject*>& Outp)
 {
-
+	uint8 i = 0;
 	for (UObject* a : Outp)
 	{
 		USoulItem* TempItem = Cast<USoulItem>(a);
@@ -123,17 +144,15 @@ void USoulGameInstanceBase::OnAsyncLoadingFinished(const TArray<UObject*>& Outp)
 			UE_LOG(LogTemp, Warning, TEXT("GI: %s is added as the default item"), *a->GetName());
 
 			FSoulItemData newData(TempItem, 1, 1);
-			CurrentSaveGame->InventoryItemData.Add(newData);
+			/*CurrentSaveGame->InventoryItemData[i] = newData;*/
+			CurrentSaveGame->InventoryItemData[i] = newData;
 		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("GI: Empty Slot"));
-			CurrentSaveGame->InventoryItemData.Add(FSoulItemData());
-		}
+		++i;
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("%s save game has %d invent slots"), *(FString(__FUNCTION__)), CurrentSaveGame->InventoryItemData.Num());
+	UE_LOG(LogTemp, Warning, TEXT("%s save game has %d Equip slots"), *(FString(__FUNCTION__)), CurrentSaveGame->EquipedItemData.Num());
+
 	if (OnSaveGameLoadingFinished.IsBound())
-	{
 		OnSaveGameLoadingFinished.Broadcast();
-	}
 }

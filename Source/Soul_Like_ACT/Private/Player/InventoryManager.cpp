@@ -66,11 +66,11 @@ bool UInventoryManager::LoadInventory()
 	{
 		FSoulItemSlot LocalSlot = FSoulItemSlot(LocalSlotNum++);
 		InventoryItems.Add(LocalSlot, Item);
-		NotifySlottedItemChanged(LocalSlot, Item);
 	}
 
 	//Load Equipments
 
+	OnInventoryLoadingFinished.Broadcast(this, true);
 	return false;
 }
 

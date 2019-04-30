@@ -20,7 +20,7 @@ void UWidget_Inventory::ConstructInventorySlots()
 		return;
 	}
 
-	ASoul_Like_ACTCharacter *MyPlayer = Cast<ASoul_Like_ACTCharacter>(GetOwningPlayerPawn());
+	ASoul_Like_ACTCharacter* MyPlayer = Cast<ASoul_Like_ACTCharacter>(GetOwningPlayerPawn());
 	UInventoryManager* LocalInventManager = MyPlayer->GetInventoryManager();
 
 	//Load Inventory
@@ -39,9 +39,12 @@ void UWidget_Inventory::ConstructInventorySlots()
 	}
 
 	//Load Equipment
+
+	/*UE_LOG(LogTemp, Warning, TEXT("%s successful"), *FString(__FUNCTION__));*/
+	LOG_FUNC_SUCCESS();
 }
 
-void UWidget_Inventory::PreCons_BindWidgets()
+void UWidget_Inventory::BindWiddgets()
 {
 	ASoul_Like_ACTCharacter* MyPlayer = Cast<ASoul_Like_ACTCharacter>(GetOwningPlayerPawn());
 	UInventoryManager* LocalInventManager = MyPlayer->GetInventoryManager();

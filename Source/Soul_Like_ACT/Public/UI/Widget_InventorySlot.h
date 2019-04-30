@@ -14,11 +14,13 @@ class SOUL_LIKE_ACT_API UWidget_InventorySlot : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Default)
 	struct FSoulItemData CurrentItemData;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
 	class UBorder* ContentBorder;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
+	class UImage* item_icon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
 	TSubclassOf<UUserWidget> BackWidget;
 

@@ -9,6 +9,9 @@
 #include "InventoryManager.generated.h"
 
 class AWeaponActor;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryLoadingFinished, UInventoryManager*, OutInventoryManager, bool, OutFirstTimeInventLoading);
+
 /**
  * This component is only been used to handle Items
  */
@@ -51,6 +54,8 @@ public:
 		FOnSlottedItemChanged OnSlottedItemChanged;
 	UPROPERTY(BlueprintAssignable, Category = Inventory)
 		FOnEquipmentChanged OnEquipmentChangedChanged;
+	UPROPERTY(BlueprintAssignable, Category = Inventory)
+		FOnInventoryLoadingFinished OnInventoryLoadingFinished;
 
 protected:
 	/** Auto slots a specific item, returns true if anything changed */

@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Item/ItemBasic.h"
 #include "SoulItemTypes.generated.h"
+
 
 USTRUCT(BlueprintType)
 struct SOUL_LIKE_ACT_API FSoulItemSlot

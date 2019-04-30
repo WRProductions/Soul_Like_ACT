@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Soul_Like_ACT.h"
 #include "Blueprint/UserWidget.h"
 #include "Widget_Inventory.generated.h"
 
@@ -47,7 +47,7 @@ public:
 		void ConstructInventorySlots();
 
 	UFUNCTION(BlueprintCallable)
-		void PreCons_BindWidgets();
+		void BindWiddgets();
 
 	UFUNCTION()
 		void UpdateInventSlot(FSoulItemSlot ItemSlot, FSoulItemData Item);
