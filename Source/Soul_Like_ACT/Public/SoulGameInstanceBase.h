@@ -2,13 +2,11 @@
 
 #pragma once
 
+#include "Soul_Like_ACT.h"
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "Types/SoulItemTypes.h"
+#include "SoulSaveGame.h"
 #include "SoulGameInstanceBase.generated.h"
-
-class USoulItem;
-class USoulSaveGame;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadingFinished);
 
@@ -27,8 +25,8 @@ public:
 	USoulGameInstanceBase();
 
 	/** List of inventory items to add to new players */
- 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
- 	TArray<FPrimaryAssetId> DefaultInventory;
+ 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
+ 	TArray<FSoulSaveItemData> DefaultInventory;
 
 	//By Default, It contains all accessible Item Types
 	const TArray<FPrimaryAssetType> AllItemTypes{USoulAssetManager::ArmourItemType, USoulAssetManager::WeaponItemType,USoulAssetManager::PotionItemType,USoulAssetManager::JewelItemType};
@@ -45,13 +43,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 		void GetItemIDWithType(const FPrimaryAssetType ItemType, TArray<FPrimaryAssetId> & OutpId);
 
-	/**
-	 * Adds the default inventory to the inventory array
-	 * @param InventoryArray Inventory to modify
-	 * @param RemoveExtra If true, remove anything other than default inventory
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = Inventory)
-		void AddDefaultInventory(bool bRemoveExtra = false);
+	/* Adds the default inventory to the inventory array */
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+		void AddDefaultInventory();
 
 	/** Loads a save game. If it fails, it will create a new one for you. Returns true if it loaded, false if it created one */
 	UFUNCTION(BlueprintCallable, Category = Save)
@@ -68,6 +62,9 @@ public:
 	/** Spawn Floating Damage Widget on screen */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = UI)
 		void SpawnFloatingDamageTextWidget(const AActor* DamageReceiver, const float DamageInput);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+		void AsyncLoadingSaveGame();
 
 	UFUNCTION(BlueprintNativeEvent)
 		void OnStartGameClicked();
@@ -99,8 +96,8 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Save)
 	USoulSaveGame* CurrentSaveGame;
 
-	UFUNCTION(BlueprintCallable)
-	void OnAsyncLoadingFinished(const TArray<UObject*> &Outp);
+	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly))
+	void MakeSoulItemData(UObject* InItemBase, TArray<UObject*> InJewels, FSoulItemData &OutItemData, int32 InItemCount = 1, int32 InItemLevel = 1);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnLoadingFinished OnSaveGameLoadingFinished;

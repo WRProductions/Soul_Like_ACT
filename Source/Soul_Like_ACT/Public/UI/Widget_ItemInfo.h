@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SoulSaveGame.h"
 #include "Blueprint/UserWidget.h"
 #include "Widget_ItemInfo.generated.h"
 

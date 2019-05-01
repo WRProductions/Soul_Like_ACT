@@ -65,7 +65,6 @@ public:
 
 protected:
 	//Tick------------------------------
-
 	UFUNCTION(BlueprintCallable)
 	void MoveForward(float Value);
 	UFUNCTION(BlueprintCallable)

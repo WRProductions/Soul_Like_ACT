@@ -56,19 +56,7 @@ bool UInventoryManager::LoadInventory()
 	USoulGameInstanceBase* GI = World ? World->GetGameInstance<USoulGameInstanceBase>() : nullptr;
 	USoulSaveGame* CurrentSG = GI->GetSaveSlot();
 
-	int32 LocalSlotNum = 0;
 
-	//Halt the program if there is NO SAVE GAME
-	check(CurrentSG);
-
-	//Load slotted items from game save
-	for (FSoulItemData& Item : CurrentSG->InventoryItemData)
-	{
-		FSoulItemSlot LocalSlot = FSoulItemSlot(LocalSlotNum++);
-		InventoryItems.Add(LocalSlot, Item);
-	}
-
-	//Load Equipments
 
 	OnInventoryLoadingFinished.Broadcast(this, true);
 	return false;

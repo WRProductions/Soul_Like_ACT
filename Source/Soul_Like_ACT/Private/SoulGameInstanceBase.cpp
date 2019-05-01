@@ -2,7 +2,6 @@
 
 
 #include "SoulGameInstanceBase.h"
-#include "SoulSaveGame.h"
 #include "Item/ItemBasic.h"
 #include "Item/SoulAssetManager.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -36,13 +35,14 @@ void USoulGameInstanceBase::GetItemIDWithType(const FPrimaryAssetType ItemType, 
 	CurrentAssetManager.GetPrimaryAssetIdList(ItemType, OutpId);
 }
 
-void USoulGameInstanceBase::AddDefaultInventory_Implementation(bool bRemoveExtra)
+void USoulGameInstanceBase::AddDefaultInventory()
 {
-	// If we want to remove extra, clear out the existing inventokay
- 	if (bRemoveExtra)
- 	{
-		//CurrentSaveGame->ResetSaveGame();
- 	}
+	for (auto localID : DefaultInventory)
+	{
+		CurrentSaveGame->InventoryItemData.Add(localID);
+	}
+
+	WriteSaveGame();
 }
 
 bool USoulGameInstanceBase::LoadOrCreateSaveGame()
@@ -58,8 +58,6 @@ bool USoulGameInstanceBase::LoadOrCreateSaveGame()
 	if (CurrentSaveGame)
 	{
 		// Make sure it has any newly added default inventory
-		AddDefaultInventory(false);
-
 		UE_LOG(LogTemp, Warning, TEXT("GI: Loaded Successful"));
 		return true;
 	}
@@ -70,7 +68,7 @@ bool USoulGameInstanceBase::LoadOrCreateSaveGame()
 		WriteSaveGame();
 		if (CurrentSaveGame)
 		{
-			AddDefaultInventory(true);
+			AddDefaultInventory();
 			UE_LOG(LogTemp, Warning, TEXT("GI: New Save Slot"));
 		}
 		else
@@ -82,7 +80,6 @@ bool USoulGameInstanceBase::LoadOrCreateSaveGame()
 bool USoulGameInstanceBase::WriteSaveGame()
 {
 	LOG_FUNC_SUCCESS();
-
 	return UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SaveSlot, SaveUserIndex);
 }
 
@@ -93,6 +90,15 @@ void USoulGameInstanceBase::ResetSaveGame()
 	bForceReset = false;
 
 	LOG_FUNC_SUCCESS();
+}
+
+void USoulGameInstanceBase::MakeSoulItemData(UObject* InItemBase, TArray<UObject*> InJewels, FSoulItemData& OutItemData, int32 InItemCount /*= 1*/, int32 InItemLevel /*= 1*/)
+{
+	OutItemData = FSoulItemData(Cast<USoulItem>(InItemBase), InItemCount, InItemLevel);
+	for (UObject* Jew : InJewels)
+	{
+		OutItemData.SlotedJewls.Add(Cast<USoulJewelItem>(InItemBase));
+	}
 }
 
 void USoulGameInstanceBase::GetSoulPlayer(UObject* WorldContextObject, ASoulPlayerController*& MyController, ASoul_Like_ACTCharacter*& MyChar, UInventoryManager*& MyInentory, bool &Successful)
@@ -124,7 +130,6 @@ USoulSaveGame* USoulGameInstanceBase::GetSaveSlot()
 		if (!CurrentSaveGame)
 			return nullptr;
 	}
-	
 	return CurrentSaveGame;
 }
 
@@ -132,27 +137,4 @@ void USoulGameInstanceBase::OnStartGameClicked_Implementation()
 {
 	WriteSaveGame();
 	UE_LOG(LogTemp, Warning, TEXT("GI: GAME START"));
-}
-
-void USoulGameInstanceBase::OnAsyncLoadingFinished(const TArray<UObject*>& Outp)
-{
-	uint8 i = 0;
-	for (UObject* a : Outp)
-	{
-		USoulItem* TempItem = Cast<USoulItem>(a);
-		if (TempItem->IsValidLowLevel()) {
-			UE_LOG(LogTemp, Warning, TEXT("GI: %s is added as the default item"), *a->GetName());
-
-			FSoulItemData newData(TempItem, 1, 1);
-			/*CurrentSaveGame->InventoryItemData[i] = newData;*/
-			CurrentSaveGame->InventoryItemData[i] = newData;
-		}
-		++i;
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("%s save game has %d invent slots"), *(FString(__FUNCTION__)), CurrentSaveGame->InventoryItemData.Num());
-	UE_LOG(LogTemp, Warning, TEXT("%s save game has %d Equip slots"), *(FString(__FUNCTION__)), CurrentSaveGame->EquipedItemData.Num());
-
-	if (OnSaveGameLoadingFinished.IsBound())
-		OnSaveGameLoadingFinished.Broadcast();
 }

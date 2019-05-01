@@ -2,13 +2,14 @@
 
 
 #include "SoulSaveGame.h"
+#include "Soul_Like_ACT.h"
 
 void USoulSaveGame::ResetSaveGame()
 {
 	UserId = "Fresh Bird ";
 	UserId.AppendInt(FMath::FRandRange(0, 1000));
 
-	InventoryItemData.Init(FSoulItemData(), 40);
+	InventoryItemData.Init(FSoulSaveItemData(), 40);
 	EquipedItemData.Add(FSoulEquipmentSlot(EGearType::BodyArmor));
 	EquipedItemData.Add(FSoulEquipmentSlot(EGearType::Helmet));
 	EquipedItemData.Add(FSoulEquipmentSlot(EGearType::Weapon));
