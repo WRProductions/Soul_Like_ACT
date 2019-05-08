@@ -37,12 +37,10 @@ void USoulGameInstanceBase::GetItemIDWithType(const FPrimaryAssetType ItemType, 
 
 void USoulGameInstanceBase::AddDefaultInventory()
 {
-	for (auto localID : DefaultInventory)
+	for (int i = 0; i < DefaultInventory.Num(); i++)
 	{
-		CurrentSaveGame->InventoryItemData.Add(localID);
+		CurrentSaveGame->InventoryItemData[i] = DefaultInventory[i];
 	}
-
-	WriteSaveGame();
 }
 
 bool USoulGameInstanceBase::LoadOrCreateSaveGame()
@@ -53,26 +51,32 @@ bool USoulGameInstanceBase::LoadOrCreateSaveGame()
 	if (UGameplayStatics::DoesSaveGameExist(SaveSlot, SaveUserIndex) && !bForceReset)
 	{
 		CurrentSaveGame = Cast<USoulSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlot, SaveUserIndex));
+		UE_LOG(LogTemp, Warning, TEXT("GI: Loading"));
 	}
 
+	//Old Slot
 	if (CurrentSaveGame)
 	{
-		// Make sure it has any newly added default inventory
 		UE_LOG(LogTemp, Warning, TEXT("GI: Loaded Successful"));
+		WriteSaveGame();
+		Broadcast_OnSaveGameLoadFinshed();
 		return true;
 	}
 	else
 	{
-		// This creates it on demand
+		//New Slot
 		CurrentSaveGame = Cast<USoulSaveGame>(UGameplayStatics::CreateSaveGameObject(DefaultSaveGameBPClass));
-		WriteSaveGame();
 		if (CurrentSaveGame)
 		{
 			AddDefaultInventory();
+			WriteSaveGame();
+			
+			Broadcast_OnSaveGameLoadFinshed();
 			UE_LOG(LogTemp, Warning, TEXT("GI: New Save Slot"));
 		}
 		else
 			UE_LOG(LogTemp, Warning, TEXT("GI: Failed to create save game"));
+		
 		return false;
 	}
 }
@@ -85,11 +89,11 @@ bool USoulGameInstanceBase::WriteSaveGame()
 
 void USoulGameInstanceBase::ResetSaveGame()
 {
+	LOG_FUNC_SUCCESS();
+
 	bForceReset = true;
 	LoadOrCreateSaveGame();
 	bForceReset = false;
-
-	LOG_FUNC_SUCCESS();
 }
 
 void USoulGameInstanceBase::MakeSoulItemData(UObject* InItemBase, TArray<UObject*> InJewels, FSoulItemData& OutItemData, int32 InItemCount /*= 1*/, int32 InItemLevel /*= 1*/)
@@ -99,6 +103,12 @@ void USoulGameInstanceBase::MakeSoulItemData(UObject* InItemBase, TArray<UObject
 	{
 		OutItemData.SlotedJewls.Add(Cast<USoulJewelItem>(InItemBase));
 	}
+}
+
+void USoulGameInstanceBase::Broadcast_OnSaveGameLoadFinshed()
+{
+	if (OnSaveGameLoadingFinished.IsBound())
+		OnSaveGameLoadingFinished.Broadcast();
 }
 
 void USoulGameInstanceBase::GetSoulPlayer(UObject* WorldContextObject, ASoulPlayerController*& MyController, ASoul_Like_ACTCharacter*& MyChar, UInventoryManager*& MyInentory, bool &Successful)

@@ -69,10 +69,13 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 		void OnStartGameClicked();
 
+	UPROPERTY(BlueprintAssignable)
+		FOnLoadingFinished OnSaveGameLoadingFinished;
+
 protected:
 	/** Rather it will attempt to actually save to disk */
 	/** Sets rather save/load is enabled. If disabled it will always count as a new character */
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = Save)
 		bool bForceReset;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Levels)
@@ -99,6 +102,5 @@ protected:
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly))
 	void MakeSoulItemData(UObject* InItemBase, TArray<UObject*> InJewels, FSoulItemData &OutItemData, int32 InItemCount = 1, int32 InItemLevel = 1);
 
-	UPROPERTY(BlueprintAssignable)
-	FOnLoadingFinished OnSaveGameLoadingFinished;
+	void Broadcast_OnSaveGameLoadFinshed();
 };
