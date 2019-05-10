@@ -14,8 +14,6 @@ UInventoryManager::UInventoryManager()
 void UInventoryManager::BeginPlay()
 {
 	Super::BeginPlay();
-
-	LoadInventory();
 }
 
 void UInventoryManager::EquipGear(AWeaponActor *const Inp)
@@ -38,28 +36,26 @@ void UInventoryManager::EquipGear(AWeaponActor *const Inp)
 		Inp->AttachToComponent(Cast<ACharacter>(GetOwner())->GetMesh(), LocalTransRules, TEXT("2H_Mace"));	
 }
 
-
-
 bool UInventoryManager::SaveInventory()
 {
-
 	return false;
 }
 
-//TODO
-bool UInventoryManager::LoadInventory()
+bool UInventoryManager::LoadInventoryData(TMap<FSoulItemSlot, FSoulItemData> InInventoryItems
+	, TMap<FSoulEquipmentSlot, FSoulItemData> InEquipedItems)
 {
-	InventoryItems.Reset();
-	EquipedItems.Reset();
+	InInventoryItems = InInventoryItems;
+	EquipedItems = EquipedItems;
 
-	UWorld* World = GetWorld();
-	USoulGameInstanceBase* GI = World ? World->GetGameInstance<USoulGameInstanceBase>() : nullptr;
-	USoulSaveGame* CurrentSG = GI->GetSaveSlot();
+	//TODO: update GAs
 
+	Notify_OnInventoryLoadingFinished(true);
+}
 
-
-	OnInventoryLoadingFinished.Broadcast(this, true);
-	return false;
+void UInventoryManager::Notify_OnInventoryLoadingFinished(bool bFirstTimeInit)
+{
+	if (OnInventoryLoadingFinished.IsBound())
+		OnInventoryLoadingFinished.Broadcast(this, bFirstTimeInit);
 }
 
 bool UInventoryManager::FillEmptySlotWithItem(FSoulItemData NewItemData)

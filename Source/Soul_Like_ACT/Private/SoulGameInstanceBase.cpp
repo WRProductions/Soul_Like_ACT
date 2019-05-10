@@ -96,6 +96,25 @@ void USoulGameInstanceBase::ResetSaveGame()
 	bForceReset = false;
 }
 
+void USoulGameInstanceBase::MakeSaveData()
+{
+	APawn *TempPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
+	
+	if (!TempPawn || !Cast<ASoul_Like_ACTCharacter>(TempPawn))
+	{
+		LOG_FUNC_FAIL();
+		return;
+	}
+
+	UInventoryManager* MyInventoryManager = Cast<ASoul_Like_ACTCharacter>(TempPawn)->GetInventoryManager();
+
+}
+
+void USoulGameInstanceBase::MakeSoulItemSaveData(FSoulItemData InItemData, FSoulSaveItemData& OutSaveItemData)
+{
+	OutSaveItemData = FSoulSaveItemData(InItemData);
+}
+
 void USoulGameInstanceBase::MakeSoulItemData(UObject* InItemBase, TArray<UObject*> InJewels, FSoulItemData& OutItemData, int32 InItemCount /*= 1*/, int32 InItemLevel /*= 1*/)
 {
 	OutItemData = FSoulItemData(Cast<USoulItem>(InItemBase), InItemCount, InItemLevel);

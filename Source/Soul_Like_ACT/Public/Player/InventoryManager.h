@@ -45,9 +45,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	bool SaveInventory();
 
-	/** Loads inventory from save game on game instance, this will replace arrays */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-	bool LoadInventory();
+	bool LoadInventoryData(TMap<FSoulItemSlot, FSoulItemData> InInventoryItems
+		, TMap<FSoulEquipmentSlot, FSoulItemData> InEquipedItems);
 
 	/** Delegate called when an inventory slot has changed */
 	UPROPERTY(BlueprintAssignable, Category = Inventory)
@@ -58,6 +58,8 @@ public:
 		FOnInventoryLoadingFinished OnInventoryLoadingFinished;
 
 protected:
+	void Notify_OnInventoryLoadingFinished(bool bFirstTimeInit);
+
 	/** Auto slots a specific item, returns true if anything changed */
 	bool FillEmptySlotWithItem(FSoulItemData NewItemData);
 
