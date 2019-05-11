@@ -30,9 +30,9 @@ void USoulGameInstanceBase::GetAllAccessibleItemID(TArray<FPrimaryAssetId>& Outp
 
 void USoulGameInstanceBase::GetItemIDWithType(const FPrimaryAssetType ItemType, TArray<FPrimaryAssetId>& OutpId)
 {
-	USoulAssetManager& CurrentAssetManager = USoulAssetManager::Get();
+	USoulAssetManager* CurrentAssetManager = USoulAssetManager::Get();
 
-	CurrentAssetManager.GetPrimaryAssetIdList(ItemType, OutpId);
+	CurrentAssetManager->GetPrimaryAssetIdList(ItemType, OutpId);
 }
 
 void USoulGameInstanceBase::AddDefaultInventory()

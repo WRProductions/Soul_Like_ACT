@@ -26,6 +26,8 @@ void UWidget_Inventory::ConstructInventorySlots()
 	//Load Inventory
 	for (TPair<FSoulItemSlot, FSoulItemData> &LocalItemSlot : LocalInventManager->InventoryItems)
 	{
+		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "UWidget_Inventory::ConstructInventorySlots");
+
 		UWidget_InventorySlot *LocalSlot = Cast<UWidget_InventorySlot>(
 			CreateWidget(GetOwningPlayer()
 			, InventorySlot_BPClass));
@@ -37,10 +39,9 @@ void UWidget_Inventory::ConstructInventorySlots()
 		InventorySlotWrapper->AddChildToWrapBox(LocalSlot);
 		InventorySlots.Add(LocalItemSlot.Key, LocalSlot);
 	}
-
 	//Load Equipment
+	BindWiddgets();
 
-	/*UE_LOG(LogTemp, Warning, TEXT("%s successful"), *FString(__FUNCTION__));*/
 	LOG_FUNC_SUCCESS();
 }
 
@@ -52,6 +53,8 @@ void UWidget_Inventory::BindWiddgets()
 	{
 		LocalInventManager->OnSlottedItemChanged.AddDynamic(this, &UWidget_Inventory::UpdateInventSlot);
 		LocalInventManager->OnEquipmentChangedChanged.AddDynamic(this, &UWidget_Inventory::UpdateGearSlot);
+		LOG_FUNC_SUCCESS();
+
 	}
 	else
 	{

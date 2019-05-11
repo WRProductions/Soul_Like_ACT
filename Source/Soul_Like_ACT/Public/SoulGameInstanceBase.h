@@ -32,45 +32,51 @@ public:
 	const TArray<FPrimaryAssetType> AllItemTypes{USoulAssetManager::ArmourItemType, USoulAssetManager::WeaponItemType,USoulAssetManager::PotionItemType,USoulAssetManager::JewelItemType};
 
 	UFUNCTION(BlueprintCallable)
-		static void GetSoulPlayer(UObject* WorldContextObject, ASoulPlayerController*& MyController, ASoul_Like_ACTCharacter*& MyChar, UInventoryManager*& MyInentory, bool &Successful);
+	static void GetSoulPlayer(UObject* WorldContextObject, ASoulPlayerController*& MyController, ASoul_Like_ACTCharacter*& MyChar, UInventoryManager*& MyInentory, bool &Successful);
 
 	UFUNCTION(BlueprintCallable)
 	USoulSaveGame* GetSaveSlot();
 
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-		void GetAllAccessibleItemID(TArray<FPrimaryAssetId>& OutpId);
+	void GetAllAccessibleItemID(TArray<FPrimaryAssetId>& OutpId);
 
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-		void GetItemIDWithType(const FPrimaryAssetType ItemType, TArray<FPrimaryAssetId> & OutpId);
+	void GetItemIDWithType(const FPrimaryAssetType ItemType, TArray<FPrimaryAssetId> & OutpId);
 
 	/* Adds the default inventory to the inventory array */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-		void AddDefaultInventory();
+	void AddDefaultInventory();
 
 	/** Loads a save game. If it fails, it will create a new one for you. Returns true if it loaded, false if it created one */
 	UFUNCTION(BlueprintCallable, Category = Save)
-		bool LoadOrCreateSaveGame();
+	bool LoadOrCreateSaveGame();
 
 	/** Writes the current save game object to disk */
 	UFUNCTION(BlueprintCallable, Category = Save)
-		bool WriteSaveGame();
+	bool WriteSaveGame();
 
 	/** Resets the current save game to it's default. This will erase player data! This won't save to disk until the next WriteSaveGame */
 	UFUNCTION(BlueprintCallable, Category = Save)
-		void ResetSaveGame();
+	void ResetSaveGame();
 
 	/** Spawn Floating Damage Widget on screen */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = UI)
-		void SpawnFloatingDamageTextWidget(const AActor* DamageReceiver, const float DamageInput);
+	void SpawnFloatingDamageTextWidget(const AActor* DamageReceiver, const float DamageInput);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-		void AsyncLoadingSaveGame();
+	void AsyncLoadingSaveGame();
 
 	UFUNCTION(BlueprintNativeEvent)
-		void OnStartGameClicked();
+	void OnStartGameClicked();
 
 	UPROPERTY(BlueprintAssignable)
-		FOnLoadingFinished OnSaveGameLoadingFinished;
+	FOnLoadingFinished OnSaveGameLoadingFinished;
+
+	UFUNCTION(BlueprintCallable)
+	static FString SoulItemDataToString(FSoulItemData ItemData)
+	{
+		return ItemData.ToString();
+	}
 
 protected:
 	/** Rather it will attempt to actually save to disk */

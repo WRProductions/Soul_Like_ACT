@@ -41,15 +41,32 @@ bool UInventoryManager::SaveInventory()
 	return false;
 }
 
-bool UInventoryManager::LoadInventoryData(TMap<FSoulItemSlot, FSoulItemData> InInventoryItems
+bool UInventoryManager::LoadInventoryData(TArray<FSoulItemData> InInventoryItems
 	, TMap<FSoulEquipmentSlot, FSoulItemData> InEquipedItems)
 {
-	InInventoryItems = InInventoryItems;
+	/*InventoryItems = InInventoryItems;*/
+	int i = 0;
+
+	for (FSoulItemData TempItemData : InInventoryItems)
+	{
+		if (TempItemData.IsValid())
+		{
+			InventoryItems.Add(FSoulItemSlot(i), TempItemData);
+		}
+		else
+		{
+			InventoryItems.Add(FSoulItemSlot(i), FSoulItemData());
+		}
+		++i;
+	}
+
 	EquipedItems = EquipedItems;
 
 	//TODO: update GAs
 
 	Notify_OnInventoryLoadingFinished(true);
+	
+	return true;
 }
 
 void UInventoryManager::Notify_OnInventoryLoadingFinished(bool bFirstTimeInit)

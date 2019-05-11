@@ -7,4 +7,3 @@
 
 #define LOG_FUNC_SUCCESS() UE_LOG(LogTemp, Warning, TEXT("%s successful"), *FString(__FUNCTION__))
 #define LOG_FUNC_FAIL() UE_LOG(LogTemp, Warning, TEXT("%s failed"), *FString(__FUNCTION__))
-

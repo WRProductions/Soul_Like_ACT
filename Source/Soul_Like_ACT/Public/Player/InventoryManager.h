@@ -45,8 +45,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	bool SaveInventory();
 
+	/** It's used for Game Instance when async loading finshed */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-	bool LoadInventoryData(TMap<FSoulItemSlot, FSoulItemData> InInventoryItems
+	bool LoadInventoryData(TArray<FSoulItemData> InInventoryItems
 		, TMap<FSoulEquipmentSlot, FSoulItemData> InEquipedItems);
 
 	/** Delegate called when an inventory slot has changed */

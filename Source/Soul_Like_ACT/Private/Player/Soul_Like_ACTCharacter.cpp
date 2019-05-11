@@ -114,7 +114,7 @@ void ASoul_Like_ACTCharacter::SetupPlayerInputComponent(class UInputComponent* P
 	PlayerInputComponent->BindAxis("Zoom", this, &ASoul_Like_ACTCharacter::ZoomCamera);
 }
 
-void ASoul_Like_ACTCharacter::GetMyPlayerController(class APlayerController *&MyController, EIsControllerValid& Outp)
+void ASoul_Like_ACTCharacter::GetMyPlayerController(class ASoulPlayerController*&MyController, EIsControllerValid& Outp)
 {
 	if (!GetController())
 	{
@@ -122,7 +122,7 @@ void ASoul_Like_ACTCharacter::GetMyPlayerController(class APlayerController *&My
 	}
 	else
 	{
-		MyController = Cast<APlayerController>(GetController());
+		MyController = Cast<ASoulPlayerController>(GetController());
 		if (MyController)
 			Outp = EIsControllerValid::IsValid;
 		else

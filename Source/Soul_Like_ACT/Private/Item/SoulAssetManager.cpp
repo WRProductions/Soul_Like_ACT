@@ -17,18 +17,18 @@ void USoulAssetManager::StartInitialLoading()
 	UAbilitySystemGlobals::Get().InitGlobalData();
 }
 
-USoulAssetManager& USoulAssetManager::Get()
+USoulAssetManager* USoulAssetManager::Get()
 {
 	USoulAssetManager* This = Cast<USoulAssetManager>(GEngine->AssetManager);
 
 	if (This)
 	{
-		return *This;
+		return This;
 	}
 	else
 	{
 		UE_LOG(LogTemp, Fatal, TEXT("Invalid AssetManager in DefaultEngine.ini, must be SoulAssetManager!"));
-		return *NewObject<USoulAssetManager>(); // never calls this
+		return NewObject<USoulAssetManager>(); // never calls this
 	}
 }
 

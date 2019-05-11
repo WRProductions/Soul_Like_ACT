@@ -107,7 +107,7 @@ struct SOUL_LIKE_ACT_API FSoulItemData
 
 	/** Constructor, default to count/level 1 so declaring them in blueprints gives you the expected behavior */
 	FSoulItemData()
-		: FSoulItemData(nullptr, 1, 1)
+		: FSoulItemData(nullptr, -1, -1)
 	{}
 
 	FSoulItemData(USoulItem* InItemBase)
@@ -161,7 +161,31 @@ struct SOUL_LIKE_ACT_API FSoulItemData
 		ItemCount = FMath::Clamp(ItemCount + Other.ItemCount, 1, MaxCount);
 		ItemLevel = FMath::Clamp(Other.ItemLevel, 1, MaxLevel);
 	}
+
+	FString ToString() const
+	{
+		if (IsValid())
+		{
+			FString newString;
+			newString.Append(ItemBase->GetName() + ", Count: ");
+			newString.AppendInt(ItemCount);
+			newString.Append(", Level: ");
+			newString.AppendInt(ItemLevel);
+			newString.Append(", JewelsNum: ");
+			newString.AppendInt(SlotedJewls.Num());
+
+			return newString;
+		}
+		else
+		{
+			return "Invalid SoulItem";
+		}
+	}
+
+
+
 };
+
 
 /** Delegate called when the contents of an inventory slot change */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSlottedItemChanged, FSoulItemSlot, ItemSlot, FSoulItemData, Item);

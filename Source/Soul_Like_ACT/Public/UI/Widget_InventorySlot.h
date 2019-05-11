@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Types/SoulItemTypes.h"
 #include "Widget_InventorySlot.generated.h"
 /**
  * 
@@ -15,7 +16,7 @@ class SOUL_LIKE_ACT_API UWidget_InventorySlot : public UUserWidget
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Default)
-	struct FSoulItemData CurrentItemData;
+	FSoulItemData CurrentItemData;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
 	class UBorder* ContentBorder;

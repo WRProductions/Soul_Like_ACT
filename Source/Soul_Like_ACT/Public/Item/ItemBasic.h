@@ -52,7 +52,7 @@ public:
 
 	/** Icon to display */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
-	UTexture2D* ItemIcon;
+	UTexture* ItemIcon;
 
 	/** Maximum number of instances that can be in inventory at once, <= 0 means infinite */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Max)
