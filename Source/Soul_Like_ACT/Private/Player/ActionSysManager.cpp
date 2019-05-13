@@ -17,7 +17,6 @@ UActionSysManager::UActionSysManager()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-
 void UActionSysManager::BeginPlay()
 {
 	Super::BeginPlay();

@@ -64,15 +64,17 @@ bool USoulGameInstanceBase::LoadOrCreateSaveGame()
 	}
 	else
 	{
+		UE_LOG(LogTemp, Warning, TEXT("GI: New Save Slot"));
 		//New Slot
 		CurrentSaveGame = Cast<USoulSaveGame>(UGameplayStatics::CreateSaveGameObject(DefaultSaveGameBPClass));
+		CurrentSaveGame->ResetSaveGame();
+
 		if (CurrentSaveGame)
 		{
 			AddDefaultInventory();
 			WriteSaveGame();
 			
 			Broadcast_OnSaveGameLoadFinshed();
-			UE_LOG(LogTemp, Warning, TEXT("GI: New Save Slot"));
 		}
 		else
 			UE_LOG(LogTemp, Warning, TEXT("GI: Failed to create save game"));

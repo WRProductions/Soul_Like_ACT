@@ -60,9 +60,7 @@ UCLASS(BlueprintType)
 public:
 	/** Constructor */
 	USoulSaveGame()
-	{
-		ResetSaveGame();
-	}
+	{ }
 
 	/** User's unique id */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
@@ -76,6 +74,5 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
 	TMap<FSoulEquipmentSlot, FSoulSaveItemData> EquipedItemData;
 
-	UFUNCTION(BlueprintCallable)
 	void ResetSaveGame();
 };

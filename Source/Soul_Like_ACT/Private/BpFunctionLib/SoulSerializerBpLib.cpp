@@ -73,8 +73,8 @@ void USoulSerializerBpLib::AttributeToString(FGameplayAttribute Attribute, FStri
 	if (Attribute == USoulAttributeSet::GetHealthAttribute())
 		Output = "Health";
 
-	else if (Attribute == USoulAttributeSet::GetStaminaAttribute())
-		Output = "Stamina";
+	else if (Attribute == USoulAttributeSet::GetPostureAttribute())
+		Output = "Posture Value";
 
 	else if (Attribute == USoulAttributeSet::GetLeechAttribute())
 		Output = "Leech";
@@ -82,14 +82,14 @@ void USoulSerializerBpLib::AttributeToString(FGameplayAttribute Attribute, FStri
 	else if (Attribute == USoulAttributeSet::GetMoveSpeedAttribute())
 		Output = "Move Speed";
 
-	else if (Attribute == USoulAttributeSet::GetTenacityAttribute())
-		Output = "Tenacity";
+	else if (Attribute == USoulAttributeSet::GetPostureStrengthAttribute())
+		Output = "Posture Strength";
 
 	else if (Attribute == USoulAttributeSet::GetAttackPowerAttribute())
 		Output = "Attack Power";
 
-	else if (Attribute == USoulAttributeSet::GetDefensePowerAttribute())
-		Output = "Defense";
+	else if (Attribute == USoulAttributeSet::GetPostureCrumbleAttribute())
+		Output = "Posture Crumble";
 
 	else if (Attribute == USoulAttributeSet::GetAttackSpeedAttribute())
 		Output = "Attack Speed";

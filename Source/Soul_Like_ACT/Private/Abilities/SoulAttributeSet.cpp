@@ -9,20 +9,20 @@
 USoulAttributeSet::USoulAttributeSet()
 	: Health(1.f)
 	, MaxHealth(1.f)
-	, Stamina(1.f)
-	, MaxStamina(1.f)
+	, Posture(1.f)
+	, MaxPosture(1.f)
+	, PostureStrength(0.0f)
 	, AttackPower(0.0f)
 	, AttackSpeed(0.0f)
 	, Leech(0.0f)
-	, DefensePower(0.0f)
-	, Tenacity(0.0f)
+	, PostureCrumble(0.0f)
 	, MoveSpeed(400.0f)
 	, CriticalStrike(5.0f)
 	, CriticalMulti(50.f)
 	, Damage(0.0f)
+	, PostureDamage(0.0f)
 {
 }
-
 
 void USoulAttributeSet::AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty)
 {
@@ -40,7 +40,6 @@ void USoulAttributeSet::AdjustAttributeForMaxChange(FGameplayAttributeData& Affe
 	}
 }
 
-
 void USoulAttributeSet::PreAttributeChange(const FGameplayAttribute & Attribute, float & NewValue)
 {
 	// This is called whenever attributes change, so for max health/mana we want to scale the current totals to match
@@ -50,12 +49,7 @@ void USoulAttributeSet::PreAttributeChange(const FGameplayAttribute & Attribute,
 	{
 		AdjustAttributeForMaxChange(Health, MaxHealth, NewValue, GetHealthAttribute());
 	}
-// 	else if (Attribute == GetMaxStaminaAttribute())
-// 	{
-// 		AdjustAttributeForMaxChange(Stamina, MaxStamina, NewValue, GetStaminaAttribute());
-// 	}
 }
-
 
 void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData & Data)
 {
@@ -83,10 +77,7 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
 		TargetCharacter = Cast<ASoulCharacterBase>(TargetActor);
 	}
-	if (Data.EvaluatedData.Attribute == GetIsCriticalDamageTakenAttribute())
-	{
-		return;
-	}
+
 	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{
 		// Get the Source actor
@@ -129,12 +120,15 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			HitResult = *Context.GetHitResult();
 		}
 
+		/**
+		 * Data.EffectSpec == FGameplayEffectSpec
+		 * Data.EffectSpec.DynamicAssetTags
+		 */ 
+		bool bIsCritic = Data.EffectSpec.DynamicAssetTags.HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Event.Montage.Shared.Critical" }, true));
+
 		// Store a local copy of the amount of damage done and clear the damage attribute
 		const float LocalDamageDone = GetDamage();
 		SetDamage(0.f);
-
-		const bool bIsCriticalDamageTaken = GetIsCriticalDamageTaken() > 0.f ? true : false;
-		SetIsCriticalDamageTaken(0.f);
 
 		if (LocalDamageDone > 0)
 		{
@@ -145,10 +139,78 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			if (TargetCharacter)
 			{
 				// This is proper damage
-				TargetCharacter->HandleDamage(LocalDamageDone, bIsCriticalDamageTaken, HitResult, SourceTags, SourceCharacter, SourceActor);
+				TargetCharacter->HandleDamage(LocalDamageDone, bIsCritic, HitResult, SourceTags, SourceCharacter, SourceActor);
 
 				// Call for all health changes
 				TargetCharacter->HandleHealthChanged(-LocalDamageDone, SourceTags);
+			}
+		}
+	}
+	else if (Data.EvaluatedData.Attribute == GetPostureDamageAttribute())
+	{
+		// Get the Source actor
+		AActor* SourceActor = nullptr;
+		AController* SourceController = nullptr;
+		ASoulCharacterBase* SourceCharacter = nullptr;
+		if (Source && Source->AbilityActorInfo.IsValid() && Source->AbilityActorInfo->AvatarActor.IsValid())
+		{
+			SourceActor = Source->AbilityActorInfo->AvatarActor.Get();
+			SourceController = Source->AbilityActorInfo->PlayerController.Get();
+			if (SourceController == nullptr && SourceActor != nullptr)
+			{
+				if (APawn * Pawn = Cast<APawn>(SourceActor))
+				{
+					SourceController = Pawn->GetController();
+				}
+			}
+
+			// Use the controller to find the source pawn
+			if (SourceController)
+			{
+				SourceCharacter = Cast<ASoulCharacterBase>(SourceController->GetPawn());
+			}
+			else
+			{
+				SourceCharacter = Cast<ASoulCharacterBase>(SourceActor);
+			}
+
+			// Set the causer actor based on context if it's set
+			if (Context.GetEffectCauser())
+			{
+				SourceActor = Context.GetEffectCauser();
+			}
+		}
+
+		// Try to extract a hit result
+		FHitResult HitResult;
+		if (Context.GetHitResult())
+		{
+			HitResult = *Context.GetHitResult();
+		}
+
+		/**
+		 * Data.EffectSpec == FGameplayEffectSpec
+		 * Data.EffectSpec.DynamicAssetTags
+		 */
+		bool bIsCritic = Data.EffectSpec.DynamicAssetTags.HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Event.Montage.Shared.Critical" }, true));
+
+		// Store a local copy of the amount of damage done and clear the damage attribute
+		const float LocalPostureDamageDone = GetPostureDamage();
+		SetPostureDamage(0.f);
+
+		if (LocalPostureDamageDone > 0)
+		{
+			// Apply the health change and then clamp it
+			const float OldPosture = GetPosture();
+			SetPosture(FMath::Clamp(OldPosture - LocalPostureDamageDone, 0.0f, GetMaxHealth()));
+
+			if (TargetCharacter)
+			{
+				// This is proper damage
+				TargetCharacter->HandlePostureDamage(LocalPostureDamageDone, bIsCritic, HitResult, SourceTags, SourceCharacter, SourceActor);
+
+				// Call for all health changes
+				TargetCharacter->HandlePostureChanged(-LocalPostureDamageDone, SourceTags);
 			}
 		}
 	}
@@ -164,12 +226,12 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			TargetCharacter->HandleHealthChanged(DeltaValue, SourceTags);
 		}
 	}
-	else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
+	else if (Data.EvaluatedData.Attribute == GetPostureAttribute())
 	{
-		SetStamina(FMath::Clamp(GetStamina(), 0.0f, GetMaxStamina()));
+		SetPosture(FMath::Clamp(GetPosture(), 0.0f, GetMaxPosture()));
 
 		if (TargetCharacter)
-			TargetCharacter->HandleStaminaChanged(DeltaValue, SourceTags);
+			TargetCharacter->HandlePostureChanged(DeltaValue, SourceTags);
 	}
 	else if (Data.EvaluatedData.Attribute == GetLeechAttribute())
 	{
@@ -194,45 +256,66 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			TargetCharacter->HandleMoveSpeedChanged(DeltaValue, SourceTags);
 		}
 	}
-	else if (Data.EvaluatedData.Attribute == GetTenacityAttribute())
+	//Posture Strength
+	else if (Data.EvaluatedData.Attribute == GetPostureStrengthAttribute())
 	{
-		SetTenacity(FMath::Clamp(GetTenacity(), 0.0f, 9999.0f));
+		SetPostureStrength(FMath::Clamp(GetPostureStrength(), 0.0f, 9999.0f));
 
 		if (TargetCharacter)
-			TargetCharacter->HandleTenacityChanged(DeltaValue, SourceTags);
+			TargetCharacter->HandlePostureStrengthChanged(DeltaValue, SourceTags);
 	}
+
+	//DP
+	else if (Data.EvaluatedData.Attribute == GetDefensePowerAttribute())
+	{
+	SetDefensePower(FMath::Clamp(GetDefensePower(), 0.0f, 9999.0f));
+
+	if (TargetCharacter)
+		TargetCharacter->HandleDefensePowerChanged(DeltaValue, SourceTags);
+	}
+
 	else if (Data.EvaluatedData.Attribute == GetAttackPowerAttribute())
 	{
 		SetAttackPower(FMath::Clamp(GetAttackPower(), 0.0f, 9999.0f));
 		if (TargetCharacter)
 			TargetCharacter->HandleAttackPowerChanged(DeltaValue, SourceTags);
 	}
-	else if (Data.EvaluatedData.Attribute == GetDefensePowerAttribute())
+
+	//Posture Crumble
+	else if (Data.EvaluatedData.Attribute == GetPostureCrumbleAttribute())
 	{
-		SetDefensePower(FMath::Clamp(GetDefensePower(), 0.0f, 9999.0f));
+		SetPostureCrumble(FMath::Clamp(GetPostureCrumble(), 0.0f, 9999.0f));
 		if (TargetCharacter)
-			TargetCharacter->HandleDefensePowerChanged(DeltaValue, SourceTags);
+			TargetCharacter->HandlePostureCrumbleChanged(DeltaValue, SourceTags);
 	}
+
+	//CS
 	else if (Data.EvaluatedData.Attribute == GetCriticalStrikeAttribute())
 	{
-	SetDefensePower(FMath::Clamp(GetCriticalStrike(), -999.f, 999.f));
-	if (TargetCharacter)
-		TargetCharacter->HandleCriticalStrikeChanged(DeltaValue, SourceTags);
+		SetCriticalStrike(FMath::Clamp(GetCriticalStrike(), -999.f, 999.f));
+		if (TargetCharacter)
+			TargetCharacter->HandleCriticalStrikeChanged(DeltaValue, SourceTags);
 	}
+
+	//CM
 	else if (Data.EvaluatedData.Attribute == GetCriticalMultiAttribute())
 	{
-	SetDefensePower(FMath::Clamp(GetCriticalMulti(), -999.f, 999.f));
-	if (TargetCharacter)
-		TargetCharacter->HandleCriticalMultiChanged(DeltaValue, SourceTags);
+		SetCriticalMulti(FMath::Clamp(GetCriticalMulti(), -999.f, 999.f));
+		if (TargetCharacter)
+			TargetCharacter->HandleCriticalMultiChanged(DeltaValue, SourceTags);
 	}
+
+	//Max
 	if (Data.EvaluatedData.Attribute == GetMaxHealthAttribute())
 	{
 		if (TargetCharacter)
 			TargetCharacter->HandleHealthChanged(DeltaValue, SourceTags);
-	}	
-	if (Data.EvaluatedData.Attribute == GetMaxStaminaAttribute())
+	}
+
+	//Max
+	if (Data.EvaluatedData.Attribute == GetMaxPostureAttribute())
 	{
 		if (TargetCharacter)
-			TargetCharacter->HandleStaminaChanged(DeltaValue, SourceTags);
+			TargetCharacter->HandlePostureChanged(DeltaValue, SourceTags);
 	}
 }

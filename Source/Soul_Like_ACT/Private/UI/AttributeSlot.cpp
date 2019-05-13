@@ -20,7 +20,7 @@ void UAttributeSlot::SetAttributeType()
 void UAttributeSlot::OnAttributeChanged(const TArray<float>& values)
 {
 	if (MyAttribute == USoulAttributeSet::GetHealthAttribute()
-		|| MyAttribute == USoulAttributeSet::GetStaminaAttribute())
+		|| MyAttribute == USoulAttributeSet::GetPostureAttribute())
 	{
 		FFormatOrderedArguments Args;
 		Args.Add((int32)values[0]);
@@ -30,9 +30,9 @@ void UAttributeSlot::OnAttributeChanged(const TArray<float>& values)
 	}
 	else if (MyAttribute == USoulAttributeSet::GetLeechAttribute()
 		|| MyAttribute == USoulAttributeSet::GetMoveSpeedAttribute()
-		|| MyAttribute == USoulAttributeSet::GetTenacityAttribute()
+		|| MyAttribute == USoulAttributeSet::GetPostureStrengthAttribute()
 		|| MyAttribute == USoulAttributeSet::GetAttackPowerAttribute()
-		|| MyAttribute == USoulAttributeSet::GetDefensePowerAttribute())
+		|| MyAttribute == USoulAttributeSet::GetPostureCrumbleAttribute())
 	{
 		AttributeValue->SetText(FText::FromString(FString::FromInt((int32)values[0])));
 	}
