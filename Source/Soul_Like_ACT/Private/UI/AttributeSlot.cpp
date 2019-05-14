@@ -32,7 +32,8 @@ void UAttributeSlot::OnAttributeChanged(const TArray<float>& values)
 		|| MyAttribute == USoulAttributeSet::GetMoveSpeedAttribute()
 		|| MyAttribute == USoulAttributeSet::GetPostureStrengthAttribute()
 		|| MyAttribute == USoulAttributeSet::GetAttackPowerAttribute()
-		|| MyAttribute == USoulAttributeSet::GetPostureCrumbleAttribute())
+		|| MyAttribute == USoulAttributeSet::GetPostureCrumbleAttribute()
+		|| MyAttribute == USoulAttributeSet::GetDefensePowerAttribute())
 	{
 		AttributeValue->SetText(FText::FromString(FString::FromInt((int32)values[0])));
 	}

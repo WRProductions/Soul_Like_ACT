@@ -20,6 +20,7 @@ enum class EIsControllerValid : uint8
 };
 
 #define ATTRIBUTE_GETTER(PropertyName) \
+	UFUNCTION(BlueprintCallable) \
 	virtual float Get##PropertyName##() const \
 	{ \
 		return AttributeSet->Get##PropertyName##(); \
@@ -85,11 +86,11 @@ protected:
 		bool bAbilitiesInitialized;
 
 	/** Temp Gameplay Abilities */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = AnimGA)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Default)
 		TArray<TSubclassOf<UGameplayAbility>> AbilityArray;
 
 	/** Passive gameplay effects applied on creation */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Abilities)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
 		TArray<TSubclassOf<UGameplayEffect>> PassiveGameplayEffects;
 
 	FTimerHandle Handle_SlowMotion, Handler_SlowMotionDelay;
@@ -134,19 +135,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TriggerSlowMotion_WithDelay(float Delay);
 
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED_TwoParams(Health)
-	ATTRIBUTE_GETTER(MaxHealth)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED_TwoParams(Posture)
-	ATTRIBUTE_GETTER(MaxPosture)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(Leech)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(PostureStrength)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(DefensePower)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(AttackPower)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(PostureCrumble)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(MoveSpeed)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(AttackSpeed)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(CriticalStrike)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(CriticalMulti)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_TwoParams(Health);
+	ATTRIBUTE_GETTER(MaxHealth);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_TwoParams(Posture);
+	ATTRIBUTE_GETTER(MaxPosture);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(Leech);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(PostureStrength);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(DefensePower);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(AttackPower);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(PostureCrumble);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(MoveSpeed);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(AttackSpeed);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(CriticalStrike);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(CriticalMulti);
+
+	UFUNCTION(BlueprintCallable)
+	float GetPosturePercent() { return GetPosture() / GetMaxPosture(); }
 
 	/** Returns the character level that is passed to the ability system */
 	UFUNCTION(BlueprintCallable)
@@ -154,6 +158,7 @@ public:
 
 protected:
 	/** Apply the startup GAs and GEs */
+	UFUNCTION(BlueprintCallable)
 	void AddStartupGameplayAbilities();
 
 	/**

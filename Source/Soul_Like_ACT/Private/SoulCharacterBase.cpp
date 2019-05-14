@@ -124,8 +124,7 @@ const bool ASoulCharacterBase::IsInRivalFaction(ASoulCharacterBase *DamageDealer
 void ASoulCharacterBase::PossessedBy(AController * NewController)
 {
 	Super::PossessedBy(NewController);
-
-	AddStartupGameplayAbilities();
+	LOG_FUNC_SUCCESS();
 }
 
 void ASoulCharacterBase::UnPossessed()

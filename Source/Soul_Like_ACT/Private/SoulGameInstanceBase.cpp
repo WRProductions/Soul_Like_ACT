@@ -132,10 +132,15 @@ void USoulGameInstanceBase::Broadcast_OnSaveGameLoadFinshed()
 		OnSaveGameLoadingFinished.Broadcast();
 }
 
-void USoulGameInstanceBase::GetSoulPlayer(UObject* WorldContextObject, ASoulPlayerController*& MyController, ASoul_Like_ACTCharacter*& MyChar, UInventoryManager*& MyInentory, bool &Successful)
+bool USoulGameInstanceBase::GetSoulPlayer(UObject* WorldContextObject, ASoulPlayerController*& MyController, ASoul_Like_ACTCharacter*& MyChar, UInventoryManager*& MyInentory, bool &Successful)
 {
+	if (!WorldContextObject->IsValidLowLevel())
+		return false;
 	UWorld* MyWorld = WorldContextObject->GetWorld();
 	
+	if (!MyWorld)
+		return false;
+
 	MyController = Cast<ASoulPlayerController>(MyWorld->GetFirstPlayerController());
 	
 	if (MyController)
@@ -144,12 +149,10 @@ void USoulGameInstanceBase::GetSoulPlayer(UObject* WorldContextObject, ASoulPlay
 		if (MyChar)
 		{
 			MyInentory = MyChar->GetInventoryManager();
-			Successful = true;
-			return;
+			return true;
 		}
 	}
-	Successful = false;
-	return;
+	return false;
 }
 
 USoulSaveGame* USoulGameInstanceBase::GetSaveSlot()

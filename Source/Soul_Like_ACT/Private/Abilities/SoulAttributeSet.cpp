@@ -12,6 +12,7 @@ USoulAttributeSet::USoulAttributeSet()
 	, Posture(1.f)
 	, MaxPosture(1.f)
 	, PostureStrength(0.0f)
+	, DefensePower(0.f)
 	, AttackPower(0.0f)
 	, AttackSpeed(0.0f)
 	, Leech(0.0f)
@@ -202,7 +203,7 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		{
 			// Apply the health change and then clamp it
 			const float OldPosture = GetPosture();
-			SetPosture(FMath::Clamp(OldPosture - LocalPostureDamageDone, 0.0f, GetMaxHealth()));
+			SetPosture(FMath::Clamp(OldPosture + LocalPostureDamageDone, 0.0f, GetMaxHealth()));
 
 			if (TargetCharacter)
 			{
@@ -210,7 +211,8 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				TargetCharacter->HandlePostureDamage(LocalPostureDamageDone, bIsCritic, HitResult, SourceTags, SourceCharacter, SourceActor);
 
 				// Call for all health changes
-				TargetCharacter->HandlePostureChanged(-LocalPostureDamageDone, SourceTags);
+				// WARNING: IT MUST BE A POSITIVE VALUE
+				TargetCharacter->HandlePostureChanged(LocalPostureDamageDone, SourceTags);
 			}
 		}
 	}
@@ -264,7 +266,6 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		if (TargetCharacter)
 			TargetCharacter->HandlePostureStrengthChanged(DeltaValue, SourceTags);
 	}
-
 	//DP
 	else if (Data.EvaluatedData.Attribute == GetDefensePowerAttribute())
 	{
