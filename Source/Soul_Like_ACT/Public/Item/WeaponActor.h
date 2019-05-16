@@ -45,7 +45,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-
 protected:
 	void CheckCollision();
 
@@ -64,13 +63,7 @@ public:
 
 	bool GetIsSwinging() const { return bIsTracingCollision; }
 
-	//When OnHit
-	//Send HitInformation back to GA
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	bool ApplyGAOnHit(ASoulCharacterBase *Target, const FHitResult &InpHitResult);
-
+protected:
 	UFUNCTION(BlueprintImplementableEvent)
-	void TriggerSlowMotion(const FHitResult &HitResult);
-	UFUNCTION(BlueprintImplementableEvent)
-	void ApplySpecialEffect(const FHitResult &HitResult);
+	void ApplyEventBackToGA(ASoulCharacterBase *Target, const FHitResult &InpHitResult);
 };

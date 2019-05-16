@@ -102,8 +102,8 @@ protected:
 
 	void TriggerSlowMotion()
 	{
-		CustomTimeDilation = 0.01f;
-		GetWorldTimerManager().SetTimer(Handle_SlowMotion, this, &ASoulCharacterBase::WaitForDilationReset, 1.f, 0, 0.15f);
+		CustomTimeDilation = 0.003f;
+		GetWorldTimerManager().SetTimer(Handle_SlowMotion, this, &ASoulCharacterBase::WaitForDilationReset, 1.f, false, 0.2f);
 	}
 
 public:	
@@ -210,6 +210,9 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void MakeStepDecelAndSound();
+
+	UFUNCTION(BlueprintCallable)
+	void ResetPerilousStatus();
 
 public:
 	

@@ -114,7 +114,10 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	float DamageDone = 0.f;
 
 	if (CriticalStrike >= LocalRandValue)
+	{
+		Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Event.Montage.Shared.Critical" }, true));
 		DamageDone = (Damage + AttackPower) * (1 + CriticalMulti / 100.f);
+	}
 	else
 		DamageDone = (Damage + AttackPower);
 
@@ -130,7 +133,6 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	{
 		//Passed the critical tag to the gameplay effect spec
 		//We shall see that when the change of the Damage is passed to the target's AttriuteSet
-		Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Event.Montage.Shared.Critical" }, true));
 
 		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().DamageProperty, EGameplayModOp::Additive, DamageDone));
 		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().PostureDamageProperty, EGameplayModOp::Additive, PostureDamageDone));
