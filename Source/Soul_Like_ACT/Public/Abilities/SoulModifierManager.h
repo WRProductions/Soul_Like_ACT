@@ -26,6 +26,16 @@ public:
 
 protected:
 
-	TArray<USoulGameplayAbility> 
+	/** Abilities to grant to this character on creation. These will be activated by tag or event and are not bound to specific inputs */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
+		TArray<USoulGameplayAbility> GameplayAbilities;
+
+	/** Map of item slot to gameplay ability class, these are bound before any abilities added by the inventory */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
+		TMap<FSoulEquipmentSlot, USoulGameplayAbility> DefaultSlottedAbilities;
+
+	/** Map of slot to ability granted by that slot. I may refactor this later */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
+		TMap<FSoulEquipmentSlot, FGameplayAbilitySpecHandle> SlottedAbilities;
 		
 };
