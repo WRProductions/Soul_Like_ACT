@@ -40,7 +40,6 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 
 public:
-
 	static const float BattleMovementScale;
 	static const float TravelMovementScale;
 
@@ -116,7 +115,7 @@ public:
 	void GetMyPlayerController(class ASoulPlayerController*& MyController, EIsControllerValid & Outp);
 
 	UFUNCTION(BlueprintCallable)
-	UInventoryManager* GetInventoryManager() const;
+	class UInventoryManager* GetInventoryManager() const;
 
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly))
 	static void GetPlayer(UWorld *InWorld, bool &Successful, ASoulPlayerController *&SoulPlayerController, ASoul_Like_ACTCharacter *&SoulCharacter, UInventoryManager *&SoulInventoryManager);

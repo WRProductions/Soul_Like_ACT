@@ -3,9 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Types/SoulItemTypes.h"
 #include "Components/ActorComponent.h"
 #include "SoulModifierManager.generated.h"
 
+USTRUCT(BlueprintType)
+struct FEquipGA_Handles
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, category = Default)
+	TArray<FGameplayAbilitySpecHandle> GA_Handles;
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SOUL_LIKE_ACT_API USoulModifierManager : public UActorComponent
@@ -16,26 +26,47 @@ public:
 	// Sets default values for this component's properties
 	USoulModifierManager();
 
-protected:
+public:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	/** Defined in SoulPlayerBase */
+	class ASoulCharacterBase* PlayerRef;
+
+	UFUNCTION(BlueprintCallable)
+	class USoulAbilitySystemComponent* GetSoulGAComponent();
 
 protected:
+	/** If true we have initialized our abilities */
+	UPROPERTY()
+	bool bAbilitiesInitialized;
 
-	/** Abilities to grant to this character on creation. These will be activated by tag or event and are not bound to specific inputs */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
-		TArray<USoulGameplayAbility> GameplayAbilities;
+	/** 
+	* These GAs are created when Beginplay
+	* DefaultActive are bound to any inputs, e.g. Action/Spells
+	*/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Default)
+	TMap<TSubclassOf<USoulGameplayAbility>, uint8> DefaultActiveAbilities;
+	/**
+	* These GAs are created when Beginplay
+	* DefaultModifers can only be triggered or modify attributes, thus permanent.
+	*/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Default)
+	TMap<TSubclassOf<USoulModifierGameplayAbility>, uint8> DefaultModifiers;
 
-	/** Map of item slot to gameplay ability class, these are bound before any abilities added by the inventory */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
-		TMap<FSoulEquipmentSlot, USoulGameplayAbility> DefaultSlottedAbilities;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	TArray<FGameplayAbilitySpecHandle> GrantedDefaultActiveGAs;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	TArray<FGameplayAbilitySpecHandle> GrantedDefaultModifiers;
 
-	/** Map of slot to ability granted by that slot. I may refactor this later */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
-		TMap<FSoulEquipmentSlot, FGameplayAbilitySpecHandle> SlottedAbilities;
-		
+	/** Map of slot to ability granted by that slot. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	TMap<FSoulEquipmentSlot, FEquipGA_Handles> SlottedAbilities;
+
+	void AddStartupGameplayAbilities();
+
+	bool AddOrRemoveGAOnEquipSlot(const FSoulEquipmentSlot& EquipSlot, bool RemoveGA);
+
+	friend ASoulCharacterBase;
+	friend class UInventoryManager;
 };

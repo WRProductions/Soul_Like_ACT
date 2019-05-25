@@ -2,7 +2,6 @@
 
 
 #include "Widget_Inventory.h"
-#include "UI/Widget_InventorySlot.h"
 #include "Components/WrapBox.h"
 #include "Player/InventoryManager.h"
 #include "Player/Soul_Like_ACTCharacter.h"

@@ -20,13 +20,55 @@ class SOUL_LIKE_ACT_API UInventoryManager : public UActorComponent
 {
 	GENERATED_BODY()
 
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	class ASoul_Like_ACTCharacter* PlayerRef;
 
 public:
-	// Sets default values for this component's properties
 	UInventoryManager();
 
+/**
+ * Inventory
+ */
+protected:
+	/** Adds a new inventory item, will add it to an empty slot if possible.
+	If the item supports count you can add more than one count.
+	It will also update the level when adding if required */
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	bool AddInventoryItem(FSoulItemData InItemData, bool bAutoSlot = true);
+	
+	/** Remove an inventory item, will also remove from slots.
+	A remove count of <= 0 means to remove all copies */
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	bool RemoveInventoryItem(FSoulItemData RemovedItem);
+	
+	/** Remove an inventory item */
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	bool RemoveInventoryItemAtIndex(FSoulItemSlot InItemSlot, int32 ItemCount = 1);
+
+	//UFUNCTION(BlueprintPure, Category = Inventory)
+	bool GetFirstSlot(FSoulItemData InItemData, FSoulItemSlot & OutSlot, bool bSkipFullSlot = true, bool bGetEmptySlot = false) const;
+
+	/** Returns all inventory items of a given type. If none is passed as type it will return all */
+	//UFUNCTION(BlueprintPure, Category = Inventory)
+	bool GetSlots(FSoulItemData InItemData, TArray<FSoulItemSlot>& OutItemDatas) const;
+
+	/** Get the reference of the ItemData at the slot. Return true if the data has a valid ItemBase and positive quantity*/
+	UFUNCTION(BlueprintPure, Category = Inventory)
+	bool GetInventoryItemData(FSoulItemSlot InItemSlot, FSoulItemData& ItemData) const;
+
+	/** Returns number of instances of this item found in the inventory. This uses count from GetItemData */
+	UFUNCTION(BlueprintPure, Category = Inventory)
+	int32 GetSlottedItemCount(FSoulItemSlot InItemSlot) const;
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	const EGearType GetGearType(FSoulItemSlot InItemSlot);
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	void AddEquipment(FSoulItemSlot InventorySlot);
+
+/**
+ * Save/Load
+ */
+public:
 	/** Map of slot, from type/num to item, initialized from ItemSlotsPerType on RPGGameInstanceBase */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FSoulItemSlot, FSoulItemData> InventoryItems;
@@ -59,12 +101,14 @@ public:
 		FOnInventoryLoadingFinished OnInventoryLoadingFinished;
 
 protected:
-	void Notify_OnInventoryLoadingFinished(bool bFirstTimeInit);
 
-	/** Auto slots a specific item, returns true if anything changed */
-	bool FillEmptySlotWithItem(FSoulItemData NewItemData);
+	void SetItemSlot(FSoulItemData& InItemData, FSoulItemSlot ItemSlot);
+
+	void Notify_OnInventoryLoadingFinished(bool bFirstTimeInit);
 
 	/** Calls the inventory update callbacks */
 	void NotifySlottedItemChanged(FSoulItemSlot ItemSlot, FSoulItemData ItemData);
 	void NotifyEquipmentChanged(FSoulEquipmentSlot EquipmentSlot, FSoulItemData ItemData);
+
+	friend ASoul_Like_ACTCharacter;
 };

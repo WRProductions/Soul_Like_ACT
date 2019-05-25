@@ -3,6 +3,7 @@
 #include "SoulCharacterBase.h"
 #include "AbilitySystemGlobals.h"
 #include "Abilities/SoulGameplayAbility.h"
+#include "Abilities/SoulModifierManager.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "ActorFxManager.h"
@@ -18,8 +19,10 @@ ASoulCharacterBase::ASoulCharacterBase()
 	// Create the attribute set, this replicates by default
 	AttributeSet = CreateDefaultSubobject<USoulAttributeSet>(TEXT("AttributeSet"));
 
-
 	FXManager = CreateDefaultSubobject<UActorFXManager>(TEXT("FXManager"));
+
+	ModifierManager = CreateDefaultSubobject<USoulModifierManager>(TEXT("ModifierManager"));
+	ModifierManager->PlayerRef = this;
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(96.f);
 	GetCapsuleComponent()->SetCapsuleRadius(60.f);
@@ -55,33 +58,7 @@ void ASoulCharacterBase::TriggerSlowMotion_WithDelay(float Delay)
 
 void ASoulCharacterBase::AddStartupGameplayAbilities()
 {
-	check(AbilitySystemComponent);
-
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
-
-	if (Role == ROLE_Authority)
-	{
-		for (auto TempAbility : AbilityArray)
-		{
-			if (TempAbility)
-				AbilitySystemComponent->GiveAbility(TempAbility);
-		}
-
-		// Now apply passives
-		for (TSubclassOf<UGameplayEffect>& GameplayEffect : PassiveGameplayEffects)
-		{
-			FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
-			EffectContext.AddSourceObject(this);
-
-			FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, GetCharacterLevel(), EffectContext);
-			if (NewHandle.IsValid())
-			{
-				FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
-			}
-		}
-	}
-
-	bAbilitiesInitialized = true;
+	ModifierManager->AddStartupGameplayAbilities();
 }
 
 void ASoulCharacterBase::HandleDamage(float DamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)

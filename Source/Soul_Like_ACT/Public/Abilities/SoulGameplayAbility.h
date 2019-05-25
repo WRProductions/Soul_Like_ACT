@@ -76,7 +76,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
 	FText DisplayName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
-	TSubclassOf<UGameplayEffect> EffectCollection;
+	TArray<UGameplayEffect*> EffectCollection;
 };
 
 UCLASS()

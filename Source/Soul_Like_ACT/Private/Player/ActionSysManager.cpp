@@ -154,14 +154,6 @@ FName UActionSysManager::Get4WaysStepDirection_GA(float PredictableMovingDirecti
 		return "B";
 }
 
-bool UActionSysManager::ActivateAbilitiesWithWeapon(bool bAllowRemoteActivation) const
-{
-	if (PlayerRef->AbilitySystemComponent)
-		return PlayerRef->AbilitySystemComponent->TryActivateAbilityByClass(PlayerRef->AbilityArray[0], true);
-	
-	return false;
-}
-
 void UActionSysManager::GetActiveAbilitiesWithTags(FGameplayTagContainer AbilityTags, TArray<USoulGameplayAbility*>& ActiveAbilities)
 {
 	if (PlayerRef->AbilitySystemComponent)

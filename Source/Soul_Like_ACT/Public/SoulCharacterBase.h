@@ -73,6 +73,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UActorFXManager *FXManager;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		class USoulModifierManager* ModifierManager;
+
 	/** The component used to handle ability system interactions */
 	UPROPERTY(BlueprintReadOnly)
 		class USoulAbilitySystemComponent *AbilitySystemComponent;
@@ -80,18 +83,6 @@ protected:
 	/** List of attributes modified by the ability system */
 	UPROPERTY()
 		USoulAttributeSet* AttributeSet;
-
-	/** If true we have initialized our abilities */
-	UPROPERTY()
-		bool bAbilitiesInitialized;
-
-	/** Temp Gameplay Abilities */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Default)
-		TArray<TSubclassOf<UGameplayAbility>> AbilityArray;
-
-	/** Passive gameplay effects applied on creation */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
-		TArray<TSubclassOf<UGameplayEffect>> PassiveGameplayEffects;
 
 	FTimerHandle Handle_SlowMotion, Handler_SlowMotionDelay;
 
@@ -159,7 +150,7 @@ public:
 protected:
 	/** Apply the startup GAs and GEs */
 	UFUNCTION(BlueprintCallable)
-	void AddStartupGameplayAbilities();
+		void AddStartupGameplayAbilities();
 
 	/**
 	 * Called when character takes damage, which may have killed them

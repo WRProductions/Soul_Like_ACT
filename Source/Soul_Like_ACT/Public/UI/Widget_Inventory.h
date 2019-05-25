@@ -4,9 +4,9 @@
 
 #include "Soul_Like_ACT.h"
 #include "Blueprint/UserWidget.h"
+#include "UI/Widget_InventorySlot.h"
 #include "Widget_Inventory.generated.h"
 
-class UWidget_InventorySlot;
 
 /**
  * 

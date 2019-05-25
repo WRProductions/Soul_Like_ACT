@@ -128,7 +128,7 @@ struct SOUL_LIKE_ACT_API FSoulItemData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Slots)
 	TArray<USoulJewelItem*> SlotedJewls;
 
-	/** Equality operators */
+	/** Equality operators. It doesn't execute QUANTITY check */
 	bool operator==(const FSoulItemData& Other) const
 	{
 		return ItemCount == Other.ItemCount && ItemLevel == Other.ItemLevel && ItemBase == Other.ItemBase && SlotedJewls == Other.SlotedJewls;
@@ -146,20 +146,32 @@ struct SOUL_LIKE_ACT_API FSoulItemData
 	}
 
 	/** Append an item data, this adds the count and overrides everything else */
-	void UpdateItemData(const FSoulItemData& Other, int32 MaxCount, int32 MaxLevel)
+	bool UpdateItemData(UPARAM(ref) FSoulItemData& Other)
 	{
-		if (MaxCount <= 0)
+		if(ItemBase != Other.ItemBase || ItemLevel != Other.ItemLevel)
+			return false;
+
+		ItemCount = (ItemCount + Other.ItemCount, 1, ItemBase->MaxCount);
+
+		int32 CountOverflow = ItemBase->MaxCount - ItemCount;
+
+		if (CountOverflow < 0)
 		{
-			MaxCount = MAX_int32;
+			ItemCount = ItemBase->MaxCount;
+			Other.ItemCount = CountOverflow;
+		}
+		else
+		{
+			Other.ItemCount = 0;
 		}
 
-		if (MaxLevel <= 0)
-		{
-			MaxLevel = MAX_int32;
-		}
+		return true;
+	}
 
-		ItemCount = FMath::Clamp(ItemCount + Other.ItemCount, 1, MaxCount);
-		ItemLevel = FMath::Clamp(Other.ItemLevel, 1, MaxLevel);
+	/** Return whether the item data and input has the same item type and ilv */
+	bool HasSameItem(FSoulItemData& Other) const
+	{
+		return ItemLevel == Other.ItemLevel && ItemBase == Other.ItemBase && SlotedJewls == Other.SlotedJewls;
 	}
 
 	FString ToString() const
@@ -181,8 +193,6 @@ struct SOUL_LIKE_ACT_API FSoulItemData
 			return "Invalid SoulItem";
 		}
 	}
-
-
 
 };
 

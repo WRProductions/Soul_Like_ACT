@@ -42,6 +42,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Item)
 	FPrimaryAssetType ItemType;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Item)
+	EGearType ItemSlotType;
+
 	/** User-visible short name */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 	FText ItemName;

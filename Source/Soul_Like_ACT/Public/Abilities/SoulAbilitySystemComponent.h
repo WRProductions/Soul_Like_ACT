@@ -29,5 +29,4 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static void ApplyGE_ToSelf(const AActor* Actor, const TSubclassOf<UGameplayEffect> GameplayEffect, const int32 AbilityLevel);
-
 };

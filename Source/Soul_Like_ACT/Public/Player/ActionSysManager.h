@@ -27,8 +27,6 @@ protected:
 
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
-	bool ActivateAbilitiesWithWeapon(bool bAllowRemoteActivation) const;
-
 	void GetActiveAbilitiesWithTags(struct FGameplayTagContainer AbilityTags, TArray<USoulGameplayAbility*>& ActiveAbilities);
 
 	bool bCanJumpSection;
