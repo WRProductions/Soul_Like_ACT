@@ -8,18 +8,18 @@
 #include "Components/VerticalBox.h"
 #include "Components/Image.h"
 
-void UWidget_ItemInfo::MakeItemInfo_Implementation(USoulItem* ItemToRead, const FSoulItemData& ItemData)
+void UWidget_ItemInfo::MakeItemInfo_Implementation(const FSoulItemData& ItemData)
 {
-	ItemName->SetText(ItemToRead->ItemName);
+	ItemName->SetText(ItemData.ItemBase->ItemName);
 
-	ItemType->SetText(FText::FromString(ItemToRead->ItemType.ToString()));
+	ItemType->SetText(FText::FromString(ItemData.ItemBase->ItemType.ToString()));
 
 	ItemLevel->SetText(FText::FromString(FString::FromInt(ItemData.ItemLevel)));
 
 	//TODO Set primary status name
  	TArray<FText> PrimStatNames, PrimStatValues;
 	bool bSuccessful;
- 	USoulSerializerBpLib::GetPrimaryStatusFromItem(ItemToRead, PrimStatNames, PrimStatValues, bSuccessful);
+ 	USoulSerializerBpLib::GetPrimaryStatusFromItem(ItemData.ItemBase, PrimStatNames, PrimStatValues, bSuccessful);
 
 	if (bSuccessful)
 	{
@@ -39,7 +39,7 @@ void UWidget_ItemInfo::MakeItemInfo_Implementation(USoulItem* ItemToRead, const 
 	}
 
 	//Item Count
-	if (ItemToRead->MaxCount == 1)
+	if (ItemData.ItemBase->MaxCount == 1)
 	{
 		ItemQuantity->SetVisibility(ESlateVisibility::Hidden);
 	}
@@ -51,16 +51,16 @@ void UWidget_ItemInfo::MakeItemInfo_Implementation(USoulItem* ItemToRead, const 
 
 	//Icon
 	UMaterialInstanceDynamic* DynIcon = ItemIcon->GetDynamicMaterial();
-	DynIcon->SetTextureParameterValue(FName("IconTexture"), ItemToRead->ItemIcon);
+	DynIcon->SetTextureParameterValue(FName("IconTexture"), ItemData.ItemBase->ItemIcon);
 
 	//Description
-	if (ItemToRead->ItemDescription.IsEmpty())
+	if (ItemData.ItemBase->ItemDescription.IsEmpty())
 	{
 		ItemDescription->SetVisibility(ESlateVisibility::Hidden);
 	}
 	else
 	{
 		ItemDescription->SetVisibility(ESlateVisibility::Visible);
-		ItemDescription->SetText(ItemToRead->ItemDescription);
+		ItemDescription->SetText(ItemData.ItemBase->ItemDescription);
 	}
 }

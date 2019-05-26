@@ -11,7 +11,7 @@ UInventoryManager::UInventoryManager()
 	PrimaryComponentTick.bCanEverTick = 0;
 }
 
-bool UInventoryManager::AddInventoryItem(FSoulItemData InItemData, bool bAutoSlot /*= true*/)
+bool UInventoryManager::AddInventoryItem(FSoulItemData InItemData)
 {
 	bool bChanged = false;
 
@@ -21,52 +21,58 @@ bool UInventoryManager::AddInventoryItem(FSoulItemData InItemData, bool bAutoSlo
 		return false;
 	}
 
-	//Find the current item data at slot
-	TArray<FSoulItemSlot> LocalSlots;
-	bool bSuccessfulChecked = GetSlots(InItemData, LocalSlots);
+	//Get slots with the similar item base
+	TArray<FSoulItemSlot> OldSlots;
+	bool bSuccessfulChecked = GetSlots(InItemData, OldSlots, true, false);
+	
+	//If we found a slot and not auto slot, update the old slot with new data
+	if(bSuccessfulChecked)
+	{
+		for (auto & LocalSlot : OldSlots)
+		{
 
-	//Find the modified data
+			InventoryItems[LocalSlot].UpdateItemData(InItemData);
+			NotifySlottedItemChanged(LocalSlot, InItemData);
+			UE_LOG(LogTemp, Warning, TEXT("UInventoryManager::AddInventoryItem -> Old_Slot_[%i]"), LocalSlot.SlotNumber);
+		}
 
+		while (InItemData.IsValid())
+		{
+			FSoulItemSlot RemainingSlot;
+
+			bSuccessfulChecked = GetFirstSlot(InItemData, RemainingSlot, true, true);
+
+			if (bSuccessfulChecked)
+			{
+				InventoryItems[RemainingSlot].UpdateItemData(InItemData);
+				NotifySlottedItemChanged(RemainingSlot, InItemData);
+				UE_LOG(LogTemp, Warning, TEXT("UInventoryManager::AddInventoryItem -> Remining_Slot_[%i]"), RemainingSlot.SlotNumber);
+			}
+		}
+
+		LOG_FUNC_SUCCESS();
+		return bSuccessfulChecked;
+	}
 	/**
-	 * Fill the inventory slot if 
+	 * Fill the inventory slot if
 	 * No same item bases in the inventory
-	 * OR bAutoSlot is true
 	 */
-	if (!bSuccessfulChecked || bAutoSlot)
+	else
 	{
 		FSoulItemSlot LocalEmptySlot;
-		
+
 		bSuccessfulChecked = GetFirstSlot(InItemData, LocalEmptySlot, true, true);
-		
+
 		if (bSuccessfulChecked)
 		{
 			InventoryItems[LocalEmptySlot] = InItemData;
 			NotifySlottedItemChanged(LocalEmptySlot, InItemData);
-			LOG_FUNC_SUCCESS();
+			UE_LOG(LogTemp, Warning, TEXT("UInventoryManager::AddInventoryItem -> New_Slot_[%i]"), LocalEmptySlot.SlotNumber);
 			return true;
 		}
 
 		LOG_FUNC_FAIL();
 		return false;
-	}
-	//If we found a slot and not auto slot, update the old slot with new data
-	else
-	{
-		FSoulItemSlot LocalSlot;
-	
-		do 
-		{
-			bSuccessfulChecked = GetFirstSlot(InItemData, LocalSlot, true, false);
-
-			if (bSuccessfulChecked)
-			{
-				InventoryItems[LocalSlot].UpdateItemData(InItemData);
-				NotifySlottedItemChanged(LocalSlot, InItemData);
-			}
-		} while (InItemData.IsValid() && bSuccessfulChecked);
-		
-		LOG_FUNC_SUCCESS();
-		return bSuccessfulChecked;
 	}
 
 	LOG_FUNC_FAIL();
@@ -100,16 +106,13 @@ bool UInventoryManager::GetFirstSlot(FSoulItemData InItemData
 {
 	for (auto& ItemTuple : InventoryItems)
 	{
-		if (ItemTuple.Value.IsValid() && ItemTuple.Value.HasSameItem(InItemData))
+		if (bGetEmptySlot && !(ItemTuple.Value.IsValid()))
 		{
-			//Get the first non-empty slot. If bSkipFullSlot is true, get the first non-full slot
-			if (ItemTuple.Value.ItemCount < ItemTuple.Value.ItemBase->MaxCount || bSkipFullSlot)
-			{
-				OutSlot = ItemTuple.Key;
-				return true;
-			}
+			OutSlot = ItemTuple.Key;
+			return true;
 		}
-		else if (bGetEmptySlot)
+		else if (ItemTuple.Value.HasSameItem(InItemData)
+			&& (ItemTuple.Value.ItemCount < ItemTuple.Value.ItemBase->MaxCount || !bSkipFullSlot))
 		{
 			OutSlot = ItemTuple.Key;
 			return true;
@@ -119,17 +122,20 @@ bool UInventoryManager::GetFirstSlot(FSoulItemData InItemData
 	return false;
 }
 
-bool UInventoryManager::GetSlots(FSoulItemData InItemData, TArray<FSoulItemSlot>& OutSlots) const
+bool UInventoryManager::GetSlots(FSoulItemData InItemData, TArray<FSoulItemSlot>& OutItemDatas, bool bSkipFullSlot /*= true*/, bool bGetEmptySlot /*= false*/) const
 {
-	for (auto ItemTuple : InventoryItems)
+	for (auto& ItemTuple : InventoryItems)
 	{
-		if (ItemTuple.Value.HasSameItem(InItemData))
+		if (bGetEmptySlot && !(ItemTuple.Value.IsValid()))
 		{
-			OutSlots.Add(ItemTuple.Key);
+			OutItemDatas.Add(ItemTuple.Key);
 		}
+		else if (ItemTuple.Value.HasSameItem(InItemData)
+			&& (ItemTuple.Value.ItemCount < ItemTuple.Value.ItemBase->MaxCount || !bSkipFullSlot))
+			OutItemDatas.Add(ItemTuple.Key);
 	}
 
-	if (OutSlots.Num() > 0) return true;
+	if (OutItemDatas.Num() > 0) return true;
 	return false;
 }
 

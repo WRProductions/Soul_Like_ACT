@@ -33,7 +33,7 @@ protected:
 	If the item supports count you can add more than one count.
 	It will also update the level when adding if required */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-	bool AddInventoryItem(FSoulItemData InItemData, bool bAutoSlot = true);
+	bool AddInventoryItem(FSoulItemData InItemData);
 	
 	/** Remove an inventory item, will also remove from slots.
 	A remove count of <= 0 means to remove all copies */
@@ -44,12 +44,24 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	bool RemoveInventoryItemAtIndex(FSoulItemSlot InItemSlot, int32 ItemCount = 1);
 
-	//UFUNCTION(BlueprintPure, Category = Inventory)
+
+	//************************************
+	// Method:    
+	// Parameter: FSoulItemData InItemData
+	// Parameter: FSoulItemSlot & OutSlot
+	// Parameter: bSkipFullSlot Whether will skip the full stacked slot
+	// Parameter: bGetEmptySlot Whether can return a empty slot
+	//************************************
 	bool GetFirstSlot(FSoulItemData InItemData, FSoulItemSlot & OutSlot, bool bSkipFullSlot = true, bool bGetEmptySlot = false) const;
 
-	/** Returns all inventory items of a given type. If none is passed as type it will return all */
-	//UFUNCTION(BlueprintPure, Category = Inventory)
-	bool GetSlots(FSoulItemData InItemData, TArray<FSoulItemSlot>& OutItemDatas) const;
+	//************************************
+	// Method:    Returns all inventory items of a given type. If none is passed as type it will return all
+	// Parameter: FSoulItemData InItemData
+	// Parameter: TArray<FSoulItemSlot> & OutItemDatas
+	// Parameter: bSkipFullSlot Whether will skip the full stacked slot
+	// Parameter: bGetEmptySlot Whether can return a empty slot
+	//************************************
+	bool GetSlots(FSoulItemData InItemData, TArray<FSoulItemSlot>& OutItemDatas, bool bSkipFullSlot = true, bool bGetEmptySlot = false) const;
 
 	/** Get the reference of the ItemData at the slot. Return true if the data has a valid ItemBase and positive quantity*/
 	UFUNCTION(BlueprintPure, Category = Inventory)

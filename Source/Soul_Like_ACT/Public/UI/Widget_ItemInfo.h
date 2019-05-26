@@ -54,5 +54,5 @@ public:
 	 * The function is called when to read the slot information
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void MakeItemInfo(USoulItem *ItemToRead, const FSoulItemData& ItemData);
+	void MakeItemInfo(const FSoulItemData& ItemData);
 };
