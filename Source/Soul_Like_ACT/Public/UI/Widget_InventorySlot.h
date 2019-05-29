@@ -16,15 +16,38 @@ class SOUL_LIKE_ACT_API UWidget_InventorySlot : public UUserWidget
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Default)
-	FSoulItemData CurrentItemData;
+	FSoulItemSlot InventorySlot;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
 	class UBorder* ContentBorder;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
 	class UImage* item_icon;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
+	class UTextBlock* item_quantity;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
 	TSubclassOf<UUserWidget> BackWidget;
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void SetupSlot(FSoulItemData InItemData);
+	UFUNCTION(BlueprintCallable)
+	void SetupSlot(FSoulItemSlot InItemSlot, FSoulItemData InItemData);
+};
+
+UCLASS()
+class SOUL_LIKE_ACT_API UWidget_EquipmentSlot : public UUserWidget
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Default)
+	FSoulEquipmentSlot InventorySlot;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
+		class UBorder* ContentBorder;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
+		class UImage* item_icon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
+		TSubclassOf<UUserWidget> BackWidget;
+
+	UFUNCTION(BlueprintCallable)
+		void SetupSlot(FSoulEquipmentSlot InItemSlot, FSoulItemData InItemData);
 };

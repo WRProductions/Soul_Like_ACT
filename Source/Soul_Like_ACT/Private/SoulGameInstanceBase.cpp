@@ -132,7 +132,7 @@ void USoulGameInstanceBase::Broadcast_OnSaveGameLoadFinshed()
 		OnSaveGameLoadingFinished.Broadcast();
 }
 
-bool USoulGameInstanceBase::GetSoulPlayer(UObject* WorldContextObject, ASoulPlayerController*& MyController, ASoul_Like_ACTCharacter*& MyChar, UInventoryManager*& MyInentory, bool &Successful)
+bool USoulGameInstanceBase::GetSoulPlayer(UObject* WorldContextObject, ASoulPlayerController*& MyController, ASoul_Like_ACTCharacter*& MyChar, UInventoryManager*& MyInentory)
 {
 	if (!WorldContextObject->IsValidLowLevel())
 		return false;

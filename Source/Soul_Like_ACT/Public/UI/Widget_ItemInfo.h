@@ -48,7 +48,6 @@ protected:
 	TArray<FString> ModifierNames;
 	TArray<FString> ModifierLevels;
 
-
 public:
 	/**
 	 * The function is called when to read the slot information

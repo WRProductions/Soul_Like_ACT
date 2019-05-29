@@ -8,14 +8,15 @@
 
 void UWidget_Inventory::ConstructInventorySlots()
 {
-	if (!InventorySlot_BPClass)
+	if (!(InventorySlotTemplate))
 	{
-		UE_LOG(LogTemp, Error, TEXT("UWidget_Inventory::No Inventory Slot class"));
+		UE_LOG(LogTemp, Error, TEXT("%s ERROR -> %s"), *FString(__FUNCTION__), *FString("Unable to get InventorySlot class"));
 		return;
 	}
 	if (!GetOwningPlayerPawn())
 	{
-		UE_LOG(LogTemp, Error, TEXT("UWidget_Inventory::No Owning player"));
+		LOG_FUNC_ERROR("No Owning Player");
+
 		return;
 	}
 
@@ -29,10 +30,10 @@ void UWidget_Inventory::ConstructInventorySlots()
 
 		UWidget_InventorySlot *LocalSlot = Cast<UWidget_InventorySlot>(
 			CreateWidget(GetOwningPlayer()
-			, InventorySlot_BPClass));
+			, InventorySlotTemplate));
 
 		//Give Item pointer
-		LocalSlot->SetupSlot(LocalItemSlot.Value);
+		LocalSlot->SetupSlot(LocalItemSlot.Key, LocalItemSlot.Value);
 
 		//Add to wrapper
 		InventorySlotWrapper->AddChildToWrapBox(LocalSlot);
@@ -65,41 +66,41 @@ void UWidget_Inventory::UpdateInventSlot(FSoulItemSlot ItemSlot, FSoulItemData I
 {
 	UWidget_InventorySlot **LocalWidget = InventorySlots.Find(ItemSlot);
 
-	(*LocalWidget)->SetupSlot(Item);
+	(*LocalWidget)->SetupSlot(ItemSlot, Item);
 }
 
 void UWidget_Inventory::UpdateGearSlot(FSoulEquipmentSlot EquipSlot, FSoulItemData Item)
 {
 	if (EquipSlot.SlotType == EGearType::Amulet)
 	{
-		EquipSlot_Amulet->SetupSlot(Item);
+		EquipSlot_Amulet->SetupSlot(EquipSlot, Item);
 	}
 	else if (EquipSlot.SlotType == EGearType::BodyArmor)
 	{
-		EquipSlot_Body->SetupSlot(Item);
+		EquipSlot_Body->SetupSlot(EquipSlot, Item);
 	}
 	else if (EquipSlot.SlotType == EGearType::Ring)
 	{
-		EquipSlot_Ring->SetupSlot(Item);
+		EquipSlot_Ring->SetupSlot(EquipSlot, Item);
 	}
 	else if (EquipSlot.SlotType == EGearType::Helmet)
 	{
-		EquipSlot_Helmet->SetupSlot(Item);
+		EquipSlot_Helmet->SetupSlot(EquipSlot, Item);
 	}
 	else if (EquipSlot.SlotType == EGearType::Gloves)
 	{
-		EquipSlot_Gloves->SetupSlot(Item);
+		EquipSlot_Gloves->SetupSlot(EquipSlot, Item);
 	}
 	else if (EquipSlot.SlotType == EGearType::Boots)
 	{
-		EquipSlot_Boots->SetupSlot(Item);
+		EquipSlot_Boots->SetupSlot(EquipSlot, Item);
 	}
 	else if (EquipSlot.SlotType == EGearType::Reliquary)
 	{
-		EquipSlot_Reliquary->SetupSlot(Item);
+		EquipSlot_Reliquary->SetupSlot(EquipSlot, Item);
 	}
 	else if (EquipSlot.SlotType == EGearType::Weapon)
 	{
-		EquipSlot_Weapon->SetupSlot(Item);
+		EquipSlot_Weapon->SetupSlot(EquipSlot, Item);
 	}
 }

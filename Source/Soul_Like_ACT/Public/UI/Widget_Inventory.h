@@ -7,7 +7,6 @@
 #include "UI/Widget_InventorySlot.h"
 #include "Widget_Inventory.generated.h"
 
-
 /**
  * 
  */
@@ -18,27 +17,27 @@ class SOUL_LIKE_ACT_API UWidget_Inventory : public UUserWidget
 
 public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
-		UWidget_InventorySlot* EquipSlot_Helmet;
+		UWidget_EquipmentSlot* EquipSlot_Helmet;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
-		UWidget_InventorySlot* EquipSlot_Body;
+		UWidget_EquipmentSlot* EquipSlot_Body;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
-		UWidget_InventorySlot* EquipSlot_Boots;
+		UWidget_EquipmentSlot* EquipSlot_Boots;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
-		UWidget_InventorySlot* EquipSlot_Gloves;
+		UWidget_EquipmentSlot* EquipSlot_Gloves;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
-		UWidget_InventorySlot* EquipSlot_Amulet;
+		UWidget_EquipmentSlot* EquipSlot_Amulet;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
-		UWidget_InventorySlot* EquipSlot_Ring;
+		UWidget_EquipmentSlot* EquipSlot_Ring;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
-		UWidget_InventorySlot* EquipSlot_Weapon;
+		UWidget_EquipmentSlot* EquipSlot_Weapon;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
-		UWidget_InventorySlot* EquipSlot_Reliquary;
+		UWidget_EquipmentSlot* EquipSlot_Reliquary;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
 		class UWrapBox* InventorySlotWrapper;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Default)
-		TSubclassOf<UWidget_InventorySlot> InventorySlot_BPClass;
+		TSubclassOf<UWidget_InventorySlot> InventorySlotTemplate;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Units)
 		TMap<FSoulItemSlot, UWidget_InventorySlot*> InventorySlots;

@@ -148,10 +148,13 @@ struct SOUL_LIKE_ACT_API FSoulItemData
 	/** Append an item data, this adds the count and overrides everything else */
 	bool UpdateItemData(UPARAM(ref) FSoulItemData& Other)
 	{
-		if(ItemBase != Other.ItemBase || ItemLevel != Other.ItemLevel)
+		if (ItemBase != Other.ItemBase || ItemLevel != Other.ItemLevel)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UpdateItemData failed, items don't match"));
 			return false;
+		}
 
-		ItemCount = (ItemCount + Other.ItemCount, 1, ItemBase->MaxCount);
+		ItemCount = FMath::Clamp(ItemCount + Other.ItemCount, 1, ItemBase->MaxCount);
 
 		int32 CountOverflow = ItemBase->MaxCount - ItemCount;
 
@@ -164,6 +167,7 @@ struct SOUL_LIKE_ACT_API FSoulItemData
 		{
 			Other.ItemCount = 0;
 		}
+		UE_LOG(LogTemp, Log, TEXT("UpdateItemData success, new_ItemCount: %i"), ItemCount);
 
 		return true;
 	}

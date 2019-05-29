@@ -10,6 +10,11 @@
 
 void UWidget_ItemInfo::MakeItemInfo_Implementation(const FSoulItemData& ItemData)
 {
+	if (!(&ItemData))
+	{
+		LOG_FUNC_ERROR("ItemData invalid");
+		return;
+	}
 	ItemName->SetText(ItemData.ItemBase->ItemName);
 
 	ItemType->SetText(FText::FromString(ItemData.ItemBase->ItemType.ToString()));

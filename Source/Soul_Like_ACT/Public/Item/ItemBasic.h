@@ -21,7 +21,8 @@ enum class EGearType : uint8
 	Gloves,
 	Ring,
 	Amulet,
-	Reliquary
+	Reliquary,
+	Jewel
 };
 
 /** Base class for all items, do not blueprint directly */
@@ -39,26 +40,26 @@ public:
 	}
 
 	/** Type of this item, set in native parent class */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Item)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Item)
 	FPrimaryAssetType ItemType;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Item)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Item)
 	EGearType ItemSlotType;
 
 	/** User-visible short name */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Item)
 	FText ItemName;
 
 	/** User-visible long description */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Item)
 	FText ItemDescription;
 
 	/** Icon to display */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Item)
 	UTexture* ItemIcon;
 
 	/** Maximum number of instances that can be in inventory at once, <= 0 means infinite */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Max)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Max)
 	int32 MaxCount;
 
 	/** Returns if the item is consumable (MaxCount <= 0)*/
@@ -66,18 +67,18 @@ public:
 	bool IsConsumable() const;
 
 	/** Maximum level this item can be, <= 0 means infinite */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Max)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Max)
 	int32 MaxLevel;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Abilities)
 	int32 MaxSlots;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Abilities)
 	TSubclassOf<class USoulPrimaryStatusGameplayAbility> PrimaryAbility;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	int32 PrimaryAbilityLevel;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Abilities)
 	TMap<TSubclassOf<class USoulModifierGameplayAbility>, int32> Modifiers;
 
 	/** Returns the logical name, equivalent to the primary asset id */
@@ -98,6 +99,7 @@ public:
 	USoulWeaponItem()
 	{
 		ItemType = USoulAssetManager::WeaponItemType;
+		ItemSlotType = EGearType::Weapon;
 	}
 };
 
@@ -112,6 +114,7 @@ public:
 	USoulArmourItem()
 	{
 		ItemType = USoulAssetManager::ArmourItemType;
+		ItemSlotType = EGearType::BodyArmor;
 	}
 };
 
@@ -126,6 +129,7 @@ public:
 	{
 		ItemType = USoulAssetManager::PotionItemType;
 		MaxCount = 10; // Infinite
+		ItemSlotType = EGearType::Non_Gear;
 	}
 };
 
@@ -139,5 +143,6 @@ public:
 	USoulJewelItem()
 	{
 		ItemType = USoulAssetManager::JewelItemType;
+		ItemSlotType = EGearType::Jewel;
 	}
 };
