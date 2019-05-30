@@ -105,6 +105,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Save)
 	USoulSaveGame* CurrentSaveGame;
 
+	UFUNCTION(BlueprintCallable)
+	void CopyKeysFromEquipMap(UPARAM(ref) TArray<FSoulEquipmentSlot>& FromEquipSlotKeys, UPARAM(ref) TMap<FSoulEquipmentSlot, FSoulItemData>& ToEquipItems);
+
 	//SaveItem to GameData converters
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly))
 	void MakeSaveData();

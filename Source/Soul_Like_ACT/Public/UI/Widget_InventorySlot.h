@@ -15,7 +15,7 @@ class SOUL_LIKE_ACT_API UWidget_InventorySlot : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Default)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
 	FSoulItemSlot InventorySlot;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
@@ -38,7 +38,7 @@ class SOUL_LIKE_ACT_API UWidget_EquipmentSlot : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Default)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
 	FSoulEquipmentSlot InventorySlot;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)

@@ -32,7 +32,8 @@ void UWidget_Inventory::ConstructInventorySlots()
 			CreateWidget(GetOwningPlayer()
 			, InventorySlotTemplate));
 
-		//Give Item pointer
+		LocalSlot->InventorySlot = LocalItemSlot.Key;
+		//Give Item to Inventory Slot
 		LocalSlot->SetupSlot(LocalItemSlot.Key, LocalItemSlot.Value);
 
 		//Add to wrapper

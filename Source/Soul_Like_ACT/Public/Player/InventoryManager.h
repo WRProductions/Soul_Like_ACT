@@ -85,8 +85,8 @@ public:
 
 	/** It's used for Game Instance when async loading finshed */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-	bool LoadInventoryData(TArray<FSoulItemData> InInventoryItems
-		, TMap<FSoulEquipmentSlot, FSoulItemData> InEquipedItems);
+	bool LoadInventoryData(UPARAM(ref) TArray<FSoulItemData> &InInventoryItems
+		, UPARAM(ref) TMap<FSoulEquipmentSlot, FSoulItemData> &InEquipedItems);
 
 	/** Delegate called when an inventory slot has changed */
 	UPROPERTY(BlueprintAssignable, Category = Inventory)
@@ -121,18 +121,7 @@ protected:
 	bool GetInventSlots(FSoulItemData InItemData, TArray<FSoulItemSlot>& OutItemDatas, bool bSkipFullSlot = true, bool bGetEmptySlot = false) const;
 
 	//Get the FSoulEquipmentSlot with the specific gear type
-	bool GetEquipSlot(EGearType GearType, FSoulEquipmentSlot& EquipSlot) 
-	{
-		if (GearType == EGearType::Non_Gear)
-			return false;
-
-		EquipSlot = FSoulEquipmentSlot(GearType);
-		
-		if (EquipedItems.Contains(EquipSlot))
-			return true;
-
-		return false;
-	}
+	bool GetEquipSlot(EGearType GearType, FSoulEquipmentSlot& EquipSlot) const;
 
 	void Notify_OnInventoryLoadingFinished(bool bFirstTimeInit);
 

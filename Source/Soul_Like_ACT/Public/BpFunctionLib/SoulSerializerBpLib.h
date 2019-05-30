@@ -34,4 +34,22 @@ public:
 
 	static void ModiferToText(const TPair<TSubclassOf<USoulModifierGameplayAbility>, int32>& InputAbilityInfo,
 		FText& ModifierName, FText& ModifierLevel);
+
+	template<typename T, typename Y>
+	static FORCEINLINE void AddKeysToMap(TArray<T>& InKeys, TMap<T, Y>& InMap)
+	{
+		for (T InKey : InKeys)
+		{
+			InMap.FindOrAdd(InKey);
+		}
+	}
+
+	template<typename T, typename Y, typename U>
+	static FORCEINLINE void Map_CopyKeys(TMap<T, Y>& FromMap, TMap<T, U>& ToMap)
+	{
+		TArray<T> TempKeys;
+		FromMap.GetKeys(TempKeys);
+
+		AddKeysToMap(TempKeys, ToMap);
+	}
 };

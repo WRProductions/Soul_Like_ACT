@@ -8,8 +8,6 @@
 
 void UWidget_InventorySlot::SetupSlot(FSoulItemSlot InItemSlot, FSoulItemData InItemData)
 {
-	InventorySlot = InItemSlot;
-
 	USoulItem* ItemBase = InItemData.ItemBase;
 
 	if (ItemBase && InItemData.ItemCount > 0)
@@ -34,8 +32,6 @@ void UWidget_InventorySlot::SetupSlot(FSoulItemSlot InItemSlot, FSoulItemData In
 
 void UWidget_EquipmentSlot::SetupSlot(FSoulEquipmentSlot InItemSlot, FSoulItemData InItemData)
 {
-	InventorySlot = InItemSlot;
-
 	USoulItem* ItemBase = InItemData.ItemBase;
 
 	if (ItemBase && InItemData.ItemCount == 1)

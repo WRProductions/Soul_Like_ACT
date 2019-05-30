@@ -98,6 +98,11 @@ void USoulGameInstanceBase::ResetSaveGame()
 	bForceReset = false;
 }
 
+void USoulGameInstanceBase::CopyKeysFromEquipMap(TArray<FSoulEquipmentSlot>& FromEquipSlotKeys, TMap<FSoulEquipmentSlot, FSoulItemData>& ToEquipItems)
+{
+	USoulSerializerBpLib::AddKeysToMap<FSoulEquipmentSlot, FSoulItemData>(FromEquipSlotKeys, ToEquipItems);
+}
+
 void USoulGameInstanceBase::MakeSaveData()
 {
 	APawn *TempPawn = GetWorld()->GetFirstPlayerController()->GetPawn();

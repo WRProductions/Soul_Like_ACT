@@ -159,11 +159,29 @@ bool UInventoryManager::GetInventSlots(FSoulItemData InItemData, TArray<FSoulIte
 	return false;
 }
 
+bool UInventoryManager::GetEquipSlot(EGearType GearType, FSoulEquipmentSlot& EquipSlot) const
+{
+	if (GearType == EGearType::Non_Gear)
+		return false;
+
+	EquipSlot = FSoulEquipmentSlot(GearType);
+
+	if (EquipedItems.Contains(EquipSlot))
+		return true;
+	
+	return false;
+}
+
 bool UInventoryManager::GetInventoryItemData(FSoulItemSlot InItemSlot, FSoulItemData& ItemData) const
 {
-	ItemData = InventoryItems.FindChecked(InItemSlot);
-	
-	if (ItemData.IsValid()) return true;
+	const FSoulItemData* TempItemData = InventoryItems.Find(InItemSlot);
+
+	if (TempItemData && TempItemData->IsValid())
+	{
+		ItemData = *TempItemData;
+		return true;
+	}
+
 	return false;
 }
 
@@ -171,7 +189,7 @@ bool UInventoryManager::GetEquipItemData(FSoulEquipmentSlot InEquipSlot, FSoulIt
 {
 	const FSoulItemData* TempItemData = EquipedItems.Find(InEquipSlot);
 	
-	if (TempItemData->IsValid())
+	if (TempItemData && TempItemData->IsValid())
 	{
 		ItemData = *TempItemData;
 		return true;
@@ -217,13 +235,13 @@ bool UInventoryManager::AddEquipment(FSoulItemSlot InventorySlot)
 		}
 		else
 		{
-			LOG_FUNC_ERROR("Cannot get EquipmentSlot");
+			LOG_FUNC_ERROR("Cannot get Equipment Slot");
 			
 			return false;
 		}
 	}
 	
-	LOG_FUNC_ERROR("Cannot get EquipmentSlot");
+	LOG_FUNC_ERROR("Cannot get Inventory Data");
 
 	return false;
 }
@@ -253,8 +271,8 @@ bool UInventoryManager::SaveInventory()
 	return false;
 }
 
-bool UInventoryManager::LoadInventoryData(TArray<FSoulItemData> InInventoryItems
-	, TMap<FSoulEquipmentSlot, FSoulItemData> InEquipedItems)
+bool UInventoryManager::LoadInventoryData(TArray<FSoulItemData> &InInventoryItems
+	, TMap<FSoulEquipmentSlot, FSoulItemData> &InEquipedItems)
 {
 	/*InventoryItems = InInventoryItems;*/
 	int i = 0;
@@ -272,7 +290,7 @@ bool UInventoryManager::LoadInventoryData(TArray<FSoulItemData> InInventoryItems
 		++i;
 	}
 
-	EquipedItems = EquipedItems;
+	EquipedItems = InEquipedItems;
 
 	//TODO: update GAs
 
