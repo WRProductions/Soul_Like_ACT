@@ -36,7 +36,10 @@ protected:
 	bool AddInventoryItem(FSoulItemData InItemData);
 
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-	bool AddEquipment(FSoulItemSlot InventorySlot);
+	bool AddEquipment(FSoulInventSlot InventorySlot);
+
+	UFUNCTION(BlueprintCallable, Category = Equipment)
+	bool RemoveEquipment(FSoulEquipmentSlot FromEquipSlot);
 	
 	/** Remove an inventory item, will also remove from slots.
 	A remove count of <= 0 means to remove all copies */
@@ -45,21 +48,21 @@ protected:
 	
 	/** Remove an inventory item */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-	bool RemoveInventoryItemAtIndex(FSoulItemSlot InItemSlot, int32 ItemCount = 1);
+	bool RemoveInventoryItemAtIndex(FSoulInventSlot InItemSlot, int32 ItemCount = 1);
 
 	/** Get the reference of the ItemData at the slot. Return true if the data has a valid ItemBase and positive quantity*/
 	UFUNCTION(BlueprintPure, Category = Inventory)
-	bool GetInventoryItemData(FSoulItemSlot InItemSlot, FSoulItemData& ItemData) const;
+	bool GetInventoryItemData(FSoulInventSlot InItemSlot, FSoulItemData& ItemData) const;
 	/** Get the reference of the Gear ItemData at the slot. Return true if the data has a valid ItemBase and positive quantity*/
 	UFUNCTION(BlueprintPure, Category = Inventory)
 	bool GetEquipItemData(FSoulEquipmentSlot InEquipSlot, FSoulItemData& ItemData) const;
 
 	/** Returns number of instances of this item found in the inventory. This uses count from GetItemData */
 	UFUNCTION(BlueprintPure, Category = Inventory)
-	int32 GetSlottedItemCount(FSoulItemSlot InItemSlot) const;
+	int32 GetSlottedItemCount(FSoulInventSlot InItemSlot) const;
 
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-	const EGearType GetGearType(FSoulItemSlot InItemSlot);
+	const EGearType GetGearType(FSoulInventSlot InItemSlot);
 
 /**
  * Save/Load
@@ -67,7 +70,7 @@ protected:
 public:
 	/** Map of slot, from type/num to item, initialized from ItemSlotsPerType on RPGGameInstanceBase */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
-	TMap<FSoulItemSlot, FSoulItemData> InventoryItems;
+	TMap<FSoulInventSlot, FSoulItemData> InventoryItems;
 
 	/** Map of slot, from type/num to item, initialized from ItemSlotsPerType on RPGGameInstanceBase */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
@@ -98,9 +101,9 @@ public:
 
 protected:
 	bool InventoryToEquipment(FSoulItemData FromItem, FSoulEquipmentSlot ToSlot);
-	bool EquipToInventory(FSoulItemData FromItem, FSoulItemSlot ToSlot, bool bAutoSlot = true);
 
-	void SetItemSlot(UPARAM(ref) FSoulItemData& InItemData, FSoulItemSlot ItemSlot);
+	void SetEquipSlot(UPARAM(ref) FSoulItemData& InItemData, FSoulEquipmentSlot ItemSlot);
+	void SetItemSlot(UPARAM(ref) FSoulItemData& InItemData, FSoulInventSlot ItemSlot);
 	
 	//************************************
 	// Method:    
@@ -109,7 +112,7 @@ protected:
 	// Parameter: bSkipFullSlot Whether will skip the full stacked slot
 	// Parameter: bGetEmptySlot Whether can return a empty slot
 	//************************************
-	bool GetFirstInventSlot(FSoulItemData InItemData, FSoulItemSlot& OutSlot, bool bSkipFullSlot = true, bool bGetEmptySlot = false) const;
+	bool GetFirstInventSlot(FSoulItemData InItemData, FSoulInventSlot& OutSlot, bool bSkipFullSlot = true, bool bGetEmptySlot = false) const;
 
 	//************************************
 	// Method:    Returns all inventory items of a given type. If none is passed as type it will return all
@@ -118,7 +121,7 @@ protected:
 	// Parameter: bSkipFullSlot Whether will skip the full stacked slot
 	// Parameter: bGetEmptySlot Whether can return a empty slot
 	//************************************
-	bool GetInventSlots(FSoulItemData InItemData, TArray<FSoulItemSlot>& OutItemDatas, bool bSkipFullSlot = true, bool bGetEmptySlot = false) const;
+	bool GetInventSlots(FSoulItemData InItemData, TArray<FSoulInventSlot>& OutItemDatas, bool bSkipFullSlot = true, bool bGetEmptySlot = false) const;
 
 	//Get the FSoulEquipmentSlot with the specific gear type
 	bool GetEquipSlot(EGearType GearType, FSoulEquipmentSlot& EquipSlot) const;
@@ -126,7 +129,7 @@ protected:
 	void Notify_OnInventoryLoadingFinished(bool bFirstTimeInit);
 
 	/** Calls the inventory update callbacks */
-	void NotifySlottedItemChanged(FSoulItemSlot ItemSlot, FSoulItemData ItemData);
+	void NotifySlottedItemChanged(FSoulInventSlot ItemSlot, FSoulItemData ItemData);
 	void NotifyEquipmentChanged(FSoulEquipmentSlot EquipmentSlot, FSoulItemData ItemData);
 
 	friend ASoul_Like_ACTCharacter;

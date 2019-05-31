@@ -45,7 +45,7 @@ bool UInventoryManager::AddInventoryItem(FSoulItemData InItemData)
 	}
 
 	//Get slots with the similar item base
-	TArray<FSoulItemSlot> OldSlots;
+	TArray<FSoulInventSlot> OldSlots;
 	bool bSuccessfulChecked = GetInventSlots(InItemData, OldSlots, true, false);
 	
 	//If we found a slot and not auto slot, update the old slot with new data
@@ -58,7 +58,7 @@ bool UInventoryManager::AddInventoryItem(FSoulItemData InItemData)
 
 		while (InItemData.IsValid())
 		{
-			FSoulItemSlot RemainingSlot;
+			FSoulInventSlot RemainingSlot;
 
 			bSuccessfulChecked = GetFirstInventSlot(InItemData, RemainingSlot, true, true);
 
@@ -77,7 +77,7 @@ bool UInventoryManager::AddInventoryItem(FSoulItemData InItemData)
 	 */
 	else
 	{
-		FSoulItemSlot LocalEmptySlot;
+		FSoulInventSlot LocalEmptySlot;
 
 		bSuccessfulChecked = GetFirstInventSlot(InItemData, LocalEmptySlot, true, true);
 
@@ -96,16 +96,63 @@ bool UInventoryManager::AddInventoryItem(FSoulItemData InItemData)
 	return false;
 }
 
+bool UInventoryManager::AddEquipment(FSoulInventSlot InventorySlot)
+{
+	FSoulItemData InventData;
+	FSoulEquipmentSlot EquipSlot;
+
+	if (!InventorySlot.IsValid()) return false;
+
+	if (GetInventoryItemData(InventorySlot, InventData))
+	{
+		if (GetEquipSlot(InventData.ItemBase->ItemSlotType, EquipSlot))
+		{
+			SetItemSlot(EquipedItems[EquipSlot], InventorySlot);
+
+			InventoryToEquipment(InventData, EquipSlot);
+
+			return true;
+		}
+		else
+		{
+			LOG_FUNC_ERROR("Cannot get Equipment Slot");
+			return false;
+		}
+	}
+	LOG_FUNC_ERROR("Cannot get Inventory Data");
+
+	return false;
+}
+
+bool UInventoryManager::RemoveEquipment(FSoulEquipmentSlot FromEquipSlot)
+{
+ 	FSoulItemData OldData;
+	
+	if (GetEquipItemData(FromEquipSlot, OldData))
+	{
+		EquipedItems[FromEquipSlot] = FSoulItemData();
+		NotifyEquipmentChanged(FromEquipSlot, EquipedItems[FromEquipSlot]);
+
+		AddInventoryItem(OldData);
+		return true;
+	}
+	else
+	{
+		LOG_FUNC_ERROR(GETENUMSTRING("EGearType", FromEquipSlot.SlotType));
+		return false;
+	}
+}
+
 bool UInventoryManager::RemoveInventoryItem(FSoulItemData RemovedItem)
 {
-	FSoulItemSlot OldSlot;
+	FSoulInventSlot OldSlot;
 	
 	if (GetFirstInventSlot(RemovedItem, OldSlot))
 		return RemoveInventoryItemAtIndex(OldSlot, -RemovedItem.ItemCount);
 	return false;
 }
 
-bool UInventoryManager::RemoveInventoryItemAtIndex(FSoulItemSlot InItemSlot, int32 ItemCount /*= 1*/)
+bool UInventoryManager::RemoveInventoryItemAtIndex(FSoulInventSlot InItemSlot, int32 ItemCount /*= 1*/)
 {
 	InventoryItems[InItemSlot].ItemCount -= ItemCount;
 	
@@ -118,7 +165,7 @@ bool UInventoryManager::RemoveInventoryItemAtIndex(FSoulItemSlot InItemSlot, int
 }
 
 bool UInventoryManager::GetFirstInventSlot(FSoulItemData InItemData
-	, FSoulItemSlot & OutSlot
+	, FSoulInventSlot & OutSlot
 	, bool bSkipFullSlot /*= true*/
 	, bool bGetEmptySlot /*= false*/) const
 {
@@ -140,7 +187,7 @@ bool UInventoryManager::GetFirstInventSlot(FSoulItemData InItemData
 	return false;
 }
 
-bool UInventoryManager::GetInventSlots(FSoulItemData InItemData, TArray<FSoulItemSlot>& OutItemDatas, bool bSkipFullSlot /*= true*/, bool bGetEmptySlot /*= false*/) const
+bool UInventoryManager::GetInventSlots(FSoulItemData InItemData, TArray<FSoulInventSlot>& OutItemDatas, bool bSkipFullSlot /*= true*/, bool bGetEmptySlot /*= false*/) const
 {
 	for (auto& ItemTuple : InventoryItems)
 	{
@@ -172,7 +219,7 @@ bool UInventoryManager::GetEquipSlot(EGearType GearType, FSoulEquipmentSlot& Equ
 	return false;
 }
 
-bool UInventoryManager::GetInventoryItemData(FSoulItemSlot InItemSlot, FSoulItemData& ItemData) const
+bool UInventoryManager::GetInventoryItemData(FSoulInventSlot InItemSlot, FSoulItemData& ItemData) const
 {
 	const FSoulItemData* TempItemData = InventoryItems.Find(InItemSlot);
 
@@ -198,7 +245,7 @@ bool UInventoryManager::GetEquipItemData(FSoulEquipmentSlot InEquipSlot, FSoulIt
 	return false;
 }
 
-int32 UInventoryManager::GetSlottedItemCount(FSoulItemSlot InItemSlot) const
+int32 UInventoryManager::GetSlottedItemCount(FSoulInventSlot InItemSlot) const
 {
 	FSoulItemData LocalData;
 	
@@ -206,44 +253,13 @@ int32 UInventoryManager::GetSlottedItemCount(FSoulItemSlot InItemSlot) const
 }
 
 
-const EGearType UInventoryManager::GetGearType(FSoulItemSlot InItemSlot)
+const EGearType UInventoryManager::GetGearType(FSoulInventSlot InItemSlot)
 {
 	FSoulItemData LocalItemData;
 	
 	const bool bSuccessful = GetInventoryItemData(InItemSlot, LocalItemData);
 
 	return bSuccessful ? LocalItemData.ItemBase->ItemSlotType : EGearType::Non_Gear;
-}
-
-bool UInventoryManager::AddEquipment(FSoulItemSlot InventorySlot)
-{
-	FSoulItemData InventData;
-
-	if (!InventorySlot.IsValid()) return false;
-
-	if (GetInventoryItemData(InventorySlot, InventData))
-	{
-		FSoulEquipmentSlot EquipSlot;
-		
-		if (GetEquipSlot(InventData.ItemBase->ItemSlotType, EquipSlot))
-		{
-			EquipToInventory(EquipedItems[EquipSlot], InventorySlot);
-			
-			InventoryToEquipment(InventData, EquipSlot);
-			
-			return true;
-		}
-		else
-		{
-			LOG_FUNC_ERROR("Cannot get Equipment Slot");
-			
-			return false;
-		}
-	}
-	
-	LOG_FUNC_ERROR("Cannot get Inventory Data");
-
-	return false;
 }
 
 void UInventoryManager::EquipGear(AWeaponActor *const Inp)
@@ -281,11 +297,11 @@ bool UInventoryManager::LoadInventoryData(TArray<FSoulItemData> &InInventoryItem
 	{
 		if (TempItemData.IsValid())
 		{
-			InventoryItems.Add(FSoulItemSlot(i), TempItemData);
+			InventoryItems.Add(FSoulInventSlot(i), TempItemData);
 		}
 		else
 		{
-			InventoryItems.Add(FSoulItemSlot(i), FSoulItemData());
+			InventoryItems.Add(FSoulInventSlot(i), FSoulItemData());
 		}
 		++i;
 	}
@@ -308,7 +324,6 @@ bool UInventoryManager::InventoryToEquipment(FSoulItemData FromItem, FSoulEquipm
 		{
 			//TODO: update GA
 
-
 			EquipedItems[MyEquipSlot] = FromItem;
 
 			NotifyEquipmentChanged(MyEquipSlot, FromItem);
@@ -322,38 +337,7 @@ bool UInventoryManager::InventoryToEquipment(FSoulItemData FromItem, FSoulEquipm
 	return false;
 }
 
-bool UInventoryManager::EquipToInventory(FSoulItemData FromItem, FSoulItemSlot ToSlot, bool bAutoSlot/*=true*/)
-{
-	if (ToSlot.IsValid() && !InventoryItems[ToSlot].IsValid())
-	{
-		InventoryItems[ToSlot] = FromItem;
-
-		NotifySlottedItemChanged(ToSlot, FromItem);
-		//TODO: remove GA
-
-		return true;
-	}
-	else if(bAutoSlot)
-	{
-		FSoulItemSlot NewEmptySlot;
-		
-		GetFirstInventSlot(FromItem, NewEmptySlot, true, true);
-
-		//TODO: remove GA
-
-		InventoryItems[NewEmptySlot] = FromItem;
- 		
-		NotifySlottedItemChanged(NewEmptySlot, FromItem);
-
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-void UInventoryManager::SetItemSlot(UPARAM(ref) FSoulItemData& InItemData, FSoulItemSlot ItemSlot)
+void UInventoryManager::SetEquipSlot(FSoulItemData& InItemData, FSoulEquipmentSlot EquipSlot)
 {
 	if (InItemData.IsValid())
 	{
@@ -361,7 +345,46 @@ void UInventoryManager::SetItemSlot(UPARAM(ref) FSoulItemData& InItemData, FSoul
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Old_ItemData->Invalid"));
+		LOG_FUNC_ERROR("Old_ItemData->Invalid");
+	}
+
+	FSoulItemData MyInventData;
+
+	if (!GetEquipItemData(EquipSlot, MyInventData))
+	{
+		EquipedItems[EquipSlot] = InItemData;
+		InItemData.ItemCount = 0;
+	}
+
+	//Switch ItemData
+	else
+	{
+		EquipedItems[EquipSlot] = InItemData;
+		InItemData = MyInventData;
+	}
+
+	if (EquipedItems[EquipSlot].IsValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("New_ItemData-> Name:%s"), *(EquipedItems[EquipSlot].ItemBase->ItemName.ToString()));
+	}
+
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("New_ItemData->Invalid"));
+	}
+
+	NotifyEquipmentChanged(EquipSlot, EquipedItems[EquipSlot]);
+}
+
+void UInventoryManager::SetItemSlot(UPARAM(ref) FSoulItemData& InItemData, FSoulInventSlot ItemSlot)
+{
+	if (InItemData.IsValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Old_ItemData-> Name:%s, Num:%i"), *(InItemData.ItemBase->ItemName.ToString()), InItemData.ItemCount);
+	}
+	else
+	{
+		LOG_FUNC_ERROR("Old_ItemData->Invalid");
 	}
 
 	FSoulItemData MyInventData;
@@ -403,7 +426,7 @@ void UInventoryManager::Notify_OnInventoryLoadingFinished(bool bFirstTimeInit)
 		OnInventoryLoadingFinished.Broadcast(this, bFirstTimeInit);
 }
 
-void UInventoryManager::NotifySlottedItemChanged(FSoulItemSlot ItemSlot, FSoulItemData ItemData)
+void UInventoryManager::NotifySlottedItemChanged(FSoulInventSlot ItemSlot, FSoulItemData ItemData)
 {
 	OnSlottedItemChanged.Broadcast(ItemSlot, ItemData);
 }

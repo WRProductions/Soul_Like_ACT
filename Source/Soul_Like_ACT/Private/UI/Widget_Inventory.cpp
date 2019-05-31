@@ -24,7 +24,7 @@ void UWidget_Inventory::ConstructInventorySlots()
 	UInventoryManager* LocalInventManager = MyPlayer->GetInventoryManager();
 
 	//Load Inventory
-	for (TPair<FSoulItemSlot, FSoulItemData> &LocalItemSlot : LocalInventManager->InventoryItems)
+	for (TPair<FSoulInventSlot, FSoulItemData> &LocalItemSlot : LocalInventManager->InventoryItems)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "UWidget_Inventory::ConstructInventorySlots");
 
@@ -63,7 +63,7 @@ void UWidget_Inventory::BindWiddgets()
 	}
 }
 
-void UWidget_Inventory::UpdateInventSlot(FSoulItemSlot ItemSlot, FSoulItemData Item)
+void UWidget_Inventory::UpdateInventSlot(FSoulInventSlot ItemSlot, FSoulItemData Item)
 {
 	UWidget_InventorySlot **LocalWidget = InventorySlots.Find(ItemSlot);
 

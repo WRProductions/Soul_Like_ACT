@@ -16,7 +16,7 @@ class SOUL_LIKE_ACT_API UWidget_InventorySlot : public UUserWidget
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
-	FSoulItemSlot InventorySlot;
+	FSoulInventSlot InventorySlot;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (BindWidget), Category = Units)
 	class UBorder* ContentBorder;
@@ -29,7 +29,7 @@ public:
 	TSubclassOf<UUserWidget> BackWidget;
 
 	UFUNCTION(BlueprintCallable)
-	void SetupSlot(FSoulItemSlot InItemSlot, FSoulItemData InItemData);
+	void SetupSlot(FSoulInventSlot InItemSlot, FSoulItemData InItemData);
 };
 
 UCLASS()

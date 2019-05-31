@@ -6,7 +6,7 @@
 #include "Materials/MaterialInstance.h"
 #include "Player/InventoryManager.h"
 
-void UWidget_InventorySlot::SetupSlot(FSoulItemSlot InItemSlot, FSoulItemData InItemData)
+void UWidget_InventorySlot::SetupSlot(FSoulInventSlot InItemSlot, FSoulItemData InItemData)
 {
 	USoulItem* ItemBase = InItemData.ItemBase;
 

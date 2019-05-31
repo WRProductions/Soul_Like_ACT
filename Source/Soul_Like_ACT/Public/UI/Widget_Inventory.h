@@ -40,7 +40,7 @@ public:
 		TSubclassOf<UWidget_InventorySlot> InventorySlotTemplate;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Units)
-		TMap<FSoulItemSlot, UWidget_InventorySlot*> InventorySlots;
+		TMap<FSoulInventSlot, UWidget_InventorySlot*> InventorySlots;
 
 	UFUNCTION(BlueprintCallable)
 		void ConstructInventorySlots();
@@ -49,7 +49,7 @@ public:
 		void BindWiddgets();
 
 	UFUNCTION()
-		void UpdateInventSlot(FSoulItemSlot ItemSlot, FSoulItemData Item);
+		void UpdateInventSlot(FSoulInventSlot ItemSlot, FSoulItemData Item);
 	UFUNCTION()
 		void UpdateGearSlot(FSoulEquipmentSlot EquipSlot, FSoulItemData Item);
 };

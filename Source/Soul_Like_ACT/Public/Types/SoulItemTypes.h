@@ -7,17 +7,17 @@
 
 
 USTRUCT(BlueprintType)
-struct SOUL_LIKE_ACT_API FSoulItemSlot
+struct SOUL_LIKE_ACT_API FSoulInventSlot
 {
 	GENERATED_BODY()
 
 	/** Constructor, -1 means an invalid slot */
-	FSoulItemSlot()
+	FSoulInventSlot()
 		: SlotNumber(-1)
 	{
 	}
 
-	FSoulItemSlot(int32 InSlotNumber)
+	FSoulInventSlot(int32 InSlotNumber)
 		: SlotNumber(InSlotNumber)
 	{
 	}
@@ -27,18 +27,18 @@ struct SOUL_LIKE_ACT_API FSoulItemSlot
 	int32 SlotNumber;
 
 	/** Equality operators */
-	bool operator==(const FSoulItemSlot& Other) const
+	bool operator==(const FSoulInventSlot& Other) const
 	{
 		return SlotNumber == Other.SlotNumber;
 	}
 
-	bool operator!=(const FSoulItemSlot& Other) const
+	bool operator!=(const FSoulInventSlot& Other) const
 	{
 		return !(*this == Other);
 	}
 
 	/** Implemented so it can be used in Maps/Sets */
-	friend uint32 GetTypeHash(const FSoulItemSlot& Key)
+	friend uint32 GetTypeHash(const FSoulInventSlot& Key)
 	{
 		uint32 Hash = 0;
 
@@ -202,6 +202,6 @@ struct SOUL_LIKE_ACT_API FSoulItemData
 
 
 /** Delegate called when the contents of an inventory slot change */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSlottedItemChanged, FSoulItemSlot, ItemSlot, FSoulItemData, Item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSlottedItemChanged, FSoulInventSlot, ItemSlot, FSoulItemData, Item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquipmentChanged, FSoulEquipmentSlot, EquipmentSlot, FSoulItemData, Item);
 
