@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "InventoryManager.h"
-#include "GameFramework/Character.h"
+#include "Player/Soul_Like_ACTCharacter.h"
 #include "Engine/World.h"
 #include "SoulSaveGame.h"
 #include "SoulGameInstanceBase.h"
@@ -138,7 +138,7 @@ bool UInventoryManager::RemoveEquipment(FSoulEquipmentSlot FromEquipSlot)
 	}
 	else
 	{
-		LOG_FUNC_ERROR(GETENUMSTRING("EGearType", FromEquipSlot.SlotType));
+		LOG_FUNC_ERROR(FindObject<UEnum>(ANY_PACKAGE, TEXT("UGearType"), true)->GetNameStringByIndex((int32)FromEquipSlot.SlotType));
 		return false;
 	}
 }

@@ -60,7 +60,7 @@ protected:
  * Most games will need to implement a subclass to support their game-specific code
  */
 UCLASS()
-	class SOUL_LIKE_ACT_API USoulModifierGameplayAbility : public UGameplayAbility
+	class SOUL_LIKE_ACT_API USoulModifierGameplayAbility : public USoulGameplayAbility
 {
 	GENERATED_BODY()
 
@@ -76,7 +76,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
 	FText DisplayName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
-	TArray<UGameplayEffect*> EffectCollection;
+	TSubclassOf<UGameplayEffect> ModifierEffect;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	TArray<FGameplayEffectSpecHandle> EffectCollection;
+
+	void ApplyEffectSpecsToOwner();
 };
 
 UCLASS()

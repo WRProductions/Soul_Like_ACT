@@ -76,3 +76,8 @@ TArray<FActiveGameplayEffectHandle> USoulGameplayAbility::ApplyEffectContainer(
 	FSoulGameplayEffectContainerSpec Spec = MakeEffectContainerSpec(ContainerTag, EventData, OverrideGameplayLevel);
 	return ApplyEffectContainerSpec(Spec);
 }
+
+void USoulModifierGameplayAbility::ApplyEffectSpecsToOwner()
+{
+
+}

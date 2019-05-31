@@ -67,6 +67,8 @@ protected:
 
 	bool AddOrRemoveGAOnEquipSlot(const FSoulEquipmentSlot& EquipSlot, bool RemoveGA);
 
+
+
 	friend ASoulCharacterBase;
 	friend class UInventoryManager;
 };
