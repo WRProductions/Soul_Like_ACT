@@ -2,6 +2,9 @@
 
 #include "Player/Soul_Like_ACTCharacter.h"
 #include "Player/ActionSysManager.h"
+#include "Player/LockTargetComponent.h"
+#include "Player/InventoryManager.h"
+#include "Player/SoulPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Item/WeaponActor.h"
 #include "Components/CapsuleComponent.h"
@@ -10,8 +13,6 @@
 #include "Components/InputComponent.h"
 #include "Perception/AIPerceptionSystem.h"
 #include "Perception/AISenseConfig_Sight.h"
-#include "Player/LockTargetComponent.h"
-#include "Player/InventoryManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "GameFramework/Controller.h"
@@ -70,6 +71,7 @@ ASoul_Like_ACTCharacter::ASoul_Like_ACTCharacter()
 	TargetLockingComponent = CreateDefaultSubobject<ULockTargetComponent>(TEXT("TargetLockingComponent"));
 
 	InventoryManager = CreateDefaultSubobject<UInventoryManager>(TEXT("InventoryManager"));
+	InventoryManager->PlayerRef = this;
 
 	Faction = EActorFaction::Player;
 
@@ -113,7 +115,7 @@ void ASoul_Like_ACTCharacter::SetupPlayerInputComponent(class UInputComponent* P
 	PlayerInputComponent->BindAxis("Zoom", this, &ASoul_Like_ACTCharacter::ZoomCamera);
 }
 
-void ASoul_Like_ACTCharacter::GetMyPlayerController(class APlayerController *&MyController, EIsControllerValid& Outp)
+void ASoul_Like_ACTCharacter::GetMyPlayerController(class ASoulPlayerController*&MyController, EIsControllerValid& Outp)
 {
 	if (!GetController())
 	{
@@ -121,12 +123,17 @@ void ASoul_Like_ACTCharacter::GetMyPlayerController(class APlayerController *&My
 	}
 	else
 	{
-		MyController = Cast<APlayerController>(GetController());
+		MyController = Cast<ASoulPlayerController>(GetController());
 		if (MyController)
 			Outp = EIsControllerValid::IsValid;
 		else
 			Outp = EIsControllerValid::IsNotValid;
 	}
+}
+
+UInventoryManager* ASoul_Like_ACTCharacter::GetInventoryManager() const
+{
+	return InventoryManager;
 }
 
 void ASoul_Like_ACTCharacter::ResetRotation()
@@ -147,6 +154,26 @@ AWeaponActor * ASoul_Like_ACTCharacter::EquipGear(TSubclassOf<AWeaponActor> Weap
 	InventoryManager->EquipGear(LocalWeapon);
 
 	return LocalWeapon;
+}
+
+void ASoul_Like_ACTCharacter::GetPlayer(UWorld* InWorld, bool& Successful, ASoulPlayerController*& SoulPlayerController, ASoul_Like_ACTCharacter*& SoulCharacter, UInventoryManager*& SoulInventoryManager)
+{
+	SoulPlayerController = Cast<ASoulPlayerController>(InWorld->GetFirstPlayerController());
+	if (SoulPlayerController)
+	{
+		SoulCharacter = Cast<ASoul_Like_ACTCharacter>(SoulPlayerController->GetPawn());
+		if (SoulCharacter)
+		{
+			SoulInventoryManager = SoulCharacter->InventoryManager;
+			if (SoulInventoryManager)
+			{
+				Successful = true;
+				return;
+			}
+		}
+	}
+	Successful = false;
+	return;
 }
 
 void ASoul_Like_ACTCharacter::TurnAtRate(float Rate)

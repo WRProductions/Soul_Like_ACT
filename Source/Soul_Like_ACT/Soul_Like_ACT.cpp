@@ -3,5 +3,4 @@
 #include "Soul_Like_ACT.h"
 #include "Modules/ModuleManager.h"
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Soul_Like_ACT, "Soul_Like_ACT" );
- 
+IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, Soul_Like_ACT, "Soul_Like_ACT");

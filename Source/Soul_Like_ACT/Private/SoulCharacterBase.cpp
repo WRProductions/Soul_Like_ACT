@@ -3,6 +3,7 @@
 #include "SoulCharacterBase.h"
 #include "AbilitySystemGlobals.h"
 #include "Abilities/SoulGameplayAbility.h"
+#include "Abilities/SoulModifierManager.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "ActorFxManager.h"
@@ -18,8 +19,10 @@ ASoulCharacterBase::ASoulCharacterBase()
 	// Create the attribute set, this replicates by default
 	AttributeSet = CreateDefaultSubobject<USoulAttributeSet>(TEXT("AttributeSet"));
 
-
 	FXManager = CreateDefaultSubobject<UActorFXManager>(TEXT("FXManager"));
+
+	ModifierManager = CreateDefaultSubobject<USoulModifierManager>(TEXT("ModifierManager"));
+	ModifierManager->PlayerRef = this;
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(96.f);
 	GetCapsuleComponent()->SetCapsuleRadius(60.f);
@@ -55,39 +58,23 @@ void ASoulCharacterBase::TriggerSlowMotion_WithDelay(float Delay)
 
 void ASoulCharacterBase::AddStartupGameplayAbilities()
 {
-	check(AbilitySystemComponent);
-
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
-
-	if (Role == ROLE_Authority)
-	{
-		for (auto TempAbility : AbilityArray)
-		{
-			if (TempAbility)
-				AbilitySystemComponent->GiveAbility(TempAbility);
-		}
-
-		// Now apply passives
-		for (TSubclassOf<UGameplayEffect>& GameplayEffect : PassiveGameplayEffects)
-		{
-			FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
-			EffectContext.AddSourceObject(this);
-
-			FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, GetCharacterLevel(), EffectContext);
-			if (NewHandle.IsValid())
-			{
-				FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
-			}
-		}
-	}
-
-	bAbilitiesInitialized = true;
+	ModifierManager->AddStartupGameplayAbilities();
 }
 
 void ASoulCharacterBase::HandleDamage(float DamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
 {
 	OnDamaged(DamageAmount, IsCriticaled, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
 
+}
+
+void ASoulCharacterBase::HandlePostureDamage(float PostureDamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
+{
+	OnPostureDamaged(PostureDamageAmount, IsCriticaled, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
+}
+
+void ASoulCharacterBase::ResetPerilousStatus()
+{
+	LOG_FUNC_FAIL();
 }
 
 void ASoulCharacterBase::MakeStepDecelAndSound_Notify(ASoulCharacterBase *CharacterRef)
@@ -98,58 +85,6 @@ void ASoulCharacterBase::MakeStepDecelAndSound_Notify(ASoulCharacterBase *Charac
 void ASoulCharacterBase::MakeStepDecelAndSound_Implementation()
 {
 	return;
-}
-
-void ASoulCharacterBase::HandleHealthChanged(float DeltaValue, const FGameplayTagContainer & EventTags)
-{
-	OnHealthChanged.Broadcast(TArray<float>{GetHealth(), GetMaxHealth()});
-}
-
-void ASoulCharacterBase::HandleStaminaChanged(float DeltaValue, const FGameplayTagContainer & EventTags)
-{
-	OnStaminaChanged.Broadcast(TArray<float>{GetStamina(), GetMaxStamina()});
-}
-
-void ASoulCharacterBase::HandleMoveSpeedChanged(float DeltaValue, const FGameplayTagContainer & EventTags)
-{
-	GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed();
-
-	OnMoveSpeedChanged.Broadcast(TArray<float>{GetMoveSpeed(), -1.f});
-}
-
-void ASoulCharacterBase::HandleLeechChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
-{
-	OnLeechChanged.Broadcast(TArray<float>{GetLeech(), -1.f});
-}
-
-void ASoulCharacterBase::HandleTenacityChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
-{
-	OnTenacityChanged.Broadcast(TArray<float>{GetTenacity(), -1.f});
-}
-
-void ASoulCharacterBase::HandleDefensePowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
-{
-	OnDefensePowerChanged.Broadcast(TArray<float>{GetDefensePower(), -1.f});
-}
-
-void ASoulCharacterBase::HandleCriticalStrikeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
-{
-	OnCriticalStrikeChanged.Broadcast(TArray<float>{GetCriticalStrike(), -1.f});
-}
-
-void ASoulCharacterBase::HandleCriticalMultiChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
-{
-	OnCriticalMultiChanged.Broadcast(TArray<float>{GetCriticalMulti(), -1.f});
-}
-
-void ASoulCharacterBase::HandleAttackPowerChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
-{
-	OnAttackPowerChanged.Broadcast(TArray<float>{GetAttackPower(), -1.f});
-}
-
-void ASoulCharacterBase::HandleAttackSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
-{
-	OnAttackSpeedChanged.Broadcast(TArray<float>{GetAttackSpeed(), -1.f});
 }
 
 UAbilitySystemComponent* ASoulCharacterBase::GetAbilitySystemComponent() const
@@ -168,12 +103,10 @@ const bool ASoulCharacterBase::IsInRivalFaction(ASoulCharacterBase *DamageDealer
 	return 0;
 }
 
-
 void ASoulCharacterBase::PossessedBy(AController * NewController)
 {
 	Super::PossessedBy(NewController);
-
-	AddStartupGameplayAbilities();
+	LOG_FUNC_SUCCESS();
 }
 
 void ASoulCharacterBase::UnPossessed()

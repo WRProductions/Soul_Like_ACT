@@ -37,15 +37,22 @@ public:
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, MaxHealth)
 
 	/** Current Health, when 0 we expect owner to die. Capped by MaxHealth */
-	UPROPERTY(BlueprintReadOnly, Category = "Stamina")
-	FGameplayAttributeData Stamina;
-	ATTRIBUTE_ACCESSORS(USoulAttributeSet, Stamina)
+	UPROPERTY(BlueprintReadOnly, Category = "Defense")
+	FGameplayAttributeData Posture;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, Posture)
 		
-	UPROPERTY(BlueprintReadOnly, Category = "Stamina")
-	FGameplayAttributeData MaxStamina;
-	ATTRIBUTE_ACCESSORS(USoulAttributeSet, MaxStamina)
+	UPROPERTY(BlueprintReadOnly, Category = "Defense")
+	FGameplayAttributeData MaxPosture;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, MaxPosture)
 
-	/** AttackPower of the attacker is multiplied by the base Damage to reduce health, so 1.0 means no bonus */
+	UPROPERTY(BlueprintReadOnly, Category = "Defense")
+	FGameplayAttributeData PostureStrength;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, PostureStrength)
+
+	UPROPERTY(BlueprintReadOnly, Category = "Defense")
+	FGameplayAttributeData DefensePower;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, DefensePower)
+
 	UPROPERTY(BlueprintReadOnly, Category = "Damage")
 	FGameplayAttributeData AttackPower;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, AttackPower)
@@ -54,49 +61,35 @@ public:
 	FGameplayAttributeData AttackSpeed;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, AttackSpeed)
 
-	/** AttackPower of the attacker is multiplied by the base Damage to reduce health, so 1.0 means no bonus */
 	UPROPERTY(BlueprintReadOnly, Category = "Damage")
 	FGameplayAttributeData Leech;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, Leech)
 
-	/** Base Damage is divided by DefensePower to get actual damage done, so 1.0 means no bonus */
 	UPROPERTY(BlueprintReadOnly, Category = "Damage")
-	FGameplayAttributeData DefensePower;
-	ATTRIBUTE_ACCESSORS(USoulAttributeSet, DefensePower)
+	FGameplayAttributeData PostureCrumble;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, PostureCrumble)
 
-	/** Base Damage is divided by DefensePower to get actual damage done, so 1.0 means no bonus */
-	UPROPERTY(BlueprintReadOnly, Category = "Damage")
-	FGameplayAttributeData Tenacity;
-	ATTRIBUTE_ACCESSORS(USoulAttributeSet, Tenacity)
-
-	/** MoveSpeed affects how fast characters can move */
 	UPROPERTY(BlueprintReadOnly, Category = "MoveSpeed")
 	FGameplayAttributeData MoveSpeed;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, MoveSpeed)
 
-	/** MoveSpeed affects how fast characters can move */
-	UPROPERTY(BlueprintReadOnly, Category = "MoveSpeed")
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
 	FGameplayAttributeData CriticalStrike;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, CriticalStrike)
 
-	/** MoveSpeed affects how fast characters can move */
-	UPROPERTY(BlueprintReadOnly, Category = "MoveSpeed")
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
 	FGameplayAttributeData CriticalMulti;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, CriticalMulti)
 
-	/** Damage is a 'temporary' attribute used by the DamageExecution to calculate final damage, which then turns into -Health */
 	UPROPERTY(BlueprintReadOnly, Category = "Output", meta = (HideFromLevelInfos))
 	FGameplayAttributeData Damage;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, Damage)
 
-	/** Damage is a 'temporary' attribute used by the DamageExecution to calculate final damage, which then turns into -Health */
 	UPROPERTY(BlueprintReadOnly, Category = "Output", meta = (HideFromLevelInfos))
-	FGameplayAttributeData IsCriticalDamageTaken;
-	ATTRIBUTE_ACCESSORS(USoulAttributeSet, IsCriticalDamageTaken)
+	FGameplayAttributeData PostureDamage;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, PostureDamage)
 
 
 protected:
-	/** Helper function to proportionally adjust the value of an attribute when it's associated max attribute changes. (i.e. When MaxHealth increases, Health increases by an amount that maintains the same percentage as before) */
 	void AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty);
-
 };

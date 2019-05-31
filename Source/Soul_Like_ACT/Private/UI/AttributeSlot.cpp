@@ -4,45 +4,23 @@
 #include "Components/TextBlock.h"
 #include "Abilities/SoulAttributeSet.h"
 #include "Abilities/SoulAbilitySystemComponent.h"
+#include "SoulSerializerBpLib.h"
 
 
 void UAttributeSlot::SetAttributeType()
 {
-	if (MyAttribute == USoulAttributeSet::GetHealthAttribute())
-		AttributeType->SetText(FText::FromString("Health:")); 
+	FString TempTypeString;
+	USoulSerializerBpLib::AttributeToString(MyAttribute, TempTypeString);
 
-	else if (MyAttribute == USoulAttributeSet::GetStaminaAttribute())
-		AttributeType->SetText(FText::FromString("Stamina:"));
-	
-	else if (MyAttribute == USoulAttributeSet::GetLeechAttribute())
-		AttributeType->SetText(FText::FromString("Leech:"));
+	TempTypeString += ":";
 
-	else if (MyAttribute == USoulAttributeSet::GetMoveSpeedAttribute())
-		AttributeType->SetText(FText::FromString("Move Speed:"));
-
-	else if (MyAttribute == USoulAttributeSet::GetTenacityAttribute())
-		AttributeType->SetText(FText::FromString("Tenacity:"));
-
-	else if (MyAttribute == USoulAttributeSet::GetAttackPowerAttribute())
-		AttributeType->SetText(FText::FromString("Attack Power:"));
-
-	else if (MyAttribute == USoulAttributeSet::GetDefensePowerAttribute())
-		AttributeType->SetText(FText::FromString("Defense:"));
-
-	else if (MyAttribute == USoulAttributeSet::GetAttackSpeedAttribute())
-		AttributeType->SetText(FText::FromString("Attack Speed:"));
-
-	else if (MyAttribute == USoulAttributeSet::GetCriticalStrikeAttribute())
-		AttributeType->SetText(FText::FromString("Critical Strike Chance:"));
-
-	else if (MyAttribute == USoulAttributeSet::GetCriticalMultiAttribute())
-		AttributeType->SetText(FText::FromString("Critical Multiplier:"));
+	AttributeType->SetText(FText::FromString(TempTypeString));
 }
 
-void UAttributeSlot::OnAttributeChanged(const TArray<float> & values)
+void UAttributeSlot::OnAttributeChanged(const TArray<float>& values)
 {
 	if (MyAttribute == USoulAttributeSet::GetHealthAttribute()
-		|| MyAttribute == USoulAttributeSet::GetStaminaAttribute())
+		|| MyAttribute == USoulAttributeSet::GetPostureAttribute())
 	{
 		FFormatOrderedArguments Args;
 		Args.Add((int32)values[0]);
@@ -52,8 +30,9 @@ void UAttributeSlot::OnAttributeChanged(const TArray<float> & values)
 	}
 	else if (MyAttribute == USoulAttributeSet::GetLeechAttribute()
 		|| MyAttribute == USoulAttributeSet::GetMoveSpeedAttribute()
-		|| MyAttribute == USoulAttributeSet::GetTenacityAttribute()
+		|| MyAttribute == USoulAttributeSet::GetPostureStrengthAttribute()
 		|| MyAttribute == USoulAttributeSet::GetAttackPowerAttribute()
+		|| MyAttribute == USoulAttributeSet::GetPostureCrumbleAttribute()
 		|| MyAttribute == USoulAttributeSet::GetDefensePowerAttribute())
 	{
 		AttributeValue->SetText(FText::FromString(FString::FromInt((int32)values[0])));
@@ -74,4 +53,3 @@ void UAttributeSlot::OnAttributeChanged(const TArray<float> & values)
 		AttributeValue->SetText(localText);
 	}
 }
-

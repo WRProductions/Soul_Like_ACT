@@ -24,8 +24,12 @@ protected:
 
 // 	UFUNCTION(BlueprintCallable)
 // 	void OnSlottedItemChanged(const struct FSoulItemSlot &ItemSlot, const class USoulItem*& Item);
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn))
+		FText AbilityName;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn))
+		FText AbilityMagnitude;
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void Setup(FString &inp_Name, FString &inp_Level);
+	void Setup(const FText&inp_Name, const FText &inp_Level);
 };

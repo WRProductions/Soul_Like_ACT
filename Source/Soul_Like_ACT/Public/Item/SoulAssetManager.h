@@ -31,7 +31,8 @@ public:
 
 
 	/** Returns the current AssetManager object */
-	static USoulAssetManager& Get();
+	UFUNCTION(BlueprintCallable)
+	static USoulAssetManager* Get();
 
 	/**
 	 * Synchronously loads an RPGItem subclass, this can hitch but is useful when you cannot wait for an async load
@@ -40,6 +41,6 @@ public:
 	 * @param PrimaryAssetId The asset identifier to load
 	 * @param bDisplayWarning If true, this will log a warning if the item failed to load
 	 */
+	UFUNCTION(BlueprintCallable)
 	USoulItem* ForceLoadItem(const FPrimaryAssetId& PrimaryAssetId, bool bLogWarning = true);
-
 };

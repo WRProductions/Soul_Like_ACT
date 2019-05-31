@@ -2,13 +2,13 @@
 
 #pragma once
 
+#include "Soul_Like_ACT.h"
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "Types/SoulItemTypes.h"
+#include "SoulSaveGame.h"
 #include "SoulGameInstanceBase.generated.h"
 
-class USoulItem;
-class USoulSaveGame;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadingFinished);
 
 /**
  * Base class for GameInstance, should be blueprinted
@@ -25,68 +25,96 @@ public:
 	USoulGameInstanceBase();
 
 	/** List of inventory items to add to new players */
- 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
- 		TMap<FPrimaryAssetId, FSoulItemData> DefaultInventory;
+ 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
+ 	TArray<FSoulSaveItemData> DefaultInventory;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
-		TArray<FPrimaryAssetType> AllItemTypes;
+	//By Default, It contains all accessible Item Types
+	const TArray<FPrimaryAssetType> AllItemTypes{USoulAssetManager::ArmourItemType, USoulAssetManager::WeaponItemType,USoulAssetManager::PotionItemType,USoulAssetManager::JewelItemType};
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
-		TArray<USoulItem*> AllItems;
+	UFUNCTION(BlueprintCallable)
+	static bool GetSoulPlayer(UObject* WorldContextObject, ASoulPlayerController*& MyController, ASoul_Like_ACTCharacter*& MyChar, UInventoryManager*& MyInentory);
 
-	/** The slot name used for saving */
-	UPROPERTY(BlueprintReadWrite, Category = Save)
-		FString SaveSlot;
-
-	/** The platform-specific user index */
-	UPROPERTY(BlueprintReadWrite, Category = Save)
-		int32 SaveUserIndex;
-
-	/** Load all the sotre items up front */
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = Inventory)
-		void InitializeAllItems();
+	UFUNCTION(BlueprintCallable)
+	USoulSaveGame* GetSaveSlot();
 
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-		void GetItemsIDWithType(const TArray<FPrimaryAssetType> ItemTypes, TMap<FPrimaryAssetId, FSoulItemData> & OutpItems);
+	void GetAllAccessibleItemID(TArray<FPrimaryAssetId>& OutpId);
 
-	/**
-	 * Adds the default inventory to the inventory array
-	 * @param InventoryArray Inventory to modify
-	 * @param RemoveExtra If true, remove anything other than default inventory
-	 */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-		void AddDefaultInventory(USoulSaveGame* SaveGame, bool bRemoveExtra = false);
+	void GetItemIDWithType(const FPrimaryAssetType ItemType, TArray<FPrimaryAssetId> & OutpId);
 
-	/** Returns true if this is a valid inventory slot */
- 	UFUNCTION(BlueprintCallable, Category = Inventory)
- 		bool IsValidItemSlot(FSoulItemSlot ItemSlot) const;
-
-	/** Returns the current save game, so it can be used to initialize state. Changes are not written until WriteSaveGame is called */
-	UFUNCTION(BlueprintCallable, Category = Save)
-		USoulSaveGame* GetCurrentSaveGame();
-
-	/** Sets rather save/load is enabled. If disabled it will always count as a new character */
-	UFUNCTION(BlueprintCallable, Category = Save)
-		void SetSavingEnabled(bool bEnabled);
+	/* Adds the default inventory to the inventory array */
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	void AddDefaultInventory();
 
 	/** Loads a save game. If it fails, it will create a new one for you. Returns true if it loaded, false if it created one */
 	UFUNCTION(BlueprintCallable, Category = Save)
-		bool LoadOrCreateSaveGame();
+	bool LoadOrCreateSaveGame();
 
 	/** Writes the current save game object to disk */
 	UFUNCTION(BlueprintCallable, Category = Save)
-		bool WriteSaveGame();
+	bool WriteSaveGame();
 
 	/** Resets the current save game to it's default. This will erase player data! This won't save to disk until the next WriteSaveGame */
 	UFUNCTION(BlueprintCallable, Category = Save)
-		void ResetSaveGame();
+	void ResetSaveGame();
+
+	/** Spawn Floating Damage Widget on screen */
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = UI)
+	void SpawnFloatingDamageTextWidget(const AActor* DamageReceiver, const float DamageInput);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void AsyncLoadingSaveGame();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnStartGameClicked();
+
+	UPROPERTY(BlueprintAssignable)
+	FOnLoadingFinished OnSaveGameLoadingFinished;
+
+	UFUNCTION(BlueprintCallable)
+	static FString SoulItemDataToString(FSoulItemData ItemData)
+	{
+		return ItemData.ToString();
+	}
 
 protected:
-	/** The current save game object */
-	UPROPERTY()
-		USoulSaveGame* CurrentSaveGame;
-
 	/** Rather it will attempt to actually save to disk */
-	UPROPERTY()
-		bool bSavingEnabled;
+	/** Sets rather save/load is enabled. If disabled it will always count as a new character */
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = Save)
+		bool bForceReset;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Levels)
+	FName GameplayLevelName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Levels)
+	FName LoginLevelName;
+
+	/** The slot name used for saving */
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Save)
+	FString SaveSlot;
+
+	/** The platform-specific user index */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Save)
+	int32 SaveUserIndex;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = Save)
+	TSubclassOf<USaveGame> DefaultSaveGameBPClass;
+
+	/** The current save game object */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Save)
+	USoulSaveGame* CurrentSaveGame;
+
+	UFUNCTION(BlueprintCallable)
+	void CopyKeysFromEquipMap(UPARAM(ref) TArray<FSoulEquipmentSlot>& FromEquipSlotKeys, UPARAM(ref) TMap<FSoulEquipmentSlot, FSoulItemData>& ToEquipItems);
+
+	//SaveItem to GameData converters
+	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly))
+	void MakeSaveData();
+	UFUNCTION(BlueprintCallable)
+	void MakeSoulItemSaveData(FSoulItemData InItemData, FSoulSaveItemData &OutSaveItemData);
+	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly))
+	void MakeSoulItemData(UObject* InItemBase, TArray<UObject*> InJewels, FSoulItemData &OutItemData, int32 InItemCount = 1, int32 InItemLevel = 1);
+
+	void Broadcast_OnSaveGameLoadFinshed();
 };

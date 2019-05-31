@@ -17,7 +17,6 @@ UActionSysManager::UActionSysManager()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-
 void UActionSysManager::BeginPlay()
 {
 	Super::BeginPlay();
@@ -153,14 +152,6 @@ FName UActionSysManager::Get4WaysStepDirection_GA(float PredictableMovingDirecti
 		return "R";
 	else
 		return "B";
-}
-
-bool UActionSysManager::ActivateAbilitiesWithWeapon(bool bAllowRemoteActivation) const
-{
-	if (PlayerRef->AbilitySystemComponent)
-		return PlayerRef->AbilitySystemComponent->TryActivateAbilityByClass(PlayerRef->AbilityArray[0], true);
-	
-	return false;
 }
 
 void UActionSysManager::GetActiveAbilitiesWithTags(FGameplayTagContainer AbilityTags, TArray<USoulGameplayAbility*>& ActiveAbilities)

@@ -66,11 +66,7 @@ void AWeaponActor::DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawT
 				&& ASoulCharacterBase::IsInRivalFaction(OwnerRef, TargetPawn) 
 				&& TryExcludeActor(TargetPawn))
 			{
-				ApplyGAOnHit(TargetPawn, Hit);
-
-				TriggerSlowMotion(Hit);
-
-				ApplySpecialEffect(Hit);
+				ApplyEventBackToGA(TargetPawn, Hit);
 			}
 		}
 	}
@@ -102,8 +98,6 @@ void AWeaponActor::StartSwing()
 	if (GearInfo->SwingSound)
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), GearInfo->SwingSound, GetActorLocation());
 
-	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, GetInstigator()->GetName() + " swinging the weapon");
-
 	for (int i = GearInfo->BladeStartLength; i <= GearInfo->BladeTail; i += 10)
 	{
 		CurrVecs.Add(GetActorLocation() + i * GetActorUpVector());
@@ -113,11 +107,6 @@ void AWeaponActor::StartSwing()
 void AWeaponActor::EndSwing()
 {
 	bIsTracingCollision = 0;
-}
-
-bool AWeaponActor::ApplyGAOnHit_Implementation(ASoulCharacterBase *Target, const FHitResult &InpHitResult)
-{
-	return true;
 }
 
 // Called every frame

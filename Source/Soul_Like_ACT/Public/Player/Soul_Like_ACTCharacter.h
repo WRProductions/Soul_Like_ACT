@@ -19,7 +19,7 @@ class ASoul_Like_ACTCharacter : public ASoulCharacterBase
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = Component)
 	class UActionSysManager* ActionSysManager;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Component, meta = (AllowPrivateAccess = "true"))
@@ -38,8 +38,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void PossessedBy(AController* NewController) override;
-public:
 
+public:
 	static const float BattleMovementScale;
 	static const float TravelMovementScale;
 
@@ -58,14 +58,13 @@ public:
 	float ForwardAxisValue, RightAxisValue;
 	float LeanAmount_Char, LeanSpeed_Char;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	float LeanAmount_Anim;
 
 	bool bIsLeftMouseButtonPressed;
 
 protected:
 	//Tick------------------------------
-
 	UFUNCTION(BlueprintCallable)
 	void MoveForward(float Value);
 	UFUNCTION(BlueprintCallable)
@@ -98,9 +97,6 @@ public:
 
 	FORCEINLINE class UActionSysManager* GetActionSysManager() const { return ActionSysManager; }
 
-	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = "Outp"))
-	void GetMyPlayerController(class APlayerController *&MyController, EIsControllerValid& Outp);
-
 	UFUNCTION(BlueprintCallable)
 	void ResetRotation();
 
@@ -115,6 +111,15 @@ public:
 		AbilitySystemComponent->SetTagMapCount(GameplayTag, 0);
 	}
 	
+	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = "Outp", BlueprintInternalUseOnly))
+	void GetMyPlayerController(class ASoulPlayerController*& MyController, EIsControllerValid & Outp);
+
+	UFUNCTION(BlueprintCallable)
+	class UInventoryManager* GetInventoryManager() const;
+
+	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly))
+	static void GetPlayer(UWorld *InWorld, bool &Successful, ASoulPlayerController *&SoulPlayerController, ASoul_Like_ACTCharacter *&SoulCharacter, UInventoryManager *&SoulInventoryManager);
+
 	friend UActionSysManager;
 };
 

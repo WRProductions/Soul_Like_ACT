@@ -24,7 +24,7 @@ AMobBasic::AMobBasic()
 	Faction = EActorFaction::Enemy;
 
 	TSubclassOf <class UUserWidget> IconWidget = ConstructorHelpers::FClassFinder<UUserWidget>(
-		TEXT("/Game/UMG/Mob/WB_LockIcon")).Class;
+		TEXT("/Game/UMG/Mob/w_mob_LockIcon")).Class;
 	TargetIcon->SetWidgetClass(IconWidget);
 	TargetIcon->SetVisibility(0);
 }

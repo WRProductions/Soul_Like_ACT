@@ -20,15 +20,27 @@ enum class EIsControllerValid : uint8
 };
 
 #define ATTRIBUTE_GETTER(PropertyName) \
+	UFUNCTION(BlueprintCallable) \
 	virtual float Get##PropertyName##() const \
 	{ \
 		return AttributeSet->Get##PropertyName##(); \
 	}
 
-#define ATTRIBUTE_GETTER_AND_HANDLECHANGED(PropertyName) \
+#define ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(PropertyName) \
 	ATTRIBUTE_GETTER(##PropertyName##) \
-	virtual void Handle##PropertyName##Changed(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	virtual void Handle##PropertyName##Changed(float DeltaValue, const struct FGameplayTagContainer& EventTags) \
+	{ \
+		if(On##PropertyName##Changed.IsBound()) \
+			On##PropertyName##Changed.Broadcast(TArray<float>{Get##PropertyName##(), -1.f}); \
+	}
 
+#define ATTRIBUTE_GETTER_AND_HANDLECHANGED_TwoParams(PropertyName) \
+	ATTRIBUTE_GETTER(##PropertyName##) \
+	virtual void Handle##PropertyName##Changed(float DeltaValue, const struct FGameplayTagContainer& EventTags) \
+	{ \
+		if(On##PropertyName##Changed.IsBound()) \
+			On##PropertyName##Changed.Broadcast(TArray<float>{Get##PropertyName##(), GetMax##PropertyName##()}); \
+	}
 
 UENUM(BlueprintType)
 enum class EActorFaction : uint8
@@ -51,7 +63,6 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void UnPossessed() override;
 
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -62,6 +73,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UActorFXManager *FXManager;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		class USoulModifierManager* ModifierManager;
+
 	/** The component used to handle ability system interactions */
 	UPROPERTY(BlueprintReadOnly)
 		class USoulAbilitySystemComponent *AbilitySystemComponent;
@@ -69,18 +83,6 @@ protected:
 	/** List of attributes modified by the ability system */
 	UPROPERTY()
 		USoulAttributeSet* AttributeSet;
-
-	/** If true we have initialized our abilities */
-	UPROPERTY()
-		bool bAbilitiesInitialized;
-
-	/** Temp Gameplay Abilities */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = AnimGA)
-		TArray<TSubclassOf<UGameplayAbility>> AbilityArray;
-
-	/** Passive gameplay effects applied on creation */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Abilities)
-		TArray<TSubclassOf<UGameplayEffect>> PassiveGameplayEffects;
 
 	FTimerHandle Handle_SlowMotion, Handler_SlowMotionDelay;
 
@@ -91,8 +93,8 @@ protected:
 
 	void TriggerSlowMotion()
 	{
-		CustomTimeDilation = 0.01f;
-		GetWorldTimerManager().SetTimer(Handle_SlowMotion, this, &ASoulCharacterBase::WaitForDilationReset, 1.f, 0, 0.15f);
+		CustomTimeDilation = 0.003f;
+		GetWorldTimerManager().SetTimer(Handle_SlowMotion, this, &ASoulCharacterBase::WaitForDilationReset, 1.f, false, 0.2f);
 	}
 
 public:	
@@ -124,28 +126,31 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TriggerSlowMotion_WithDelay(float Delay);
 
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED(Health)
-	ATTRIBUTE_GETTER(MaxHealth)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED(Stamina)
-	ATTRIBUTE_GETTER(MaxStamina)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED(Leech)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED(DefensePower)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED(AttackPower)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED(Tenacity)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED(MoveSpeed)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED(AttackSpeed)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED(CriticalStrike)
-	ATTRIBUTE_GETTER_AND_HANDLECHANGED(CriticalMulti)
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_TwoParams(Health);
+	ATTRIBUTE_GETTER(MaxHealth);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_TwoParams(Posture);
+	ATTRIBUTE_GETTER(MaxPosture);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(Leech);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(PostureStrength);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(DefensePower);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(AttackPower);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(PostureCrumble);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(MoveSpeed);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(AttackSpeed);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(CriticalStrike);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(CriticalMulti);
 
+	UFUNCTION(BlueprintCallable)
+	float GetPosturePercent() { return GetPosture() / GetMaxPosture(); }
 
 	/** Returns the character level that is passed to the ability system */
 	UFUNCTION(BlueprintCallable)
 		virtual int32 GetCharacterLevel() const { return 1; }
 
-
 protected:
 	/** Apply the startup GAs and GEs */
-	void AddStartupGameplayAbilities();
+	UFUNCTION(BlueprintCallable)
+		void AddStartupGameplayAbilities();
 
 	/**
 	 * Called when character takes damage, which may have killed them
@@ -157,20 +162,30 @@ protected:
 	 * @param DamageCauser The actual actor that did the damage, might be a weapon or projectile
 	 */
 	UFUNCTION(BlueprintImplementableEvent)
-		void OnDamaged(float DamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+	void OnDamaged(float DamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+
+	/**
+	*Called when character takes posture damage
+	*/
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnPostureDamaged(float PostureDamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnChanged OnHealthChanged;
 	UPROPERTY(BlueprintAssignable)
+	FOnChanged OnPostureChanged;
+	UPROPERTY(BlueprintAssignable)
 	FOnChanged OnMoveSpeedChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnChanged OnPostureStrengthChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnChanged OnDefensePowerChanged;
 	UPROPERTY(BlueprintAssignable)
 	FOnChanged OnStaminaChanged;
 	UPROPERTY(BlueprintAssignable)
 	FOnChanged OnLeechChanged;
 	UPROPERTY(BlueprintAssignable)
-	FOnChanged OnTenacityChanged;
-	UPROPERTY(BlueprintAssignable)
-	FOnChanged OnDefensePowerChanged;
+	FOnChanged OnPostureCrumbleChanged;
 	UPROPERTY(BlueprintAssignable)
 	FOnChanged OnAttackPowerChanged;
 	UPROPERTY(BlueprintAssignable)
@@ -182,14 +197,18 @@ protected:
 
 	// Called from RPGAttributeSet, these call BP events above
 	virtual void HandleDamage(float DamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
-	
+	virtual void HandlePostureDamage(float PostureDamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+
 	UFUNCTION(BlueprintNativeEvent)
 	void MakeStepDecelAndSound();
+
+	UFUNCTION(BlueprintCallable)
+	void ResetPerilousStatus();
 
 public:
 	
 	UFUNCTION(BlueprintCallable)
-		static void TagContainerToString(const FGameplayTagContainer &Container, FString &Outp)
+	static void TagContainerToString(const FGameplayTagContainer &Container, FString &Outp)
 	{
 		Outp = Container.ToString();
 	}
