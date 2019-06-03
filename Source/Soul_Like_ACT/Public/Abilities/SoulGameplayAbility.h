@@ -78,13 +78,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
 	TSubclassOf<UGameplayEffect> ModifierEffect;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
-	TArray<FGameplayEffectSpecHandle> EffectCollection;
+	TArray<FActiveGameplayEffectHandle> EffectCollection;
 
-	void ApplyEffectSpecsToOwner();
+	void ApplyEffectsToSelf();
+
+	void RemoveEffectsFromSelf();
 };
 
 UCLASS()
-	class USoulPrimaryStatusGameplayAbility : public USoulModifierGameplayAbility
+class USoulPrimaryStatusGameplayAbility : public USoulModifierGameplayAbility
 {
 	GENERATED_BODY()
 

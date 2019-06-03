@@ -69,6 +69,7 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	AActor* SourceActor = SourceAbilitySystemComponent ? SourceAbilitySystemComponent->AvatarActor : nullptr;
 	AActor* TargetActor = TargetAbilitySystemComponent ? TargetAbilitySystemComponent->AvatarActor : nullptr;
 
+
 	//Warning: it's non-static. Be careful when modify the GE
 	FGameplayEffectSpec* Spec = ExecutionParams.GetOwningSpecForPreExecuteMod();
 
@@ -89,8 +90,8 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	float PostureStrength = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().PostureStrengthDef, EvaluationParameters, PostureStrength);
 
-	float Damage = 0.f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DamageDef, EvaluationParameters, Damage);
+	float DamageMulti = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DamageDef, EvaluationParameters, DamageMulti);
 	float AttackPower = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().AttackPowerDef, EvaluationParameters, AttackPower);
 	float CriticalStrike = 0.f;
@@ -116,10 +117,10 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	if (CriticalStrike >= LocalRandValue)
 	{
 		Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Event.Montage.Shared.Critical" }, true));
-		DamageDone = (Damage + AttackPower) * (1 + CriticalMulti / 100.f);
+		DamageDone = (DamageMulti + 1.f) * AttackPower * (1 + CriticalMulti / 100.f);
 	}
 	else
-		DamageDone = (Damage + AttackPower);
+		DamageDone = (DamageMulti + 1.f) * AttackPower;
 
 	//Defense calculation
 	DamageDone *= (DamageDone / (DamageDone + DefensePower));

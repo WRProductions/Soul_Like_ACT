@@ -9,7 +9,7 @@
 USoulAttributeSet::USoulAttributeSet()
 	: Health(1.f)
 	, MaxHealth(1.f)
-	, Posture(1.f)
+	, Posture(0.f)
 	, MaxPosture(1.f)
 	, PostureStrength(0.0f)
 	, DefensePower(0.f)

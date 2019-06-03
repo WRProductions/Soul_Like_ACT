@@ -88,9 +88,11 @@ bool AWeaponActor::TryExcludeActor(AActor * HitActor)
 	return 1;
 }
 
-void AWeaponActor::StartSwing()
+void AWeaponActor::StartSwing(const float &InDmgMulti)
 {
 	bIsTracingCollision = 1;
+
+	DmgMultiplier = InDmgMulti;
 
 	CurrVecs.Reset();
 	MyTargets.Empty();

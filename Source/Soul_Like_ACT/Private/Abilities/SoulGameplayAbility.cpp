@@ -38,8 +38,14 @@ FSoulGameplayEffectContainerSpec USoulGameplayAbility::MakeEffectContainerSpecFr
 		// Build GameplayEffectSpecs for each applied effect
 		for (const TSubclassOf<UGameplayEffect>& EffectClass : Container.TargetGameplayEffectClasses)
 		{
+
+			FGameplayEffectSpecHandle newGEHandle = MakeOutgoingGameplayEffectSpec(EffectClass, OverrideGameplayLevel);
+			
+			newGEHandle.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Damage.Type.Physical"), true), EventData.EventMagnitude);
+			newGEHandle.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Damage.Type.Posture"), true), EventData.EventMagnitude);
+			
 			ReturnSpec.TargetGameplayEffectSpecs.
-			           Add(MakeOutgoingGameplayEffectSpec(EffectClass, OverrideGameplayLevel));
+			           Add(newGEHandle);
 		}
 	}
 	return ReturnSpec;
@@ -77,7 +83,18 @@ TArray<FActiveGameplayEffectHandle> USoulGameplayAbility::ApplyEffectContainer(
 	return ApplyEffectContainerSpec(Spec);
 }
 
-void USoulModifierGameplayAbility::ApplyEffectSpecsToOwner()
+void USoulModifierGameplayAbility::ApplyEffectsToSelf()
 {
+	K2_ApplyGameplayEffectSpecToTarget();
+}
 
+void USoulModifierGameplayAbility::RemoveEffectsFromSelf()
+{
+	for (FActiveGameplayEffectHandle& LocalActiveEffect : EffectCollection)
+	{
+		if (LocalActiveEffect.WasSuccessfullyApplied())
+		{
+			LocalActiveEffect.RemoveFromGlobalMap();
+		}
+	}
 }

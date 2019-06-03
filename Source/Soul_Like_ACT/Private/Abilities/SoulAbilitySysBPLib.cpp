@@ -16,7 +16,7 @@ void USoulAbilitySysBPLib::CreateEventData(const AActor *Target, const AActor *S
 	TempEventData.Instigator = Source;
 	TempEventData.Target = Target;
 	//TODO damage magnitude
-	TempEventData.EventMagnitude = 100.f;
+	TempEventData.EventMagnitude = EventMagnitude;
 	TempEventData.EventTag = EventTag;
 	TempEventData.ContextHandle = TempContextHandle;
 

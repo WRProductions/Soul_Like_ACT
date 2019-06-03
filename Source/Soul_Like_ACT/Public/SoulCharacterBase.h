@@ -181,8 +181,6 @@ protected:
 	UPROPERTY(BlueprintAssignable)
 	FOnChanged OnDefensePowerChanged;
 	UPROPERTY(BlueprintAssignable)
-	FOnChanged OnStaminaChanged;
-	UPROPERTY(BlueprintAssignable)
 	FOnChanged OnLeechChanged;
 	UPROPERTY(BlueprintAssignable)
 	FOnChanged OnPostureCrumbleChanged;

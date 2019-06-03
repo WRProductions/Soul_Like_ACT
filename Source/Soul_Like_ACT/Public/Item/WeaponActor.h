@@ -41,6 +41,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	TArray<AActor*> MyTargets;
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	float DmgMultiplier;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -53,15 +56,18 @@ protected:
 	void DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawTraceLine);
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ShowDrawTraceLine, meta = (ExposeOnSpawn = 1))
-		bool bEnableDrawTraceLine;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, meta = (ExposeOnSpawn = 1))
+	bool bEnableDrawTraceLine;
 
 	UFUNCTION(BlueprintCallable)
-		void StartSwing();
+	void StartSwing(const float &InDmgMulti);
 	UFUNCTION(BlueprintCallable)
-		void EndSwing();
+	void EndSwing();
 
 	bool GetIsSwinging() const { return bIsTracingCollision; }
+
+	UFUNCTION(BlueprintCallable)
+	float GetDamageMagnitude() const { return DmgMultiplier; }
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
