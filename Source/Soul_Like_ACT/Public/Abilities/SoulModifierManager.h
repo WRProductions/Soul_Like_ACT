@@ -7,15 +7,10 @@
 #include "Components/ActorComponent.h"
 #include "SoulModifierManager.generated.h"
 
-USTRUCT(BlueprintType)
-struct FEquipGA_Handles
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, category = Default)
-	TArray<FGameplayAbilitySpecHandle> GA_Handles;
-};
+struct FGameplayAbilitySpecHandle;
+struct FGameplayAbilitySpec;
+class UGameplayAbility;
+struct FSoulItemData;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SOUL_LIKE_ACT_API USoulModifierManager : public UActorComponent
@@ -30,11 +25,8 @@ public:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	/** Defined in SoulPlayerBase */
-	class ASoulCharacterBase* PlayerRef;
-
-	UFUNCTION(BlueprintCallable)
-	class USoulAbilitySystemComponent* GetSoulGAComponent();
+	UFUNCTION(BlueprintCallable, Category = Player)
+	static USoulModifierManager* GetSoulModifierManger(class AActor* Owner);
 
 protected:
 	/** If true we have initialized our abilities */
@@ -46,13 +38,13 @@ protected:
 	* DefaultActive are bound to any inputs, e.g. Action/Spells
 	*/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Default)
-	TMap<TSubclassOf<USoulGameplayAbility>, uint8> DefaultActiveAbilities;
+	TMap<TSubclassOf<USoulGameplayAbility>,  int32> DefaultActiveAbilities;
 	/**
 	* These GAs are created when Beginplay
 	* DefaultModifers can only be triggered or modify attributes, thus permanent.
 	*/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Default)
-	TMap<TSubclassOf<USoulModifierGameplayAbility>, uint8> DefaultModifiers;
+	TMap<TSubclassOf<USoulModifierGameplayAbility>, int32> DefaultModifiers;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
 	TArray<FGameplayAbilitySpecHandle> GrantedDefaultActiveGAs;
@@ -61,14 +53,22 @@ protected:
 
 	/** Map of slot to ability granted by that slot. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
-	TMap<FSoulEquipmentSlot, FEquipGA_Handles> SlottedAbilities;
+	TArray<FGameplayAbilitySpecHandle> SlottedAbilities;
 
 	void AddStartupGameplayAbilities();
 
-	bool AddOrRemoveGAOnEquipSlot(const FSoulEquipmentSlot& EquipSlot, bool RemoveGA);
+	/**
+	 * Update the modifiers from the equipment to player. 
+	 * bIsAdded is false represents the gear is unequipped
+	 * Warning: The function shall only be called in UInventoryManager. Don't call it manually
+	 */
+	bool UpdateModifierToPlayer(const FSoulItemData& InputItemData, bool bIsAdded = true);
 
+	UFUNCTION(BlueprintCallable)
+	class USoulAbilitySystemComponent* GetOwnerGameplayAbilityComponent();
 
+	FGameplayAbilitySpec* FindAbilitySpecFromHandle(FGameplayAbilitySpecHandle& InSpecHandle);
 
-	friend ASoulCharacterBase;
+	friend class ASoulCharacterBase;
 	friend class UInventoryManager;
 };

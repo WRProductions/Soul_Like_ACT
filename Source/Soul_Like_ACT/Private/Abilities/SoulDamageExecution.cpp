@@ -99,8 +99,8 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	float CriticalMulti = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().CriticalMultiDef, EvaluationParameters, CriticalMulti);
 
-	float PostureDamage = 0.f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().PostureDamageDef, EvaluationParameters, PostureDamage);
+	float PostureMulti = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().PostureDamageDef, EvaluationParameters, PostureMulti);
 	float PostureCrumble = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().PostureCrumbleDef, EvaluationParameters, PostureCrumble);
 
@@ -128,7 +128,7 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	/**
 	* POSTURE DAMAGE
 	*/
-	float PostureDamageDone = PostureDamage + PostureCrumble - PostureStrength;
+	float PostureDamageDone =  (1.f +PostureMulti) * PostureCrumble * (PostureCrumble / (PostureCrumble + PostureStrength));
 
 	if (DamageDone >= 0.f)
 	{

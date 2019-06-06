@@ -42,19 +42,23 @@ USoulAbilitySystemComponent * USoulAbilitySystemComponent::GetAbilitySystemCompo
 
 }
 
-void USoulAbilitySystemComponent::ApplyGE_ToSelf(const AActor* Actor, const TSubclassOf<UGameplayEffect> GameplayEffect, const int32 AbilityLevel = 1/*=1*/)
+FActiveGameplayEffectHandle USoulAbilitySystemComponent::ApplyGE_ToSelf(const AActor* Actor, const TSubclassOf<UGameplayEffect> GameplayEffect, const int32 AbilityLevel = 1/*=1*/)
 {
 
 	USoulAbilitySystemComponent *TempComp = GetAbilitySystemComponentFromActor(Actor);
 	if (TempComp)
 	{
 		FGameplayEffectContextHandle EffectContext = TempComp->MakeEffectContext();
+		
 		EffectContext.AddSourceObject(Actor);
 
 		FGameplayEffectSpecHandle NewHandle = TempComp->MakeOutgoingSpec(GameplayEffect, AbilityLevel, EffectContext);
+		
 		if (NewHandle.IsValid())
 		{
-			FActiveGameplayEffectHandle ActiveGEHandle = TempComp->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), TempComp);
+			return (TempComp->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), TempComp));
 		}
 	}
+
+	return FActiveGameplayEffectHandle();
 }

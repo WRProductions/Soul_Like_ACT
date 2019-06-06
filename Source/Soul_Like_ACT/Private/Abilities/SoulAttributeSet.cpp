@@ -141,9 +141,6 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			{
 				// This is proper damage
 				TargetCharacter->HandleDamage(LocalDamageDone, bIsCritic, HitResult, SourceTags, SourceCharacter, SourceActor);
-
-				// Call for all health changes
-				TargetCharacter->HandleHealthChanged(-LocalDamageDone, SourceTags);
 			}
 		}
 	}
@@ -209,10 +206,6 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			{
 				// This is proper damage
 				TargetCharacter->HandlePostureDamage(LocalPostureDamageDone, bIsCritic, HitResult, SourceTags, SourceCharacter, SourceActor);
-
-				// Call for all health changes
-				// WARNING: IT MUST BE A POSITIVE VALUE
-				TargetCharacter->HandlePostureChanged(LocalPostureDamageDone, SourceTags);
 			}
 		}
 	}
@@ -221,102 +214,50 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		// Handle other health changes such as from healing or direct modifiers
 		// First clamp it
 		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
-
-		if (TargetCharacter)
-		{
-			// Call for all health changes
-			TargetCharacter->HandleHealthChanged(DeltaValue, SourceTags);
-		}
 	}
 	else if (Data.EvaluatedData.Attribute == GetPostureAttribute())
 	{
 		SetPosture(FMath::Clamp(GetPosture(), 0.0f, GetMaxPosture()));
-
-		if (TargetCharacter)
-			TargetCharacter->HandlePostureChanged(DeltaValue, SourceTags);
 	}
 	else if (Data.EvaluatedData.Attribute == GetLeechAttribute())
 	{
 		SetLeech(FMath::Clamp(GetLeech (), 0.0f, 100.0f));
-
-		if (TargetCharacter)
-			TargetCharacter->HandleLeechChanged(DeltaValue, SourceTags);
 	}
 	else if (Data.EvaluatedData.Attribute == GetAttackSpeedAttribute())
 	{
 		SetLeech(FMath::Clamp(GetAttackSpeed(), 0.0f, 999.0f));
-
-		if (TargetCharacter)
-			TargetCharacter->HandleAttackSpeedChanged(DeltaValue, SourceTags);
 	}
 	else if (Data.EvaluatedData.Attribute == GetMoveSpeedAttribute())
 	{
 		SetMoveSpeed(FMath::Clamp(GetMoveSpeed(), 0.0f, 2000.0f));
-		if (TargetCharacter)
-		{
-			// Call for all movespeed changes
-			TargetCharacter->HandleMoveSpeedChanged(DeltaValue, SourceTags);
-		}
 	}
 	//Posture Strength
 	else if (Data.EvaluatedData.Attribute == GetPostureStrengthAttribute())
 	{
 		SetPostureStrength(FMath::Clamp(GetPostureStrength(), 0.0f, 9999.0f));
-
-		if (TargetCharacter)
-			TargetCharacter->HandlePostureStrengthChanged(DeltaValue, SourceTags);
 	}
 	//DP
 	else if (Data.EvaluatedData.Attribute == GetDefensePowerAttribute())
 	{
 	SetDefensePower(FMath::Clamp(GetDefensePower(), 0.0f, 9999.0f));
-
-	if (TargetCharacter)
-		TargetCharacter->HandleDefensePowerChanged(DeltaValue, SourceTags);
 	}
-
 	else if (Data.EvaluatedData.Attribute == GetAttackPowerAttribute())
 	{
 		SetAttackPower(FMath::Clamp(GetAttackPower(), 0.0f, 9999.0f));
-		if (TargetCharacter)
-			TargetCharacter->HandleAttackPowerChanged(DeltaValue, SourceTags);
 	}
-
 	//Posture Crumble
 	else if (Data.EvaluatedData.Attribute == GetPostureCrumbleAttribute())
 	{
 		SetPostureCrumble(FMath::Clamp(GetPostureCrumble(), 0.0f, 9999.0f));
-		if (TargetCharacter)
-			TargetCharacter->HandlePostureCrumbleChanged(DeltaValue, SourceTags);
 	}
-
 	//CS
 	else if (Data.EvaluatedData.Attribute == GetCriticalStrikeAttribute())
 	{
 		SetCriticalStrike(FMath::Clamp(GetCriticalStrike(), -999.f, 999.f));
-		if (TargetCharacter)
-			TargetCharacter->HandleCriticalStrikeChanged(DeltaValue, SourceTags);
 	}
-
 	//CM
 	else if (Data.EvaluatedData.Attribute == GetCriticalMultiAttribute())
 	{
 		SetCriticalMulti(FMath::Clamp(GetCriticalMulti(), -999.f, 999.f));
-		if (TargetCharacter)
-			TargetCharacter->HandleCriticalMultiChanged(DeltaValue, SourceTags);
-	}
-
-	//Max
-	if (Data.EvaluatedData.Attribute == GetMaxHealthAttribute())
-	{
-		if (TargetCharacter)
-			TargetCharacter->HandleHealthChanged(DeltaValue, SourceTags);
-	}
-
-	//Max
-	if (Data.EvaluatedData.Attribute == GetMaxPostureAttribute())
-	{
-		if (TargetCharacter)
-			TargetCharacter->HandlePostureChanged(DeltaValue, SourceTags);
 	}
 }

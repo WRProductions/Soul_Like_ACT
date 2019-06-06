@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Soul_Like_ACT.h"
 #include "GameplayAbility.h"
 #include "Abilities/SoulAbilityTypes.h"
 #include "GameplayTagContainer.h"
@@ -23,6 +23,9 @@ public:
 	USoulGameplayAbility()
 	{
 	}
+
+	UFUNCTION(BlueprintCallable)
+	float GetAttackSpeed() const;
 
 	/** Map of gameplay tags to gameplay effect containers */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = GameplayEffects)
@@ -64,9 +67,6 @@ UCLASS()
 {
 	GENERATED_BODY()
 
-protected:
-
-
 public:
 	USoulModifierGameplayAbility()
 		: DisplayName(FText::FromString("Invalid Modifier"))
@@ -76,12 +76,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
 	FText DisplayName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
-	TSubclassOf<UGameplayEffect> ModifierEffect;
+	int32 MaxLevel;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
+	TArray<TSubclassOf<UGameplayEffect>> ModifierEffects;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
 	TArray<FActiveGameplayEffectHandle> EffectCollection;
 
+	UFUNCTION(BlueprintCallable, Category = ModifierAbility)
 	void ApplyEffectsToSelf();
-
+	UFUNCTION(BlueprintCallable, Category = ModifierAbility)
 	void RemoveEffectsFromSelf();
 };
 

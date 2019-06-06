@@ -22,7 +22,6 @@ ASoulCharacterBase::ASoulCharacterBase()
 	FXManager = CreateDefaultSubobject<UActorFXManager>(TEXT("FXManager"));
 
 	ModifierManager = CreateDefaultSubobject<USoulModifierManager>(TEXT("ModifierManager"));
-	ModifierManager->PlayerRef = this;
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(96.f);
 	GetCapsuleComponent()->SetCapsuleRadius(60.f);
@@ -92,6 +91,11 @@ UAbilitySystemComponent* ASoulCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
+USoulModifierManager* ASoulCharacterBase::GetModifierManager() const
+{
+	return ModifierManager;
+}
+
 const bool ASoulCharacterBase::IsInRivalFaction(ASoulCharacterBase *DamageDealer, ASoulCharacterBase *DamageReceiver)
 {
 	if (DamageDealer->Faction == EActorFaction::Player && DamageReceiver->Faction == EActorFaction::Enemy)
@@ -114,10 +118,46 @@ void ASoulCharacterBase::UnPossessed()
 	Super::UnPossessed();
 }
 
-// Called when the game starts or when spawned
-void ASoulCharacterBase::BeginPlay()
+void ASoulCharacterBase::BindOnAttributesChanged()
 {
-	Super::BeginPlay();
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(USoulAttributeSet::GetHealthAttribute())
+		.AddUObject(this, &ASoulCharacterBase::HandleHealthChanged);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(USoulAttributeSet::GetPostureAttribute())
+		.AddUObject(this, &ASoulCharacterBase::HandlePostureChanged);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(USoulAttributeSet::GetLeechAttribute())
+		.AddUObject(this, &ASoulCharacterBase::HandleLeechChanged);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(USoulAttributeSet::GetAttackSpeedAttribute())
+		.AddUObject(this, &ASoulCharacterBase::HandleAttackSpeedChanged);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(USoulAttributeSet::GetMoveSpeedAttribute())
+		.AddUObject(this, &ASoulCharacterBase::HandleMoveSpeedChanged);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(USoulAttributeSet::GetPostureStrengthAttribute())
+		.AddUObject(this, &ASoulCharacterBase::HandlePostureStrengthChanged);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(USoulAttributeSet::GetDefensePowerAttribute())
+		.AddUObject(this, &ASoulCharacterBase::HandleDefensePowerChanged);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(USoulAttributeSet::GetAttackPowerAttribute())
+		.AddUObject(this, &ASoulCharacterBase::HandleAttackPowerChanged);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(USoulAttributeSet::GetPostureCrumbleAttribute())
+		.AddUObject(this, &ASoulCharacterBase::HandlePostureCrumbleChanged);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(USoulAttributeSet::GetCriticalStrikeAttribute())
+		.AddUObject(this, &ASoulCharacterBase::HandleCriticalStrikeChanged);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(USoulAttributeSet::GetCriticalMultiAttribute())
+		.AddUObject(this, &ASoulCharacterBase::HandleCriticalMultiChanged);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(USoulAttributeSet::GetMaxHealthAttribute())
+		.AddUObject(this, &ASoulCharacterBase::HandleHealthChanged);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(USoulAttributeSet::GetMaxPostureAttribute())
+		.AddUObject(this, &ASoulCharacterBase::HandlePostureChanged);
 }
 
 // Called every frame

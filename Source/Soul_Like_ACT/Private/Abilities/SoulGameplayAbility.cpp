@@ -76,6 +76,14 @@ TArray<FActiveGameplayEffectHandle> USoulGameplayAbility::ApplyEffectContainerSp
 	return AllEffects;
 }
 
+float USoulGameplayAbility::GetAttackSpeed() const
+{
+	ASoulCharacterBase *OwnerCharacter = Cast<ASoulCharacterBase>(GetOwningActorFromActorInfo());
+	if (OwnerCharacter)
+		return (OwnerCharacter->GetAttackSpeed() / 100.f + 1.f);
+	return 1.f;
+}
+
 TArray<FActiveGameplayEffectHandle> USoulGameplayAbility::ApplyEffectContainer(
 	FGameplayTag ContainerTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel)
 {
@@ -85,7 +93,15 @@ TArray<FActiveGameplayEffectHandle> USoulGameplayAbility::ApplyEffectContainer(
 
 void USoulModifierGameplayAbility::ApplyEffectsToSelf()
 {
-	K2_ApplyGameplayEffectSpecToTarget();
+	for (auto& LocalGE : ModifierEffects)
+	{
+		FActiveGameplayEffectHandle NewActivatedGE = USoulAbilitySystemComponent::ApplyGE_ToSelf(GetOwningActorFromActorInfo(), LocalGE, GetAbilityLevel());
+		
+		if (NewActivatedGE.IsValid())
+		{
+			EffectCollection.Add(NewActivatedGE);
+		}
+	}
 }
 
 void USoulModifierGameplayAbility::RemoveEffectsFromSelf()
@@ -94,7 +110,9 @@ void USoulModifierGameplayAbility::RemoveEffectsFromSelf()
 	{
 		if (LocalActiveEffect.WasSuccessfullyApplied())
 		{
-			LocalActiveEffect.RemoveFromGlobalMap();
+			//ApplyGameplayEffectToOwner()
+			LocalActiveEffect.GetOwningAbilitySystemComponent()->RemoveActiveGameplayEffect(LocalActiveEffect);
+			LOG_FUNC_NORMAL("1");
 		}
 	}
 }
