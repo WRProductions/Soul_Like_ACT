@@ -55,6 +55,14 @@ void ASoulCharacterBase::TriggerSlowMotion_WithDelay(float Delay)
 	}
 }
 
+void ASoulCharacterBase::HandleMoveSpeedChanged(const FOnAttributeChangeData& Data)
+{
+	GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed();
+
+	if (OnMoveSpeedChanged.IsBound())
+		OnMoveSpeedChanged.Broadcast(TArray<float>{GetMoveSpeed(), -1.f});
+}
+
 void ASoulCharacterBase::AddStartupGameplayAbilities()
 {
 	ModifierManager->AddStartupGameplayAbilities();

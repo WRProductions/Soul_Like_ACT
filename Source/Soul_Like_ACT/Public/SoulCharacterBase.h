@@ -138,11 +138,7 @@ public:
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(AttackPower);
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(PostureCrumble);
 	ATTRIBUTE_GETTER(MoveSpeed);
-	virtual void HandleMoveSpeedChanged(const FOnAttributeChangeData& Data) 
-	{ 
-		if(OnMoveSpeedChanged.IsBound()) 
-			OnMoveSpeedChanged.Broadcast(TArray<float>{GetMoveSpeed(), -1.f}); 
-	}
+	virtual void HandleMoveSpeedChanged(const FOnAttributeChangeData& Data);
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(AttackSpeed);
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(CriticalStrike);
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(CriticalMulti);
