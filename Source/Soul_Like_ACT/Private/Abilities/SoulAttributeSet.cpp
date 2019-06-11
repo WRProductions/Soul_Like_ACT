@@ -125,7 +125,9 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		 * Data.EffectSpec == FGameplayEffectSpec
 		 * Data.EffectSpec.DynamicAssetTags
 		 */ 
-		bool bIsCritic = Data.EffectSpec.DynamicAssetTags.HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Event.Montage.Shared.Critical" }, true));
+		bool bIsCritic = Data.EffectSpec.DynamicAssetTags.HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Damage.Critical" }, true));
+
+		bool bIsStun = Data.EffectSpec.DynamicAssetTags.HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Damage.Critical" }, true));
 
 		// Store a local copy of the amount of damage done and clear the damage attribute
 		const float LocalDamageDone = GetDamage();
@@ -140,7 +142,7 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			if (TargetCharacter)
 			{
 				// This is proper damage
-				TargetCharacter->HandleDamage(LocalDamageDone, bIsCritic, HitResult, SourceTags, SourceCharacter, SourceActor);
+				TargetCharacter->HandleDamage(LocalDamageDone, bIsCritic, bIsStun, HitResult, SourceTags, SourceCharacter, SourceActor);
 			}
 		}
 	}

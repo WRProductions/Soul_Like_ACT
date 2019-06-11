@@ -12,6 +12,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChanged, const TArray<float> &, values);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTrigger_OnMeleeAttack, AActor*, SourceActor, AActor*, TargetActor);
+
 UENUM(BlueprintType)
 enum class EIsControllerValid : uint8
 {
@@ -128,6 +130,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TriggerSlowMotion_WithDelay(float Delay);
 
+	void Notify_OnMeleeAttack(AActor * TargetActor)
+	{
+		if (OnMeleeAttack.IsBound())
+			OnMeleeAttack.Broadcast(this, TargetActor);
+	}
+
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_TwoParams(Health);
 	ATTRIBUTE_GETTER(MaxHealth);
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_TwoParams(Posture);
@@ -165,7 +173,7 @@ protected:
 	 * @param DamageCauser The actual actor that did the damage, might be a weapon or projectile
 	 */
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnDamaged(float DamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+	void OnDamaged(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 
 	/**
 	*Called when character takes posture damage
@@ -196,8 +204,11 @@ protected:
 	UPROPERTY(BlueprintAssignable)
 	FOnChanged OnCriticalMultiChanged;
 
+	UPROPERTY(BlueprintAssignable)
+	FTrigger_OnMeleeAttack OnMeleeAttack;
+
 	// Called from RPGAttributeSet, these call BP events above
-	virtual void HandleDamage(float DamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+	virtual void HandleDamage(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 	virtual void HandlePostureDamage(float PostureDamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 
 	UFUNCTION(BlueprintNativeEvent)

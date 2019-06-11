@@ -25,8 +25,12 @@ public:
 	int32 GetDefaultAbilityLevel() const;
 
 	/** Version of function in AbilitySystemGlobals that returns correct type */
+	UFUNCTION(BlueprintCallable)
 	static USoulAbilitySystemComponent* GetAbilitySystemComponentFromActor(const AActor* Actor, bool LookForComponent = false);
 
 	UFUNCTION(BlueprintCallable)
 	static FActiveGameplayEffectHandle ApplyGE_ToSelf(const AActor* Actor, const TSubclassOf<UGameplayEffect> GameplayEffect, const int32 AbilityLevel);
+
+	UFUNCTION(BlueprintCallable)
+	static FActiveGameplayEffectHandle ApplyGE_ToTarget(const AActor* FromActor, const AActor* TargetActor, const TSubclassOf<UGameplayEffect> GameplayEffect, const int32 AbilityLevel);
 };
