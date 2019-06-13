@@ -127,7 +127,7 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		 */ 
 		bool bIsCritic = Data.EffectSpec.DynamicAssetTags.HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Damage.Critical" }, true));
 
-		bool bIsStun = Data.EffectSpec.DynamicAssetTags.HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Damage.Critical" }, true));
+		bool bIsStun = Data.EffectSpec.DynamicAssetTags.HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Damage.Stun" }, true));
 
 		// Store a local copy of the amount of damage done and clear the damage attribute
 		const float LocalDamageDone = GetDamage();
@@ -141,8 +141,17 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 
 			if (TargetCharacter)
 			{
-				// This is proper damage
-				TargetCharacter->HandleDamage(LocalDamageDone, bIsCritic, bIsStun, HitResult, SourceTags, SourceCharacter, SourceActor);
+				FGameplayTagContainer LocalContainer;
+				Data.EffectSpec.GetAllAssetTags(LocalContainer);
+
+				if (LocalContainer.HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Damage.Dot" }, true)))
+				{
+					TargetCharacter->HandleDotDamage(LocalDamageDone, bIsCritic, bIsStun, HitResult, SourceTags, SourceCharacter, SourceActor);
+				}
+				else
+				{
+					TargetCharacter->HandleDamage(LocalDamageDone, bIsCritic, bIsStun, HitResult, SourceTags, SourceCharacter, SourceActor);
+				}
 			}
 		}
 	}

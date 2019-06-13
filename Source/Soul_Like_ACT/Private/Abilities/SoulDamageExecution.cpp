@@ -142,7 +142,9 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 		//Passed the critical tag to the gameplay effect spec
 		//We shall see that when the change of the Damage is passed to the target's AttriuteSet
 
-		(Cast<ASoulCharacterBase>(SourceActor))->Notify_OnMeleeAttack(TargetActor);
+		Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Damage.Stun" }, true));
+
+		(Cast<ASoulCharacterBase>(SourceActor))->Notify_OnMeleeAttack(TargetActor, *(Spec->GetContext().GetHitResult()));
 
 		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().DamageProperty, EGameplayModOp::Additive, DamageDone));
 		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().PostureDamageProperty, EGameplayModOp::Additive, PostureDamageDone));
@@ -184,7 +186,6 @@ void USoulDotDamageExecution::Execute_Implementation(const FGameplayEffectCustom
 
 	if (DamageDone >= 0.f)
 	{
-		Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Damage.Stun" }, true));
 		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().DamageProperty, EGameplayModOp::Additive, DamageDone));
 	}
 }

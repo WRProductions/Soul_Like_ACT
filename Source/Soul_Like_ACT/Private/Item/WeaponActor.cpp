@@ -3,7 +3,6 @@
 #include "Item/WeaponActor.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Types/DamageTypes.h"
 #include "Abilities/SoulAbilitySysBPLib.h"
 #include "SoulCharacterBase.h"
 #include "DrawDebugHelpers.h"

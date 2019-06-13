@@ -9,7 +9,6 @@
 #include "UObject/ConstructorHelpers.h"
 #include "ActorFXManager.h"
 #include "Components/WidgetComponent.h"
-#include "Types/DamageTypes.h"
 
 // Sets default values
 AMobBasic::AMobBasic()

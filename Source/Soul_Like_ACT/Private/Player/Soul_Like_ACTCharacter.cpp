@@ -16,7 +16,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "GameFramework/Controller.h"
-#include "Types/DamageTypes.h"
 #include "GameFramework/SpringArmComponent.h"
 
 const float ASoul_Like_ACTCharacter::BattleMovementScale{ 1.f };

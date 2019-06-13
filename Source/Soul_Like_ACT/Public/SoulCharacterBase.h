@@ -12,7 +12,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChanged, const TArray<float> &, values);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTrigger_OnMeleeAttack, AActor*, SourceActor, AActor*, TargetActor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FTrigger_OnMeleeAttack, AActor*, SourceActor, AActor*, TargetActor, const FHitResult, HitResult);
 
 UENUM(BlueprintType)
 enum class EIsControllerValid : uint8
@@ -86,6 +86,10 @@ protected:
 	UPROPERTY()
 		USoulAttributeSet* AttributeSet;
 
+	bool bIsDead;
+
+	UAnimMontage* DeathMontage;
+
 	FTimerHandle Handle_SlowMotion, Handler_SlowMotionDelay;
 
 	void WaitForDilationReset()
@@ -113,8 +117,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EActorFaction Faction;
 
-//Static
-public:
 	static const bool IsInRivalFaction(ASoulCharacterBase *DamageDealer, ASoulCharacterBase *DamageReceiver);
 
 	UFUNCTION(BlueprintCallable)
@@ -130,10 +132,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TriggerSlowMotion_WithDelay(float Delay);
 
-	void Notify_OnMeleeAttack(AActor * TargetActor)
+	void Notify_OnMeleeAttack(AActor * TargetActor, const FHitResult HitResult)
 	{
 		if (OnMeleeAttack.IsBound())
-			OnMeleeAttack.Broadcast(this, TargetActor);
+			OnMeleeAttack.Broadcast(this, TargetActor, HitResult);
 	}
 
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_TwoParams(Health);
@@ -175,6 +177,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnDamaged(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnDotDamaged(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+
 	/**
 	*Called when character takes posture damage
 	*/
@@ -209,6 +214,8 @@ protected:
 
 	// Called from RPGAttributeSet, these call BP events above
 	virtual void HandleDamage(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+	virtual void HandleDotDamage(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+
 	virtual void HandlePostureDamage(float PostureDamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 
 	UFUNCTION(BlueprintNativeEvent)
@@ -216,6 +223,8 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void ResetPerilousStatus();
+
+	virtual void HandleOnDead();
 
 public:
 	

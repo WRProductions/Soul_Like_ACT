@@ -73,6 +73,11 @@ void ASoulCharacterBase::HandleDamage(float DamageAmount, const bool IsCriticale
 	OnDamaged(DamageAmount, IsCriticaled, bIsStun, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
 }
 
+void ASoulCharacterBase::HandleDotDamage(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
+{
+	OnDotDamaged(DamageAmount, IsCriticaled, bIsStun, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
+}
+
 void ASoulCharacterBase::HandlePostureDamage(float PostureDamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
 {
 	OnPostureDamaged(PostureDamageAmount, IsCriticaled, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
@@ -81,6 +86,14 @@ void ASoulCharacterBase::HandlePostureDamage(float PostureDamageAmount, const bo
 void ASoulCharacterBase::ResetPerilousStatus()
 {
 	LOG_FUNC_FAIL();
+}
+
+void ASoulCharacterBase::HandleOnDead()
+{
+	GetCapsuleComponent()->SetActive(false);
+	GetMesh()->SetEnableBodyGravity(false);
+
+	
 }
 
 void ASoulCharacterBase::MakeStepDecelAndSound_Notify(ASoulCharacterBase *CharacterRef)
