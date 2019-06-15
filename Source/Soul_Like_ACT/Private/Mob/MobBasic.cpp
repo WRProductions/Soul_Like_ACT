@@ -36,54 +36,36 @@ void AMobBasic::BeginPlay()
 
 
 
-void AMobBasic::OnDeath_Implementation(int32 CurrHealth, int32 MaxHealth)
+void AMobBasic::HandleOnDead()
 {
-	if (CurrHealth <= 0.f)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, GetName() + " is dead");
+	Super::HandleOnDead();
 
-		//Remove Collision
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
-
-		AController *LocalController = GetController();
-		if (LocalController)
-			LocalController->UnPossess();
-
-		GetTargetingComponent()->FacingTarget_End();
-
-		Faction = EActorFaction::Untargetable;
-
-		StopAnimMontage(GetMesh()->GetAnimInstance()->GetCurrentActiveMontage());
-
-		ToggleLockIcon(0);
-	}
+	MobOnDead();
 }
 
-// Called every frame
-void AMobBasic::Tick(float DeltaTime)
+void AMobBasic::MobOnDead_Implementation()
 {
-	Super::Tick(DeltaTime);
+	//Remove Collision
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-}
+	AController *LocalController = GetController();
+		
+	if (LocalController)
+		LocalController->UnPossess();
 
-// Called to bind functionality to input
-void AMobBasic::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	GetTargetingComponent()->FacingTarget_End();
 
+	Faction = EActorFaction::Untargetable;
+
+	StopAnimMontage(GetMesh()->GetAnimInstance()->GetCurrentActiveMontage());
+
+	ToggleLockIcon(0);
 }
 
 void AMobBasic::SetTarget(AActor *PlayerPawn) const
 {
 	TargetingComponent->SetTarget(PlayerPawn);
-}
-
-bool AMobBasic::GetIsStun()
-{
-	//TODO
-	//If Stuned, cannnot facing player
-	return 0;
 }
 
 void AMobBasic::SetFocus(bool InputMode, AActor * Target)

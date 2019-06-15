@@ -159,6 +159,12 @@ public:
 	/** Returns the character level that is passed to the ability system */
 	UFUNCTION(BlueprintCallable)
 	virtual int32 GetCharacterLevel() const { return 1; }
+	
+	UFUNCTION(BlueprintCallable)
+	bool GetIsDead() const { return bIsDead; }
+
+	UFUNCTION(BlueprintCallable)
+		bool GetIsHealthZero() const { return GetHealth() <= 0.f; }
 
 protected:
 	/** Apply the startup GAs and GEs */
@@ -224,10 +230,10 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void ResetPerilousStatus();
 
+	UFUNCTION(BlueprintCallable)
 	virtual void HandleOnDead();
 
 public:
-	
 	UFUNCTION(BlueprintCallable)
 	static void TagContainerToString(const FGameplayTagContainer &Container, FString &Outp)
 	{

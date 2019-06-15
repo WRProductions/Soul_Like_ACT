@@ -32,20 +32,13 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void OnDeath(int32 CurrHealth, int32 MaxHealth);
+	UFUNCTION(BlueprintNativeEvent)
+	void MobOnDead();
+
+	virtual void HandleOnDead() override;
 
 public:	
-
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	void SetTarget(AActor *PlayerPawn) const;
-
-	bool GetIsStun();
 
 	UMob_TargetingComponent *GetTargetingComponent() const { return TargetingComponent; }
 

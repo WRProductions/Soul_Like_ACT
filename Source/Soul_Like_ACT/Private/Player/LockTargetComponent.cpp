@@ -13,34 +13,38 @@
 #include "Components/CapsuleComponent.h"
 
 
-// Sets default values for this component's properties
 ULockTargetComponent::ULockTargetComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	PrimaryComponentTick.TickInterval = 0.f;
 }
 
-
-// Called when the game starts
 void ULockTargetComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
 	PlayerRef = Cast<ACharacter>(GetOwner());
 	check(PlayerRef);
-
 }
 
-
-// Called every frame
 void ULockTargetComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	Tick_UpdateRotation();
+
+	if (bIsFacingOffsetEnabled && !bIsTargetingEnabled)
+	{
+		FacingOffsetDelta = FMath::Clamp(FacingOffsetDelta + DeltaTime * 5.f, 0.f, 1.f);
+		FRotator IdleRotation = FMath::Lerp(FRotator(0.f, FacingOffset_CurrentRotationYaw, 0.f), FRotator(0.f, FacingOffset_ForwardRotationYaw, 0.f), FacingOffsetDelta);
+		
+		GetOwner()->SetActorRotation(IdleRotation);
+
+		if (FacingOffsetDelta == 1.f)
+			bIsFacingOffsetEnabled = false;
+	}
 }
 
 
@@ -58,6 +62,19 @@ void ULockTargetComponent::ToggleCameraLock(bool FreeCamera)
 }
 
 
+void ULockTargetComponent::ForceUsingFacingOffset(bool bHaveTarget)
+{
+	//It's been used to fix the rotation at any combo conjunction
+	//when bIsTargetingEnabled is enabled.
+	if (!bHaveTarget)
+	{
+		//Get the forward rotation according to playercontroller
+		FacingOffset_ForwardRotationYaw = GetOwner()->GetInstigatorController()->GetControlRotation().Yaw;
+		FacingOffset_CurrentRotationYaw = GetOwner()->GetActorRotation().Yaw;
+		bIsFacingOffsetEnabled = true;
+		FacingOffsetDelta = 0.f;
+	}
+}
 
 void ULockTargetComponent::InitComponent(class UArrowComponent *ArrowComponentRef)
 {
@@ -67,15 +84,6 @@ void ULockTargetComponent::InitComponent(class UArrowComponent *ArrowComponentRe
 	check(PlayerArrow);
 
 	PlayerArrow->SetVisibility(0);
-}
-
-
-bool ULockTargetComponent::SetForceFacingOffset(bool Inp)
-{
-	if (bIsTargetingEnabled)
-		bForcedFacingOffset = Inp;
-	
-	return Inp;
 }
 
 void ULockTargetComponent::FindTarget(ETargetFindingDirection Direction /*= ETargetFindingDirection::Centre*/)
@@ -98,7 +106,6 @@ void ULockTargetComponent::FindTarget(ETargetFindingDirection Direction /*= ETar
 	if (SelectedActor)
 		EnableLockingTarget();
 }
-
 
 void ULockTargetComponent::GetPotentialTargetsInScreen(TArray<AActor *> &OutPotentialTargets)
 {
@@ -127,7 +134,6 @@ void ULockTargetComponent::GetPotentialTargetsInScreen(TArray<AActor *> &OutPote
 	}
 }
 
-
 void ULockTargetComponent::RuleOutBlockedTargets(TArray<AActor *> LocalPotentialTargets, TArray<AActor *> &OutPotentialTargets)
 {
 	for (auto *TargetableActor : LocalPotentialTargets)
@@ -136,7 +142,6 @@ void ULockTargetComponent::RuleOutBlockedTargets(TArray<AActor *> LocalPotential
 			OutPotentialTargets.Add(TargetableActor);
 	}
 }
-
 
 void ULockTargetComponent::FindClosestTargetInScreen(TArray<AActor *> &LocalPotentialTargets, AActor *&ClosestTarget)
 {
@@ -169,7 +174,6 @@ void ULockTargetComponent::FindClosestTargetInScreen(TArray<AActor *> &LocalPote
 		//UE_LOG(LogTemp, Warning, TEXT("Target Position on Screen: %s, Screen Centre Vec: %s"), *TargetScreenPosition.ToString(), *ScreenCentre.ToString());
 	}
 }
-
 
 void ULockTargetComponent::Find_InDirection(TArray<AActor *> &LocalPotentialTargets, AActor *&ClosestTarget, ETargetFindingDirection Direction)
 {
@@ -224,7 +228,6 @@ void ULockTargetComponent::Find_InDirection(TArray<AActor *> &LocalPotentialTarg
 	}
 }
 
-
 void ULockTargetComponent::EnableLockingTarget()
 {
 	bIsTargetingEnabled = 1;
@@ -258,14 +261,12 @@ void ULockTargetComponent::SetRotationMode_FaceTarget()
 	PlayerRef->GetCharacterMovement()->bUseControllerDesiredRotation = 0;
 }
 
-
 void ULockTargetComponent::CacheRotationSetting()
 {
 	bOwnerControllerRotationYaw = PlayerRef->bUseControllerRotationYaw;
 	bOwnerOrientRotToMovement = PlayerRef->GetCharacterMovement()->bOrientRotationToMovement;
 	bOwnerControllerDesiredRot = PlayerRef->GetCharacterMovement()->bUseControllerDesiredRotation;
 }
-
 
 void ULockTargetComponent::ResetRotationSetting()
 {
@@ -308,14 +309,12 @@ bool ULockTargetComponent::IsTraceBlocked(AActor *SelectedTarget, TArray<AActor*
 	return false;
 }
 
-
 FVector ULockTargetComponent::GetLineTraceStartLocation()
 {
 	return (GetOwner()->GetActorLocation()
 		+ GetOwner()->GetActorForwardVector() * 10.f
 		+ GetOwner()->GetActorUpVector() * 100.f);
 }
-
 
 void ULockTargetComponent::Timer_CheckBlockingAndDistance()
 {
@@ -347,16 +346,19 @@ void ULockTargetComponent::Timer_CheckBlockingAndDistance()
 	}
 }
 
-
 void ULockTargetComponent::Tick_UpdateRotation()
 {
-	if (!bIsTargetingEnabled) return;
+	if (!bIsTargetingEnabled || Cast<ASoulCharacterBase>(SelectedActor)->GetIsDead())
+	{
+		bIsTargetingEnabled = false;
+		return;
+	}
 
 	//Set Arrow Rotation
 	if (PlayerArrow)
 	{
 		FRotator SlerpedRotation = GetOwner()->GetInstigatorController()->GetControlRotation();
-		PlayerArrow->SetWorldRotation(FRotator{ 0.f, SlerpedRotation.Yaw, 0.f });
+		PlayerArrow->SetWorldRotation(SlerpedRotation);
 	}
 
 	//Set Capsule Component rotation to face the target

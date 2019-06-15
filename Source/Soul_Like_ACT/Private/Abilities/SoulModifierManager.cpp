@@ -87,20 +87,6 @@ void USoulModifierManager::AddStartupGameplayAbilities()
 			GetOwnerGameplayAbilityComponent()->TryActivateAbility(LocalGrantedMod, true);
 		}
 	}
-// Now apply passives
-// 		for (auto& GameplayEffect : PassiveGameplayEffects)
-// 		{
-// 			if (!GameplayEffect.Key) continue;
-// 
-// 			FGameplayEffectContextHandle EffectContext = PlayerRef->GetAbilitySystemComponent()->MakeEffectContext();
-// 			EffectContext.AddSourceObject(PlayerRef);
-// 
-// 			FGameplayEffectSpecHandle NewHandle = PlayerRef->GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffect.Key, GameplayEffect.Value, EffectContext);
-// 			if (NewHandle.IsValid())
-// 			{
-// 				FActiveGameplayEffectHandle ActiveGEHandle = PlayerRef->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), PlayerRef->GetAbilitySystemComponent());
-// 			}
-// 		}
 
 	bAbilitiesInitialized = true;
 }

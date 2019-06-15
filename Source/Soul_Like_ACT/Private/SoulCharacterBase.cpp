@@ -90,10 +90,7 @@ void ASoulCharacterBase::ResetPerilousStatus()
 
 void ASoulCharacterBase::HandleOnDead()
 {
-	GetCapsuleComponent()->SetActive(false);
-	GetMesh()->SetEnableBodyGravity(false);
-
-	
+	bIsDead = true;
 }
 
 void ASoulCharacterBase::MakeStepDecelAndSound_Notify(ASoulCharacterBase *CharacterRef)

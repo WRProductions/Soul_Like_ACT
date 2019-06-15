@@ -23,11 +23,15 @@ protected:
 	FTimerHandle TargetBlockingHandler;
 
 	bool bFreeCamera;
-	bool bForcedFacingOffset;
 
-	bool bOwnerControllerRotationYaw = 0
-		, bOwnerOrientRotToMovement = 1
-		, bOwnerControllerDesiredRot = 0;
+	bool bIsFacingOffsetEnabled;
+	float FacingOffsetDelta;
+	float FacingOffset_ForwardRotationYaw;
+	float FacingOffset_CurrentRotationYaw;
+
+	bool bOwnerControllerRotationYaw = false
+		, bOwnerOrientRotToMovement = true
+		, bOwnerControllerDesiredRot = false;
 
 	TArray<AActor*> PotentialTargetActors;
 
@@ -40,6 +44,7 @@ public:
 
 	class AActor *SelectedActor;
 
+	UPROPERTY(BlueprintReadOnly)
 	bool bIsTargetingEnabled;
 
 protected:
@@ -75,16 +80,15 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-		void ToggleCameraLock(bool FreeCamera);
+	void ToggleCameraLock(bool FreeCamera);
 
 	UFUNCTION(BlueprintCallable)
-		void Toggle_InDirection(ETargetFindingDirection Direction) { FindTarget(Direction); }
+	void Toggle_InDirection(ETargetFindingDirection Direction) { FindTarget(Direction); }
+
+	UFUNCTION(BlueprintCallable)
+	void ForceUsingFacingOffset(bool bHaveTarget);
 
 	void InitComponent(class UArrowComponent *ArrowComponentRef);
 
 	bool GetIsTargetingEnabled() { return bIsTargetingEnabled; }
-
-	UFUNCTION(BlueprintCallable)
-	bool SetForceFacingOffset(bool Inp);
-
 };
