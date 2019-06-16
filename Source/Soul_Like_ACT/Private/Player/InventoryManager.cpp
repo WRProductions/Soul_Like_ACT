@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "InventoryManager.h"
-#include "GameFramework/Character.h"
+#include "Player/Soul_Like_ACTCharacter.h"
+#include "Abilities/SoulModifierManager.h"
 #include "Engine/World.h"
 #include "SoulSaveGame.h"
 #include "SoulGameInstanceBase.h"
@@ -107,6 +108,12 @@ bool UInventoryManager::AddEquipment(FSoulInventSlot InventorySlot)
 	{
 		if (GetEquipSlot(InventData.ItemBase->ItemSlotType, EquipSlot))
 		{
+			USoulModifierManager* MyModiferManager = USoulModifierManager::GetSoulModifierManger(GetOwner());
+
+			//remove the current GA
+ 			if (MyModiferManager)
+ 				MyModiferManager->UpdateModifierToPlayer(EquipedItems[EquipSlot], false);
+
 			SetItemSlot(EquipedItems[EquipSlot], InventorySlot);
 
 			InventoryToEquipment(InventData, EquipSlot);
@@ -130,6 +137,12 @@ bool UInventoryManager::RemoveEquipment(FSoulEquipmentSlot FromEquipSlot)
 	
 	if (GetEquipItemData(FromEquipSlot, OldData))
 	{
+		USoulModifierManager* MyModiferManager = USoulModifierManager::GetSoulModifierManger(GetOwner());
+
+ 		//remove the current GA
+ 		if (MyModiferManager)
+			MyModiferManager->UpdateModifierToPlayer(OldData, false);
+
 		EquipedItems[FromEquipSlot] = FSoulItemData();
 		NotifyEquipmentChanged(FromEquipSlot, EquipedItems[FromEquipSlot]);
 
@@ -138,7 +151,7 @@ bool UInventoryManager::RemoveEquipment(FSoulEquipmentSlot FromEquipSlot)
 	}
 	else
 	{
-		LOG_FUNC_ERROR(GETENUMSTRING("EGearType", FromEquipSlot.SlotType));
+		LOG_FUNC_ERROR(FindObject<UEnum>(ANY_PACKAGE, TEXT("UGearType"), true)->GetNameStringByIndex((int32)FromEquipSlot.SlotType));
 		return false;
 	}
 }
@@ -328,7 +341,11 @@ bool UInventoryManager::InventoryToEquipment(FSoulItemData FromItem, FSoulEquipm
 
 			NotifyEquipmentChanged(MyEquipSlot, FromItem);
 
-			//TODO: update GA
+			USoulModifierManager* MyModiferManager = USoulModifierManager::GetSoulModifierManger(GetOwner());
+			
+			if (MyModiferManager)
+				MyModiferManager->UpdateModifierToPlayer(EquipedItems[MyEquipSlot], true);
+			
 			return true;
 		}
 	}

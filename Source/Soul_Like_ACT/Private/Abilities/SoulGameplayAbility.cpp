@@ -38,8 +38,14 @@ FSoulGameplayEffectContainerSpec USoulGameplayAbility::MakeEffectContainerSpecFr
 		// Build GameplayEffectSpecs for each applied effect
 		for (const TSubclassOf<UGameplayEffect>& EffectClass : Container.TargetGameplayEffectClasses)
 		{
+
+			FGameplayEffectSpecHandle newGEHandle = MakeOutgoingGameplayEffectSpec(EffectClass, OverrideGameplayLevel);
+			
+			newGEHandle.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Damage.Type.Physical"), true), EventData.EventMagnitude);
+			newGEHandle.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Damage.Type.Posture"), true), EventData.EventMagnitude);
+			
 			ReturnSpec.TargetGameplayEffectSpecs.
-			           Add(MakeOutgoingGameplayEffectSpec(EffectClass, OverrideGameplayLevel));
+			           Add(newGEHandle);
 		}
 	}
 	return ReturnSpec;
@@ -70,9 +76,43 @@ TArray<FActiveGameplayEffectHandle> USoulGameplayAbility::ApplyEffectContainerSp
 	return AllEffects;
 }
 
+float USoulGameplayAbility::GetAttackSpeed() const
+{
+	ASoulCharacterBase *OwnerCharacter = Cast<ASoulCharacterBase>(GetOwningActorFromActorInfo());
+	if (OwnerCharacter)
+		return (OwnerCharacter->GetAttackSpeed() / 100.f + 1.f);
+	return 1.f;
+}
+
 TArray<FActiveGameplayEffectHandle> USoulGameplayAbility::ApplyEffectContainer(
 	FGameplayTag ContainerTag, const FGameplayEventData& EventData, int32 OverrideGameplayLevel)
 {
 	FSoulGameplayEffectContainerSpec Spec = MakeEffectContainerSpec(ContainerTag, EventData, OverrideGameplayLevel);
 	return ApplyEffectContainerSpec(Spec);
+}
+
+void USoulModifierGameplayAbility::ApplyEffectsToSelf()
+{
+	for (auto& LocalGE : ModifierEffects)
+	{
+		FActiveGameplayEffectHandle NewActivatedGE = USoulAbilitySystemComponent::ApplyGE_ToSelf(GetOwningActorFromActorInfo(), LocalGE, GetAbilityLevel());
+		
+		if (NewActivatedGE.IsValid())
+		{
+			EffectCollection.Add(NewActivatedGE);
+		}
+	}
+}
+
+void USoulModifierGameplayAbility::RemoveEffectsFromSelf()
+{
+	for (FActiveGameplayEffectHandle& LocalActiveEffect : EffectCollection)
+	{
+		if (LocalActiveEffect.WasSuccessfullyApplied())
+		{
+			//ApplyGameplayEffectToOwner()
+			LocalActiveEffect.GetOwningAbilitySystemComponent()->RemoveActiveGameplayEffect(LocalActiveEffect);
+			LOG_FUNC_NORMAL("1");
+		}
+	}
 }

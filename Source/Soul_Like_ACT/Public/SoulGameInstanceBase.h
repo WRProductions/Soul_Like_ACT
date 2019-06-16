@@ -61,7 +61,7 @@ public:
 
 	/** Spawn Floating Damage Widget on screen */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = UI)
-	void SpawnFloatingDamageTextWidget(const AActor* DamageReceiver, const float DamageInput);
+	void SpawnFloatingDamageTextWidget(const AActor* DamageReceiver, const float DamageInput, bool bIsCritical = false);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void AsyncLoadingSaveGame();

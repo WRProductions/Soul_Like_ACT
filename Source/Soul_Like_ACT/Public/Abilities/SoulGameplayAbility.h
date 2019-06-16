@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Soul_Like_ACT.h"
 #include "GameplayAbility.h"
 #include "Abilities/SoulAbilityTypes.h"
 #include "GameplayTagContainer.h"
@@ -13,7 +13,7 @@
  * This class uses GameplayEffectContainers to allow easier execution of gameplay effects based on a triggering tag
  * Most games will need to implement a subclass to support their game-specific code
  */
-UCLASS()
+UCLASS(Abstract)
 	class SOUL_LIKE_ACT_API USoulGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
@@ -23,6 +23,9 @@ public:
 	USoulGameplayAbility()
 	{
 	}
+
+	UFUNCTION(BlueprintCallable)
+	float GetAttackSpeed() const;
 
 	/** Map of gameplay tags to gameplay effect containers */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = GameplayEffects)
@@ -53,6 +56,18 @@ protected:
 		const FSoulGameplayEffectContainerSpec& ContainerSpec);
 };
 
+UCLASS(Abstract)
+class SOUL_LIKE_ACT_API USoulActiveAbility: public UGameplayAbility
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, VisibleAnywhere, Category = Default)
+	UAnimMontage* MontageToPlay;
+
+	USoulAbilityTask_PlayMontageAndWaitForEvent
+}
+
 
 /**
  * Subclass of ability blueprint type with game-specific data
@@ -60,12 +75,9 @@ protected:
  * Most games will need to implement a subclass to support their game-specific code
  */
 UCLASS()
-	class SOUL_LIKE_ACT_API USoulModifierGameplayAbility : public UGameplayAbility
+	class SOUL_LIKE_ACT_API USoulModifierGameplayAbility : public USoulGameplayAbility
 {
 	GENERATED_BODY()
-
-protected:
-
 
 public:
 	USoulModifierGameplayAbility()
@@ -76,11 +88,20 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
 	FText DisplayName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
-	TArray<UGameplayEffect*> EffectCollection;
+	int32 MaxLevel;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Default)
+	TArray<TSubclassOf<UGameplayEffect>> ModifierEffects;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
+	TArray<FActiveGameplayEffectHandle> EffectCollection;
+
+	UFUNCTION(BlueprintCallable, Category = ModifierAbility)
+	void ApplyEffectsToSelf();
+	UFUNCTION(BlueprintCallable, Category = ModifierAbility)
+	void RemoveEffectsFromSelf();
 };
 
 UCLASS()
-	class USoulPrimaryStatusGameplayAbility : public USoulModifierGameplayAbility
+class USoulPrimaryStatusGameplayAbility : public USoulModifierGameplayAbility
 {
 	GENERATED_BODY()
 

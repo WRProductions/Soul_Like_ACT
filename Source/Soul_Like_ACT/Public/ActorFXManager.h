@@ -22,22 +22,29 @@ class SOUL_LIKE_ACT_API UActorFXManager : public UActorComponent
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = DataAsset)
-	class UDA_FXCollection *FXCollection;
-
 public:	
 	// Sets default values for this component's properties
 	UActorFXManager();
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-	void SpawnParticleWithHitResult(const FHitResult &HitResult, UParticleSystem *ParticleClass);
 	
-	void SpawnSoundWithHitResult(const FHitResult &HitResult, USoundBase *SoundCue);
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
+		TArray<USoundBase*> OnHitSounds;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
+		TArray<USoundBase*> OnBlockSounds;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
+		TArray<USoundBase*> OnParrySounds;
 
-public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Visual)
+		TArray<UParticleSystem*> OnHitParticles;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Visual)
+		TArray<UParticleSystem*> OnBlockParticles;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Visual)
+		TArray<UParticleSystem*> OnParryParticles;
+
+	UFUNCTION(BlueprintCallable)
+	void SpawnParticleWithHitResult(const FHitResult& HitResult, UParticleSystem* ParticleClass);
+
+	UFUNCTION(BlueprintCallable)
+	void SpawnSoundWithHitResult(const FHitResult& HitResult, USoundBase* SoundCue);
 
 	UFUNCTION(BlueprintCallable)
 	bool PlayEffects(const FHitResult &HitResult, const EFXType InputType);

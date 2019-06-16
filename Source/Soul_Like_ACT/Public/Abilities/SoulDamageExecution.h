@@ -19,3 +19,15 @@ public:
 
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, OUT FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
 };
+
+UCLASS()
+class SOUL_LIKE_ACT_API USoulDotDamageExecution : public UGameplayEffectExecutionCalculation
+{
+	GENERATED_BODY()
+
+public:
+	USoulDotDamageExecution();
+
+	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, OUT FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
+};
+

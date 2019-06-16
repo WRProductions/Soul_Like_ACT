@@ -36,25 +36,38 @@ int32 USoulAbilitySystemComponent::GetDefaultAbilityLevel() const
 	return 1;
 }
 
+bool USoulAbilitySystemComponent::TryActivateAbility_Soul(FGameplayAbilitySpecHandle AbilityToActivate, bool bAllowRemoteActivation)
+{
+	return TryActivateAbility(AbilityToActivate, bAllowRemoteActivation);
+}
+
 USoulAbilitySystemComponent * USoulAbilitySystemComponent::GetAbilitySystemComponentFromActor(const AActor * Actor, bool LookForComponent)
 {
 	return Cast<USoulAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Actor, LookForComponent));
 
 }
 
-void USoulAbilitySystemComponent::ApplyGE_ToSelf(const AActor* Actor, const TSubclassOf<UGameplayEffect> GameplayEffect, const int32 AbilityLevel = 1/*=1*/)
+FActiveGameplayEffectHandle USoulAbilitySystemComponent::ApplyGE_ToSelf(const AActor* Actor, const TSubclassOf<UGameplayEffect> GameplayEffect, const int32 AbilityLevel = 1/*=1*/)
 {
+	return ApplyGE_ToTarget(Actor, Actor, GameplayEffect, AbilityLevel);
+}
 
-	USoulAbilitySystemComponent *TempComp = GetAbilitySystemComponentFromActor(Actor);
+FActiveGameplayEffectHandle USoulAbilitySystemComponent::ApplyGE_ToTarget(const AActor* FromActor, const AActor* TargetActor, const TSubclassOf<UGameplayEffect> GameplayEffect, const int32 AbilityLevel)
+{
+	USoulAbilitySystemComponent* TempComp = GetAbilitySystemComponentFromActor(TargetActor);
 	if (TempComp)
 	{
 		FGameplayEffectContextHandle EffectContext = TempComp->MakeEffectContext();
-		EffectContext.AddSourceObject(Actor);
+
+		EffectContext.AddSourceObject(FromActor);
 
 		FGameplayEffectSpecHandle NewHandle = TempComp->MakeOutgoingSpec(GameplayEffect, AbilityLevel, EffectContext);
+
 		if (NewHandle.IsValid())
 		{
-			FActiveGameplayEffectHandle ActiveGEHandle = TempComp->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), TempComp);
+			return (TempComp->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), TempComp));
 		}
 	}
+
+	return FActiveGameplayEffectHandle();
 }

@@ -2,6 +2,7 @@
 
 #include "SoulDamageExecution.h"
 #include "Abilities/SoulAttributeSet.h"
+#include "SoulCharacterBase.h"
 #include "AbilitySystemComponent.h"
 
 struct SoulDamageStatics
@@ -51,14 +52,20 @@ static const SoulDamageStatics& DamageStatics()
 USoulDamageExecution::USoulDamageExecution()
 {
 	RelevantAttributesToCapture.Add(DamageStatics().PostureStrengthDef);
-
 	RelevantAttributesToCapture.Add(DamageStatics().DamageDef);
+
 	RelevantAttributesToCapture.Add(DamageStatics().AttackPowerDef);
 	RelevantAttributesToCapture.Add(DamageStatics().CriticalStrikeDef);
 	RelevantAttributesToCapture.Add(DamageStatics().CriticalMultiDef);
 
 	RelevantAttributesToCapture.Add(DamageStatics().PostureDamageDef);
 	RelevantAttributesToCapture.Add(DamageStatics().PostureCrumbleDef);
+}
+
+USoulDotDamageExecution::USoulDotDamageExecution()
+{
+	RelevantAttributesToCapture.Add(DamageStatics().DamageDef);
+	RelevantAttributesToCapture.Add(DamageStatics().AttackPowerDef);
 }
 
 void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, OUT FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
@@ -68,6 +75,7 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 
 	AActor* SourceActor = SourceAbilitySystemComponent ? SourceAbilitySystemComponent->AvatarActor : nullptr;
 	AActor* TargetActor = TargetAbilitySystemComponent ? TargetAbilitySystemComponent->AvatarActor : nullptr;
+
 
 	//Warning: it's non-static. Be careful when modify the GE
 	FGameplayEffectSpec* Spec = ExecutionParams.GetOwningSpecForPreExecuteMod();
@@ -89,8 +97,8 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	float PostureStrength = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().PostureStrengthDef, EvaluationParameters, PostureStrength);
 
-	float Damage = 0.f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DamageDef, EvaluationParameters, Damage);
+	float DamageMulti = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DamageDef, EvaluationParameters, DamageMulti);
 	float AttackPower = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().AttackPowerDef, EvaluationParameters, AttackPower);
 	float CriticalStrike = 0.f;
@@ -98,8 +106,8 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	float CriticalMulti = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().CriticalMultiDef, EvaluationParameters, CriticalMulti);
 
-	float PostureDamage = 0.f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().PostureDamageDef, EvaluationParameters, PostureDamage);
+	float PostureMulti = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().PostureDamageDef, EvaluationParameters, PostureMulti);
 	float PostureCrumble = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().PostureCrumbleDef, EvaluationParameters, PostureCrumble);
 
@@ -115,11 +123,11 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 
 	if (CriticalStrike >= LocalRandValue)
 	{
-		Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Event.Montage.Shared.Critical" }, true));
-		DamageDone = (Damage + AttackPower) * (1 + CriticalMulti / 100.f);
+		Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Damage.Critical" }, true));
+		DamageDone = (DamageMulti + 1.f) * AttackPower * (1 + CriticalMulti / 100.f);
 	}
 	else
-		DamageDone = (Damage + AttackPower);
+		DamageDone = (DamageMulti + 1.f) * AttackPower;
 
 	//Defense calculation
 	DamageDone *= (DamageDone / (DamageDone + DefensePower));
@@ -127,15 +135,57 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	/**
 	* POSTURE DAMAGE
 	*/
-	float PostureDamageDone = PostureDamage + PostureCrumble - PostureStrength;
+	float PostureDamageDone =  (1.f +PostureMulti) * PostureCrumble * (PostureCrumble / (PostureCrumble + PostureStrength));
 
 	if (DamageDone >= 0.f)
 	{
 		//Passed the critical tag to the gameplay effect spec
 		//We shall see that when the change of the Damage is passed to the target's AttriuteSet
 
+		Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Damage.Stun" }, true));
+
+		(Cast<ASoulCharacterBase>(SourceActor))->Notify_OnMeleeAttack(TargetActor, *(Spec->GetContext().GetHitResult()));
+
 		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().DamageProperty, EGameplayModOp::Additive, DamageDone));
 		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().PostureDamageProperty, EGameplayModOp::Additive, PostureDamageDone));
 	}
 }
 
+void USoulDotDamageExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, OUT FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
+{
+	UAbilitySystemComponent* TargetAbilitySystemComponent = ExecutionParams.GetTargetAbilitySystemComponent();
+	UAbilitySystemComponent* SourceAbilitySystemComponent = ExecutionParams.GetSourceAbilitySystemComponent();
+
+	AActor* SourceActor = SourceAbilitySystemComponent ? SourceAbilitySystemComponent->AvatarActor : nullptr;
+	AActor* TargetActor = TargetAbilitySystemComponent ? TargetAbilitySystemComponent->AvatarActor : nullptr;
+
+
+	//Warning: it's non-static. Be careful when modify the GE
+	FGameplayEffectSpec* Spec = ExecutionParams.GetOwningSpecForPreExecuteMod();
+
+	// Gather the tags from the source and target as that can affect which buffs should be used
+	const FGameplayTagContainer* SourceTags = Spec->CapturedSourceTags.GetAggregatedTags();
+	const FGameplayTagContainer* TargetTags = Spec->CapturedTargetTags.GetAggregatedTags();
+
+	FAggregatorEvaluateParameters EvaluationParameters;
+	EvaluationParameters.SourceTags = SourceTags;
+	EvaluationParameters.TargetTags = TargetTags;
+
+	float DefensePower = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DefensePowerDef, EvaluationParameters, DefensePower);
+
+	float DamageMulti = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DamageDef, EvaluationParameters, DamageMulti);
+	float AttackPower = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().AttackPowerDef, EvaluationParameters, AttackPower);
+
+	float DamageDone = 0.f;
+	DamageDone = (DamageMulti + 1.f) * AttackPower;
+
+	DamageDone *= (DamageDone / (DamageDone + DefensePower));
+
+	if (DamageDone >= 0.f)
+	{
+		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().DamageProperty, EGameplayModOp::Additive, DamageDone));
+	}
+}

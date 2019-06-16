@@ -3,7 +3,6 @@
 #include "Item/WeaponActor.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Types/DamageTypes.h"
 #include "Abilities/SoulAbilitySysBPLib.h"
 #include "SoulCharacterBase.h"
 #include "DrawDebugHelpers.h"
@@ -88,9 +87,11 @@ bool AWeaponActor::TryExcludeActor(AActor * HitActor)
 	return 1;
 }
 
-void AWeaponActor::StartSwing()
+void AWeaponActor::StartSwing(const float &InDmgMulti)
 {
 	bIsTracingCollision = 1;
+
+	DmgMultiplier = InDmgMulti;
 
 	CurrVecs.Reset();
 	MyTargets.Empty();

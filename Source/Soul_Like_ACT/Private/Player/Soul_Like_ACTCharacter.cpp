@@ -16,7 +16,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "GameFramework/Controller.h"
-#include "Types/DamageTypes.h"
 #include "GameFramework/SpringArmComponent.h"
 
 const float ASoul_Like_ACTCharacter::BattleMovementScale{ 1.f };
@@ -95,10 +94,6 @@ void ASoul_Like_ACTCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
-
-
-//////////////////////////////////////////////////////////////////////////
-// Input
 
 void ASoul_Like_ACTCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
@@ -217,7 +212,7 @@ FVector ASoul_Like_ACTCharacter::PredictMovement()
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
 
 	const FVector Direction =
-		(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X) * ForwardAxisValue
+		((FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X) * ForwardAxisValue).GetSafeNormal()
 			+ FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y) * RightAxisValue).GetSafeNormal();
 
 	return Direction;
