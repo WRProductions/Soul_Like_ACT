@@ -24,6 +24,9 @@ public:
 	/** Returns the default level used for ability activations, derived from the character */
 	int32 GetDefaultAbilityLevel() const;
 
+	UFUNCTION(BlueprintCallable)
+	bool TryActivateAbility_Soul(FGameplayAbilitySpecHandle AbilityToActivate, bool bAllowRemoteActivation);
+
 	/** Version of function in AbilitySystemGlobals that returns correct type */
 	UFUNCTION(BlueprintCallable)
 	static USoulAbilitySystemComponent* GetAbilitySystemComponentFromActor(const AActor* Actor, bool LookForComponent = false);

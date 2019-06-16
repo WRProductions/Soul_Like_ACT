@@ -36,6 +36,11 @@ int32 USoulAbilitySystemComponent::GetDefaultAbilityLevel() const
 	return 1;
 }
 
+bool USoulAbilitySystemComponent::TryActivateAbility_Soul(FGameplayAbilitySpecHandle AbilityToActivate, bool bAllowRemoteActivation)
+{
+	return TryActivateAbility(AbilityToActivate, bAllowRemoteActivation);
+}
+
 USoulAbilitySystemComponent * USoulAbilitySystemComponent::GetAbilitySystemComponentFromActor(const AActor * Actor, bool LookForComponent)
 {
 	return Cast<USoulAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Actor, LookForComponent));

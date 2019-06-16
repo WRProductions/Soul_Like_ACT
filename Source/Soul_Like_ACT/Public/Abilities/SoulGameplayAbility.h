@@ -13,7 +13,7 @@
  * This class uses GameplayEffectContainers to allow easier execution of gameplay effects based on a triggering tag
  * Most games will need to implement a subclass to support their game-specific code
  */
-UCLASS()
+UCLASS(Abstract)
 	class SOUL_LIKE_ACT_API USoulGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
@@ -55,6 +55,18 @@ protected:
 	virtual TArray<FActiveGameplayEffectHandle> ApplyEffectContainerSpec(
 		const FSoulGameplayEffectContainerSpec& ContainerSpec);
 };
+
+UCLASS(Abstract)
+class SOUL_LIKE_ACT_API USoulActiveAbility: public UGameplayAbility
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, VisibleAnywhere, Category = Default)
+	UAnimMontage* MontageToPlay;
+
+	USoulAbilityTask_PlayMontageAndWaitForEvent
+}
 
 
 /**
