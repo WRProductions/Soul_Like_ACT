@@ -144,6 +144,9 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				FGameplayTagContainer LocalContainer;
 				Data.EffectSpec.GetAllAssetTags(LocalContainer);
 
+				if(GetHealth() <= 0.f)
+					(Cast<ASoulCharacterBase>(SourceActor))->Notify_OnMeleeKill(SourceActor, TargetActor, HitResult);
+
 				if (LocalContainer.HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Damage.Dot" }, true)))
 				{
 					TargetCharacter->HandleDotDamage(LocalDamageDone, bIsCritic, bIsStun, HitResult, SourceTags, SourceCharacter, SourceActor);

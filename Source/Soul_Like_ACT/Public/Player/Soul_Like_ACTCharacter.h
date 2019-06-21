@@ -102,14 +102,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		AWeaponActor *EquipGear(TSubclassOf<AWeaponActor> WeaponClassRef, bool bShowTracelines);
-
-	//Use this to remove tag like Ability.Melee
-	//So we can force to use Evade while attacking
-	UFUNCTION(BlueprintCallable)
-	void RemoveGameplayTag_DANGER(const FGameplayTag& GameplayTag)
-	{
-		AbilitySystemComponent->SetTagMapCount(GameplayTag, 0);
-	}
 	
 	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = "Outp", BlueprintInternalUseOnly))
 	void GetMyPlayerController(class ASoulPlayerController*& MyController, EIsControllerValid & Outp);

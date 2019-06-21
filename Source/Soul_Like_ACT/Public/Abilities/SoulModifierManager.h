@@ -46,10 +46,14 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Default)
 	TMap<TSubclassOf<USoulModifierGameplayAbility>, int32> DefaultModifiers;
 
+	/**
+	 * GameAbilitySpecHandles that for future usages
+	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
-	TArray<FGameplayAbilitySpecHandle> GrantedDefaultActiveGAs;
+	TArray<FGameplayAbilitySpecHandle> GrantedActiveAbilities;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)
-	TArray<FGameplayAbilitySpecHandle> GrantedDefaultModifiers;
+	TArray<FGameplayAbilitySpecHandle> GrantedModifierAbilities;
 
 	/** Map of slot to ability granted by that slot. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Default)

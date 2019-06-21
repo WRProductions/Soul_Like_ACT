@@ -35,6 +35,7 @@ void ULockTargetComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 	Tick_UpdateRotation();
 
+	//Facing Offset during attacking
 	if (bIsFacingOffsetEnabled && !bIsTargetingEnabled)
 	{
 		FacingOffsetDelta = FMath::Clamp(FacingOffsetDelta + DeltaTime * 5.f, 0.f, 1.f);
@@ -280,6 +281,7 @@ void ULockTargetComponent::DisableLockingTarget()
 {
 	bIsTargetingEnabled = 0;
 
+	//TODO
 	Cast<ACharacter>(GetOwner())->GetCharacterMovement()->MaxWalkSpeed = 600.f;
 
 	PlayerArrow->SetVisibility(0);

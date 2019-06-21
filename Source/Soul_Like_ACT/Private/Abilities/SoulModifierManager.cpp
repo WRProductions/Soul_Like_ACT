@@ -66,7 +66,7 @@ void USoulModifierManager::AddStartupGameplayAbilities()
 					, GetOwner())
 			);
 
-			GrantedDefaultActiveGAs.Add(LocalGrantedActiveGA);
+			GrantedActiveAbilities.Add(LocalGrantedActiveGA);
 		}
 	}
 
@@ -82,7 +82,7 @@ void USoulModifierManager::AddStartupGameplayAbilities()
 					, GetOwner())
 			);
 
-			GrantedDefaultModifiers.Add(LocalGrantedMod);
+			GrantedModifierAbilities.Add(LocalGrantedMod);
 
 			GetOwnerGameplayAbilityComponent()->TryActivateAbility(LocalGrantedMod, true);
 		}

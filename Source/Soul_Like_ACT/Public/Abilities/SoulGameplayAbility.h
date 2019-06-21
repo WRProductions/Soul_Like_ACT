@@ -56,19 +56,18 @@ protected:
 		const FSoulGameplayEffectContainerSpec& ContainerSpec);
 };
 
-UCLASS(Abstract)
-class SOUL_LIKE_ACT_API USoulActiveAbility: public UGameplayAbility
+UCLASS()
+class SOUL_LIKE_ACT_API USoulActiveAbility : public USoulGameplayAbility
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, VisibleAnywhere, Category = Default)
+	USoulActiveAbility()
+	{
+	}
+
 	UAnimMontage* MontageToPlay;
-
-	USoulAbilityTask_PlayMontageAndWaitForEvent
-}
-
-
+};
 /**
  * Subclass of ability blueprint type with game-specific data
  * This class uses GameplayEffectContainers to allow easier execution of gameplay effects based on a triggering tag

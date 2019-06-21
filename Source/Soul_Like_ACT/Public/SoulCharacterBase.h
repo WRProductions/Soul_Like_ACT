@@ -120,7 +120,11 @@ public:
 	static const bool IsInRivalFaction(ASoulCharacterBase *DamageDealer, ASoulCharacterBase *DamageReceiver);
 
 	UFUNCTION(BlueprintCallable)
-	virtual bool IsTargetable() const override { return Faction != EActorFaction::Untargetable; }
+	virtual bool IsTargetable() const override 
+	{ 
+		return (Faction != EActorFaction::Untargetable
+			&& !GetIsHealthZero()); 
+	}
 
 	UFUNCTION(BlueprintCallable)
 	virtual void ToggleLockIcon(bool LockOn) override;
@@ -136,6 +140,12 @@ public:
 	{
 		if (OnMeleeAttack.IsBound())
 			OnMeleeAttack.Broadcast(this, TargetActor, HitResult);
+	}
+
+	void Notify_OnMeleeKill(AActor* SourceActor, AActor* TargetActor, const FHitResult HitResult)
+	{
+		if (OnMeleeKill.IsBound())
+			OnMeleeKill.Broadcast(SourceActor, TargetActor, HitResult);
 	}
 
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_TwoParams(Health);
@@ -218,6 +228,9 @@ protected:
 	UPROPERTY(BlueprintAssignable)
 	FTrigger_OnMeleeAttack OnMeleeAttack;
 
+	UPROPERTY(BlueprintAssignable)
+	FTrigger_OnMeleeAttack OnMeleeKill;
+
 	// Called from RPGAttributeSet, these call BP events above
 	virtual void HandleDamage(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 	virtual void HandleDotDamage(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
@@ -247,4 +260,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetAP_TEST() const { return GetAttackPower(); }
+
+	//Use this to remove tag like Ability.Melee
+	//So we can force to use Evade while attacking
+	UFUNCTION(BlueprintCallable)
+	void RemoveGameplayTag_DANGER(const FGameplayTag& GameplayTag)
+	{
+		AbilitySystemComponent->SetTagMapCount(GameplayTag, 0);
+	}
 };
