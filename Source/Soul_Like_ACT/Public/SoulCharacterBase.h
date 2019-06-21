@@ -123,11 +123,11 @@ public:
 	virtual bool IsTargetable() const override 
 	{ 
 		return (Faction != EActorFaction::Untargetable
-			&& !GetIsHealthZero()); 
+			&& !GetIsDead()); 
 	}
 
 	UFUNCTION(BlueprintCallable)
-	virtual void ToggleLockIcon(bool LockOn) override;
+	virtual void ToggleLockIcon() override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual bool IsAlive() const { return GetHealth() > 0.f; }

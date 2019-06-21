@@ -59,31 +59,3 @@ public:
 	/** Uses the passed in event data */
 	virtual void GetTargets_Implementation(ASoulCharacterBase* TargetingCharacter, AActor* TargetingActor, FGameplayEventData EventData, TArray<FHitResult>& OutHitResults, TArray<AActor*>& OutActors) const override;
 };
-
-/** Trivial target type that pulls the target out of the event data */
-UCLASS(NotBlueprintable)
-class SOUL_LIKE_ACT_API USoulTargetType_LineTraceFront : public USoulTargetType
-{
-	GENERATED_BODY()
-
-public:
-	// Constructor and overrides
-	USoulTargetType_LineTraceFront() {}
-
-	/** Uses the passed in event data */
-	virtual void GetTargets_Implementation(ASoulCharacterBase* TargetingCharacter, AActor* TargetingActor, FGameplayEventData EventData, TArray<FHitResult>& OutHitResults, TArray<AActor*>& OutActors) const override;
-};
-
-/** Trivial target type that pulls the target out of the event data */
-UCLASS(NotBlueprintable)
-class SOUL_LIKE_ACT_API USoulTargetType_SphereTrace : public USoulTargetType
-{
-	GENERATED_BODY()
-
-public:
-	// Constructor and overrides
-	USoulTargetType_SphereTrace() {}
-
-	/** Uses the passed in event data */
-	virtual void GetTargets_Implementation(ASoulCharacterBase* TargetingCharacter, AActor* TargetingActor, FGameplayEventData EventData, TArray<FHitResult>& OutHitResults, TArray<AActor*>& OutActors) const override;
-};

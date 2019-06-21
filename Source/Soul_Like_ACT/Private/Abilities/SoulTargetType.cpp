@@ -26,26 +26,3 @@ void USoulTargetType_UseEventData::GetTargets_Implementation(ASoulCharacterBase*
 		OutActors.Add(const_cast<AActor*>(EventData.Target));
 	}
 }
-
-void USoulTargetType_LineTraceFront::GetTargets_Implementation(ASoulCharacterBase* TargetingCharacter, AActor* TargetingActor, FGameplayEventData EventData, TArray<FHitResult>& OutHitResults, TArray<AActor*>& OutActors) const
-{
-	UCapsuleComponent *TargetingCapsul = TargetingCharacter->GetCapsuleComponent();
-	FVector InitLocation = TargetingCapsul->GetComponentLocation() + TargetingCapsul->GetComponentRotation().GetComponentForAxis(EAxis::X) * 70.f;
-	FVector EndLocation = InitLocation + TargetingCapsul->GetComponentRotation().GetComponentForAxis(EAxis::X) * 140.f;
-
-	TArray<FHitResult> Hits;
-	UKismetSystemLibrary::LineTraceMultiForObjects(TargetingCharacter->GetWorld(), InitLocation, EndLocation
-		, TArray<TEnumAsByte<EObjectTypeQuery>>{EObjectTypeQuery::ObjectTypeQuery3}
-		, false
-		, TArray<AActor*>{TargetingCharacter}
-		, EDrawDebugTrace::ForDuration
-		, Hits
-		, true);
-
-	OutHitResults = Hits;
-
-	for (auto hit : Hits)
-	{
-		OutActors.Add(hit.GetActor());
-	}
-}

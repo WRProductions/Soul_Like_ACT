@@ -222,7 +222,7 @@ void ULockTargetComponent::Find_InDirection(TArray<AActor *> &LocalPotentialTarg
 
 		if (TempClosestTarget)
 		{
-			Cast<ASoulCharacterBase>(ClosestTarget)->ToggleLockIcon(false);
+			Cast<ASoulCharacterBase>(ClosestTarget)->ToggleLockIcon();
 			ClosestTarget = TempClosestTarget;
 			//UE_LOG(LogTemp, Warning, TEXT("Target Position on Screen: %s, Screen Centre Vec: %s"), *TargetScreenPosition.ToString(), *ScreenCentre.ToString());
 		}
@@ -239,7 +239,7 @@ void ULockTargetComponent::EnableLockingTarget()
 	CacheRotationSetting();
 
 	//Target->OnSelected
-	Cast<ITargetable>(SelectedActor)->ToggleLockIcon(1);
+	Cast<ITargetable>(SelectedActor)->ToggleLockIcon();
 
 	//Set Rotation Mode
 	SetRotationMode_FaceTarget();
@@ -257,9 +257,9 @@ void ULockTargetComponent::EnableLockingTarget()
 
 void ULockTargetComponent::SetRotationMode_FaceTarget()
 {
-	PlayerRef->bUseControllerRotationYaw = 0;
-	PlayerRef->GetCharacterMovement()->bOrientRotationToMovement = 0;
-	PlayerRef->GetCharacterMovement()->bUseControllerDesiredRotation = 0;
+	PlayerRef->bUseControllerRotationYaw = false;
+	PlayerRef->GetCharacterMovement()->bOrientRotationToMovement = false;
+	PlayerRef->GetCharacterMovement()->bUseControllerDesiredRotation = false;
 }
 
 void ULockTargetComponent::CacheRotationSetting()
@@ -271,7 +271,6 @@ void ULockTargetComponent::CacheRotationSetting()
 
 void ULockTargetComponent::ResetRotationSetting()
 {
-
 	PlayerRef->bUseControllerRotationYaw = bOwnerControllerRotationYaw;
 	PlayerRef->GetCharacterMovement()->bOrientRotationToMovement = bOwnerOrientRotToMovement;
 	PlayerRef->GetCharacterMovement()->bUseControllerDesiredRotation = bOwnerControllerDesiredRot;
@@ -279,7 +278,7 @@ void ULockTargetComponent::ResetRotationSetting()
 
 void ULockTargetComponent::DisableLockingTarget()
 {
-	bIsTargetingEnabled = 0;
+	bIsTargetingEnabled = false;
 
 	//TODO
 	Cast<ACharacter>(GetOwner())->GetCharacterMovement()->MaxWalkSpeed = 600.f;
@@ -287,12 +286,11 @@ void ULockTargetComponent::DisableLockingTarget()
 	PlayerArrow->SetVisibility(0);
 
 	if(SelectedActor)
-		Cast<ITargetable>(SelectedActor)->ToggleLockIcon(0);
+		Cast<ITargetable>(SelectedActor)->ToggleLockIcon();
 
 	SelectedActor = nullptr;
 
 	ResetRotationSetting();
-
 	GetOwner()->GetInstigatorController()->ResetIgnoreLookInput();
 }
 
@@ -350,9 +348,8 @@ void ULockTargetComponent::Timer_CheckBlockingAndDistance()
 
 void ULockTargetComponent::Tick_UpdateRotation()
 {
-	if (!bIsTargetingEnabled || Cast<ASoulCharacterBase>(SelectedActor)->GetIsDead())
+	if (!bIsTargetingEnabled)
 	{
-		bIsTargetingEnabled = false;
 		return;
 	}
 
@@ -376,6 +373,7 @@ void ULockTargetComponent::Tick_UpdateRotation()
 	}
 
 	//TODO need a precise condition
+	//Prevent the CapsuleComponent sliding when gets close to the target
 	if (!PlayerRef->GetMesh()->GetAnimInstance()->IsAnyMontagePlaying() || bIsTargetingEnabled)
 	{
 		FRotator PlayerCapRotation = PlayerRef->GetCapsuleComponent()->GetComponentRotation();

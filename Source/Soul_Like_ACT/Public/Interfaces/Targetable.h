@@ -38,5 +38,5 @@ public:
 	
 	virtual bool IsTargetable() const = 0;
 
-	virtual void ToggleLockIcon(bool LockOn) = 0;
+	virtual void ToggleLockIcon() = 0;
 };

@@ -33,16 +33,16 @@ ASoulCharacterBase::ASoulCharacterBase()
 }
 
 
-void ASoulCharacterBase::ToggleLockIcon(bool LockOn)
+void ASoulCharacterBase::ToggleLockIcon()
 {
 
-	if (!TargetIcon->IsVisible() && LockOn)
+	if (!IsTargetable() || TargetIcon->IsVisible())
 	{
-		TargetIcon->SetVisibility(1);
+		TargetIcon->SetVisibility(false);
 	}
-	else if(TargetIcon->IsVisible() && !LockOn)
+	else
 	{
-		TargetIcon->SetVisibility(0);
+		TargetIcon->SetVisibility(true);
 	}
 }
 
@@ -71,11 +71,21 @@ void ASoulCharacterBase::AddStartupGameplayAbilities()
 void ASoulCharacterBase::HandleDamage(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
 {
 	OnDamaged(DamageAmount, IsCriticaled, bIsStun, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
+	
+	if (GetIsHealthZero())
+	{
+		HandleOnDead();
+	}
 }
 
 void ASoulCharacterBase::HandleDotDamage(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
 {
 	OnDotDamaged(DamageAmount, IsCriticaled, bIsStun, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
+
+	if (GetIsHealthZero())
+	{
+		HandleOnDead();
+	}
 }
 
 void ASoulCharacterBase::HandlePostureDamage(float PostureDamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
