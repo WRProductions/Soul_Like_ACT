@@ -26,6 +26,7 @@ protected:
 
 	bool bIsFacingOffsetEnabled;
 	float FacingOffsetDelta;
+	float FacingDeltaSpeed;
 	float FacingOffset_ForwardRotationYaw;
 	float FacingOffset_CurrentRotationYaw;
 
@@ -86,7 +87,7 @@ public:
 	void Toggle_InDirection(ETargetFindingDirection Direction) { FindTarget(Direction); }
 
 	UFUNCTION(BlueprintCallable)
-	void ForceUsingFacingOffset(bool bHaveTarget);
+	void ForceUsingFacingOffset(float InFacingDeltaSpeed = 10.f);
 
 	void InitComponent(class UArrowComponent *ArrowComponentRef);
 

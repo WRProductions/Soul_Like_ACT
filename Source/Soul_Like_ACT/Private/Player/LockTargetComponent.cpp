@@ -38,7 +38,7 @@ void ULockTargetComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	//Facing Offset during attacking
 	if (bIsFacingOffsetEnabled && !bIsTargetingEnabled)
 	{
-		FacingOffsetDelta = FMath::Clamp(FacingOffsetDelta + DeltaTime * 5.f, 0.f, 1.f);
+		FacingOffsetDelta = FMath::Clamp(FacingOffsetDelta + DeltaTime * FacingDeltaSpeed, 0.f, 1.f);
 		FRotator IdleRotation = FMath::Lerp(FRotator(0.f, FacingOffset_CurrentRotationYaw, 0.f), FRotator(0.f, FacingOffset_ForwardRotationYaw, 0.f), FacingOffsetDelta);
 		
 		GetOwner()->SetActorRotation(IdleRotation);
@@ -62,19 +62,14 @@ void ULockTargetComponent::ToggleCameraLock(bool FreeCamera)
 	}
 }
 
-
-void ULockTargetComponent::ForceUsingFacingOffset(bool bHaveTarget)
+void ULockTargetComponent::ForceUsingFacingOffset(float InFacingDeltaSpeed/* = 10.f*/)
 {
-	//It's been used to fix the rotation at any combo conjunction
-	//when bIsTargetingEnabled is enabled.
-	if (!bHaveTarget)
-	{
-		//Get the forward rotation according to playercontroller
-		FacingOffset_ForwardRotationYaw = GetOwner()->GetInstigatorController()->GetControlRotation().Yaw;
-		FacingOffset_CurrentRotationYaw = GetOwner()->GetActorRotation().Yaw;
-		bIsFacingOffsetEnabled = true;
-		FacingOffsetDelta = 0.f;
-	}
+	//Get the forward rotation according to player controller
+	FacingOffset_ForwardRotationYaw = GetOwner()->GetInstigatorController()->GetControlRotation().Yaw;
+	FacingOffset_CurrentRotationYaw = GetOwner()->GetActorRotation().Yaw;
+	bIsFacingOffsetEnabled = true;
+	FacingOffsetDelta = 0.f;
+	FacingDeltaSpeed = InFacingDeltaSpeed;
 }
 
 void ULockTargetComponent::InitComponent(class UArrowComponent *ArrowComponentRef)
