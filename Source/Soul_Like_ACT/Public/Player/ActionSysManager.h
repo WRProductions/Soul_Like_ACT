@@ -36,8 +36,9 @@ protected:
 
 public:
 	bool bIsUsingMelee() const;
-	bool bIsUsingAbility() const;
+	bool bIsUsingSkills() const;
 	bool bCanUseAnyGA() const;
+	bool bIsUsingParry() const;
 
 	UFUNCTION(BlueprintCallable)
 	bool DoMeleeAttack();
@@ -47,8 +48,15 @@ public:
 	bool DoDodge();
 
 	UFUNCTION(BlueprintCallable)
+		bool DoParry_Start();
+	UFUNCTION(BlueprintCallable)
+		bool DoParry_End();
+
+	/**
+	 * These 2 functions are called via Active Melee GameplayAbilities
+	 */
+	UFUNCTION(BlueprintCallable)
 	bool SetJumpSection(const FName InpComboScetionName, UAnimMontage *InpMontage);
-	
 	UFUNCTION(BlueprintCallable)
 	bool JumpSectionForCombo();
 	

@@ -59,8 +59,6 @@ void AMobBasic::MobOnDead_Implementation()
 	Faction = EActorFaction::Untargetable;
 
 	StopAnimMontage(GetMesh()->GetAnimInstance()->GetCurrentActiveMontage());
-
-	ToggleLockIcon(0);
 }
 
 void AMobBasic::SetTarget(AActor *PlayerPawn) const

@@ -91,4 +91,7 @@ public:
 	void InitComponent(class UArrowComponent *ArrowComponentRef);
 
 	bool GetIsTargetingEnabled() { return bIsTargetingEnabled; }
+
+
+	FVector GetNormalizedVec(FVector Inp);
 };

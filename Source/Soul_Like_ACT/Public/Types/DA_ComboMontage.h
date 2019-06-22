@@ -31,8 +31,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Montages)
 	UAnimMontage *Normal_Montage;
-
-
 };
 
 

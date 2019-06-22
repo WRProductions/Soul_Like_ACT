@@ -14,18 +14,12 @@ UActorFXManager::UActorFXManager()
 
 void UActorFXManager::SpawnParticleWithHitResult(const FHitResult &HitResult, UParticleSystem *ParticleClass)
 {
-	if (!HitResult.bBlockingHit)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld()
-			, OnHitParticles[0]
-			, GetOwner()->GetActorLocation()
-			, FRotator::ZeroRotator
-			, FVector::OneVector
-			, true);
-	}
-
-	FRotator NormVec = UKismetMathLibrary::MakeRotFromX(HitResult.ImpactNormal) * -1;
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleClass, HitResult.TraceEnd, NormVec, FVector::OneVector, true);
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld()
+		, OnHitParticles[0]
+		, GetOwner()->GetActorLocation()
+		, FRotator::ZeroRotator
+		, FVector::OneVector
+		, true);
 }
 
 void UActorFXManager::SpawnSoundWithHitResult(const FHitResult &HitResult, USoundBase *SoundCue)

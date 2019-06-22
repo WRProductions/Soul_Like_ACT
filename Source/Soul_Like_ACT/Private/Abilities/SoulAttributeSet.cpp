@@ -150,6 +150,9 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				}
 				else
 				{
+					if (GetHealth() <= 0.f)
+						(Cast<ASoulCharacterBase>(SourceActor))->Notify_OnMeleeKill(SourceActor, TargetActor, HitResult);
+
 					TargetCharacter->HandleDamage(LocalDamageDone, bIsCritic, bIsStun, HitResult, SourceTags, SourceCharacter, SourceActor);
 				}
 			}

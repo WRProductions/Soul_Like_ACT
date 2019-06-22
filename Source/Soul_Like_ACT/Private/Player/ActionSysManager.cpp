@@ -4,6 +4,7 @@
 #include "Player/Soul_Like_ACTCharacter.h"
 #include "Types/DA_PlayerAnimSet.h"
 #include "Animation/AnimInstance.h"
+#include "Abilities/SoulModifierManager.h"
 #include "Types/DA_ComboMontage.h"
 #include "Abilities/SoulAbilitySystemComponent.h"
 #include "TimerManager.h"
@@ -31,9 +32,9 @@ void UActionSysManager::TickComponent(float DeltaTime, enum ELevelTick TickType,
 
 bool UActionSysManager::DoMeleeAttack()
 {
-	if (!bCanUseAnyGA())
+	if (!bCanUseAnyGA() || bIsUsingParry())
 		return 0;
- 
+
  	if (bIsUsingMelee())
  		return TryEnableJumpSection();
 	
@@ -67,7 +68,7 @@ bool UActionSysManager::DoDodge()
 
 		for (USoulGameplayAbility * localGA : tempGAs)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Current GA: %s"), *localGA->GetName());
+			LOG_FUNC_ERROR(localGA->GetName());
 		}
 		
 		return 0;
@@ -76,6 +77,43 @@ bool UActionSysManager::DoDodge()
 	return PlayerRef->AbilitySystemComponent->TryActivateAbilitiesByTag(
 		FGameplayTagContainer{ FGameplayTag::RequestGameplayTag(FName{"Ability.Skill.Evade"}, true) },
 		true);
+}
+
+bool UActionSysManager::DoParry_Start()
+{
+	if (!bCanUseAnyGA())
+	{
+		TArray<USoulGameplayAbility*> tempGAs;
+		PlayerRef->AbilitySystemComponent->GetActiveAbilitiesWithTags(
+			FGameplayTagContainer{ FGameplayTag::RequestGameplayTag(FName{"Ability.Skill"}, true) },
+			tempGAs);
+
+		for (USoulGameplayAbility* localGA : tempGAs)
+		{
+			LOG_FUNC_ERROR(localGA->GetName());
+		}
+
+		return 0;
+	}
+
+	return PlayerRef->AbilitySystemComponent->TryActivateAbilitiesByTag(
+		FGameplayTagContainer{ FGameplayTag::RequestGameplayTag(FName{"Ability.Skill.Parry"}, true) },
+		true);
+
+}
+
+bool UActionSysManager::DoParry_End()
+{
+	UAnimInstance* AnimInstance = PlayerRef->GetMesh()->GetAnimInstance();
+	UAnimMontage* CurrentMontage = AnimInstance->GetCurrentActiveMontage();
+
+	if (CurrentMontage)
+	{
+		AnimInstance->Montage_JumpToSection(FName("ParryEnd"), CurrentMontage);
+		return true;
+	}
+
+	return false;
 }
 
 bool UActionSysManager::SetJumpSection(const FName InpComboScetionName, UAnimMontage *InpMontage)
@@ -178,13 +216,11 @@ bool UActionSysManager::bIsUsingMelee() const
 	}
 }
 
-bool UActionSysManager::bIsUsingAbility() const
+bool UActionSysManager::bIsUsingSkills() const
 {
-	UAbilitySystemComponent *localComp = PlayerRef->GetAbilitySystemComponent();
+	UAbilitySystemComponent * MyAbilityComponent = PlayerRef->GetAbilitySystemComponent();
 	
-	if (!localComp) return 0;
-
-	return (localComp->HasMatchingGameplayTag(
+	return (MyAbilityComponent->HasMatchingGameplayTag(
 		FGameplayTag::RequestGameplayTag(FName{ "Ability.Skill" }, true)));
 }
 
@@ -192,5 +228,13 @@ bool UActionSysManager::bCanUseAnyGA() const
 {
 	return (PlayerRef->GetHealth() > 0.f &&
 		!UGameplayStatics::IsGamePaused(GetWorld()) &&
-		!bIsUsingAbility());
+		!bIsUsingSkills());
+}
+
+bool UActionSysManager::bIsUsingParry() const
+{
+	UAbilitySystemComponent *MyAbilityComponent = USoulAbilitySystemComponent::GetAbilitySystemComponentFromActor(GetOwner(), false);
+
+	return (MyAbilityComponent->HasMatchingGameplayTag(
+		FGameplayTag::RequestGameplayTag(FName{ "Ability.Skill.Parry" }, true)));
 }
