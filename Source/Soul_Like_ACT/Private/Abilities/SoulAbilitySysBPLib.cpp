@@ -31,7 +31,7 @@ bool USoulAbilitySysBPLib::GetMontageFromActiveAbility(TSubclassOf<USoulActiveAb
 	 if (LocalAbility)
 	 {
 		 AnimMontage = LocalAbility->MontageToPlay;
-		 return AnimMontage != nullptr;
+		 return (AnimMontage != nullptr);
 	 }
 
 	 AnimMontage = NULL;
@@ -43,7 +43,7 @@ float USoulAbilitySysBPLib::GetMontageSectionLength(UAnimMontage* AnimMontage, F
 	int32 SectionIndex = AnimMontage->GetSectionIndex(SectionName);
 	
 	if (SectionIndex == INDEX_NONE)
-		return -1.f;
+		return 0.f;
 
 	return AnimMontage->GetSectionLength(SectionIndex);
 }

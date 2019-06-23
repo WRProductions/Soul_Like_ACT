@@ -48,7 +48,6 @@ static const SoulDamageStatics& DamageStatics()
 	return DmgStatics;
 }
 
-
 USoulDamageExecution::USoulDamageExecution()
 {
 	RelevantAttributesToCapture.Add(DamageStatics().PostureStrengthDef);
