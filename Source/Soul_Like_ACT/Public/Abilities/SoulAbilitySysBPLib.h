@@ -6,6 +6,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "SoulAbilitySysBPLib.generated.h"
 
+class UAnimMontage;
 /**
  * 
  */
@@ -17,4 +18,9 @@ class SOUL_LIKE_ACT_API USoulAbilitySysBPLib : public UAbilitySystemBlueprintLib
 public:
 	UFUNCTION(BlueprintCallable, Category = Ability, Meta = (Tooltip = "This function can be used to create the event data through weapon on hit"))
 	static void CreateEventData(const AActor *Target, const AActor *Source, const FHitResult &InpHitResult, const FGameplayTag EventTag, const float EventMagnitude, FGameplayEventData & OutpEventData);
+
+	UFUNCTION(BlueprintCallable)
+		static bool GetMontageFromActiveAbility(TSubclassOf<USoulActiveAbility> ActiveAbilityClass, UAnimMontage*& AnimMontage);
+	UFUNCTION(BlueprintCallable)
+		static float GetMontageSectionLength(UAnimMontage* AnimMontage, FName SectionName);
 };

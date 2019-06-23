@@ -36,6 +36,8 @@ protected:
 
 	TArray<AActor*> PotentialTargetActors;
 
+	float MoveSpeedMulti = 1.f;
+
 	class UArrowComponent *PlayerArrow;
 	class ACharacter *PlayerRef;
 
@@ -93,6 +95,7 @@ public:
 
 	bool GetIsTargetingEnabled() { return bIsTargetingEnabled; }
 
-
 	FVector GetNormalizedVec(FVector Inp);
+
+	friend ASoul_Like_ACTCharacter;
 };

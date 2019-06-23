@@ -40,9 +40,6 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 
 public:
-	static const float BattleMovementScale;
-	static const float TravelMovementScale;
-
 	ASoul_Like_ACTCharacter();
 
 	virtual void Tick(float DeltaTime) override;
@@ -85,9 +82,7 @@ protected:
 	FVector PredictMovement();
 
 protected:
-	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	// End of APawn interface
 
 public:
 	/** Returns CameraBoom subobject **/

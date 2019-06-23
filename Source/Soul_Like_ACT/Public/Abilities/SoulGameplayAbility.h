@@ -66,13 +66,11 @@ public:
 	{
 	}
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Montage)
 	UAnimMontage* MontageToPlay;
 };
-/**
- * Subclass of ability blueprint type with game-specific data
- * This class uses GameplayEffectContainers to allow easier execution of gameplay effects based on a triggering tag
- * Most games will need to implement a subclass to support their game-specific code
- */
+
+
 UCLASS()
 	class SOUL_LIKE_ACT_API USoulModifierGameplayAbility : public USoulGameplayAbility
 {

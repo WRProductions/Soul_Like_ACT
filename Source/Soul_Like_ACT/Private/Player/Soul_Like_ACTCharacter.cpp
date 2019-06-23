@@ -18,9 +18,6 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 
-const float ASoul_Like_ACTCharacter::BattleMovementScale{ 1.f };
-const float ASoul_Like_ACTCharacter::TravelMovementScale{ 1.f };
-
 //////////////////////////////////////////////////////////////////////////
 // ASoul_Like_ACTCharacter
 
@@ -232,13 +229,7 @@ void ASoul_Like_ACTCharacter::MoveRight(float Value)
 
 void ASoul_Like_ACTCharacter::MakeMove()
 {
-	if (Controller)
-	{
-		FVector Direction = PredictMovement();
+	FVector Direction = PredictMovement();
 
-		if (TargetLockingComponent->GetIsTargetingEnabled())
-			AddMovementInput(Direction, BattleMovementScale);
-		else
-			AddMovementInput(Direction, TravelMovementScale);
-	}
+	AddMovementInput(Direction, TargetLockingComponent->MoveSpeedMulti);
 }

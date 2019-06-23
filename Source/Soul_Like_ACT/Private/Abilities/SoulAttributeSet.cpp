@@ -17,7 +17,7 @@ USoulAttributeSet::USoulAttributeSet()
 	, AttackSpeed(0.0f)
 	, Leech(0.0f)
 	, PostureCrumble(0.0f)
-	, MoveSpeed(400.0f)
+	, MoveSpeed(.1f)
 	, CriticalStrike(5.0f)
 	, CriticalMulti(50.f)
 	, Damage(0.0f)
@@ -243,7 +243,7 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	}
 	else if (Data.EvaluatedData.Attribute == GetMoveSpeedAttribute())
 	{
-		SetMoveSpeed(FMath::Clamp(GetMoveSpeed(), 0.0f, 2000.0f));
+		SetMoveSpeed(FMath::Clamp(GetMoveSpeed(), 0.0f, 3000.f));
 	}
 	//Posture Strength
 	else if (Data.EvaluatedData.Attribute == GetPostureStrengthAttribute())
