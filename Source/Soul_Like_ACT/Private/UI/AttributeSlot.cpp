@@ -19,6 +19,10 @@ void UAttributeSlot::SetAttributeType()
 
 void UAttributeSlot::OnAttributeChanged(const TArray<float>& values)
 {
+	FString TempTypeString;
+	USoulSerializerBpLib::AttributeToString(MyAttribute, TempTypeString);
+	LOG_FUNC_ERROR(TempTypeString);
+
 	if (MyAttribute == USoulAttributeSet::GetHealthAttribute()
 		|| MyAttribute == USoulAttributeSet::GetPostureAttribute())
 	{
@@ -45,7 +49,8 @@ void UAttributeSlot::OnAttributeChanged(const TArray<float>& values)
 		FText localText = FText::Format(NSLOCTEXT("OnAttributeChanging", "Changing2", "{0}%"), Args);
 		AttributeValue->SetText(localText);
 	}
-	else if (MyAttribute == USoulAttributeSet::GetCriticalMultiAttribute())
+	else if (MyAttribute == USoulAttributeSet::GetCriticalMultiAttribute()
+		|| MyAttribute == USoulAttributeSet::GetMeleeRangeAttribute())
 	{
 		FFormatOrderedArguments Args;
 		Args.Add((int32)values[0] + 100);

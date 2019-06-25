@@ -2,12 +2,11 @@
 
 #include "Item/WeaponActor.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/ArrowComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Abilities/SoulAbilitySysBPLib.h"
 #include "SoulCharacterBase.h"
 #include "DrawDebugHelpers.h"
-
-
 
 // Sets default values
 AWeaponActor::AWeaponActor()
@@ -35,48 +34,19 @@ void AWeaponActor::BeginPlay()
 void AWeaponActor::CheckCollision()
 {
 	PrevVecs = CurrVecs;
-	for (int i = GearInfo->BladeStartLength; i <= GearInfo->BladeTail; i += 20)
+	for (int8 i = 0; i < PrevVecs.Num(); ++i)
 	{
-		int32 size_ = (i - GearInfo->BladeStartLength) / 10;
+		if (TraceType == EMeleeTraceType::Line)
+			CurrVecs[i] = GetActorLocation() + i * GetActorUpVector() * 25.f;
+		else if (TraceType == EMeleeTraceType::Capsule)
+			CurrVecs[i] = GetActorLocation() + i * GetActorUpVector() * 50.f;
 
-		CurrVecs[size_] = GetActorLocation() + i * GetActorUpVector();
-
-		DrawTraceLine(PrevVecs[size_], CurrVecs[size_], bEnableDrawTraceLine);
+		DrawTrace(PrevVecs[i], CurrVecs[i], bEnableDrawTraceLine);
 	}
 }
 
-void AWeaponActor::DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawTraceLine)
-{
-	TArray<FHitResult> Hits;
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this);
-	QueryParams.AddIgnoredActor(OwnerRef);
-
-	bool bIsHit = GetWorld()->LineTraceMultiByChannel(Hits, prevVec_, currVec_, ECC_Pawn, QueryParams);
-	if (bIsHit)
-	{
-		if (bDrawTraceLine)
-			DrawDebugLine(GetWorld(), prevVec_, currVec_, FColor::Green, 0, 2.f, 0, 1.f);
-
-		for (const auto &Hit : Hits)
-		{
-			ASoulCharacterBase * TargetPawn = Cast<ASoulCharacterBase>(Hit.GetActor());
-			if (TargetPawn
-				&& ASoulCharacterBase::IsInRivalFaction(OwnerRef, TargetPawn) 
-				&& TryExcludeActor(TargetPawn))
-			{
-				ApplyEventBackToGA(TargetPawn, Hit);
-			}
-		}
-	}
-	else if (bDrawTraceLine) 
-			DrawDebugLine(GetWorld(), prevVec_, currVec_, FColor::Red, 0, 2.f, 0, 1.f);
-}
-
-/*
-* Exclude the actor which takes the impact
-* Return true if the Actor has not been impacted
-*/
+// Exclude the actor which will receive the damage
+// Return true if the Actor has not been excluded yet
 bool AWeaponActor::TryExcludeActor(AActor * HitActor)
 {
 	if (MyTargets.Contains(HitActor))
@@ -87,11 +57,52 @@ bool AWeaponActor::TryExcludeActor(AActor * HitActor)
 	return 1;
 }
 
-void AWeaponActor::StartSwing(const float &InDmgMulti)
+void AWeaponActor::DrawTrace(FVector prevVec_, FVector currVec_, bool bDrawTraceLine)
+{
+	TArray<FHitResult> Hits;
+ 	FCollisionQueryParams QueryParams;
+ 	QueryParams.AddIgnoredActor(this);
+ 	QueryParams.AddIgnoredActor(OwnerRef);
+ 	QueryParams.bTraceComplex = false;
+ 	QueryParams.TraceTag = FName("WeaponMelee");
+
+	if (bDrawTraceLine)
+		GetWorld()->DebugDrawTraceTag = FName("WeaponMelee");
+	else
+		GetWorld()->DebugDrawTraceTag = NAME_None;
+
+	bool bIsHit = false;
+	if (TraceType == EMeleeTraceType::Line)
+	{
+		bIsHit = GetWorld()->LineTraceMultiByChannel(Hits, prevVec_, currVec_, ECC_Pawn, QueryParams);
+	}
+	else if (TraceType == EMeleeTraceType::Capsule)
+	{
+		FCollisionShape CollisionShape;
+		CollisionShape.SetCapsule(30.f, 30.f);
+		bIsHit = GetWorld()->SweepMultiByChannel(Hits, prevVec_, currVec_, FQuat::Identity, ECC_Pawn, CollisionShape, QueryParams);
+	}
+	if (bIsHit)
+	{
+		for (const auto& Hit : Hits)
+		{
+			ASoulCharacterBase* TargetPawn = Cast<ASoulCharacterBase>(Hit.GetActor());
+			if (TargetPawn
+				&& ASoulCharacterBase::IsInRivalFaction(OwnerRef, TargetPawn)
+				&& TryExcludeActor(TargetPawn))
+			{
+				ApplyEventBackToGA(TargetPawn, Hit);
+			}
+		}
+	}
+}
+
+void AWeaponActor::StartSwing(EMeleeTraceType MeleeTraceType, const float InDmgMulti /*= 1.f*/, const float InAreaMulti /*= 1.f*/)
 {
 	bIsTracingCollision = 1;
 
 	DmgMultiplier = InDmgMulti;
+	TraceType = MeleeTraceType;
 
 	CurrVecs.Reset();
 	MyTargets.Empty();
@@ -99,9 +110,27 @@ void AWeaponActor::StartSwing(const float &InDmgMulti)
 	if (GearInfo->SwingSound)
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), GearInfo->SwingSound, GetActorLocation());
 
-	for (int i = GearInfo->BladeStartLength; i <= GearInfo->BladeTail; i += 10)
+	if (TraceType == EMeleeTraceType::Line)
 	{
+		int32 i = GearInfo->BladeStartLength;
 		CurrVecs.Add(GetActorLocation() + i * GetActorUpVector());
+
+		do
+		{
+			i += 25;
+			CurrVecs.Add(GetActorLocation() + i * GetActorUpVector());
+		} while (i <= GearInfo->BladeTail * InAreaMulti);
+	}
+	else if (TraceType == EMeleeTraceType::Capsule)
+	{
+		int32 i = GearInfo->BladeStartLength;
+		CurrVecs.Add(GetActorLocation() + i * GetActorUpVector());
+
+		do
+		{
+			i += 60;
+			CurrVecs.Add(GetActorLocation() + i * GetActorUpVector());
+		} while (i <= GearInfo->BladeTail * InAreaMulti);
 	}
 }
 

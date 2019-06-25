@@ -152,6 +152,7 @@ public:
 	ATTRIBUTE_GETTER(MaxHealth);
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_TwoParams(Posture);
 	ATTRIBUTE_GETTER(MaxPosture);
+	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(MeleeRange);
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(Leech);
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(PostureStrength);
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(DefensePower);
@@ -164,7 +165,10 @@ public:
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_OneParam(CriticalMulti);
 
 	UFUNCTION(BlueprintCallable)
-	float GetPosturePercent() { return GetPosture() / GetMaxPosture(); }
+	float GetPosturePercent() const { return GetPosture() / GetMaxPosture(); }
+
+	UFUNCTION(BlueprintCallable)
+	float GetAreaMultiplier() const { return GetMeleeRange(); }
 
 	/** Returns the character level that is passed to the ability system */
 	UFUNCTION(BlueprintCallable)
@@ -209,6 +213,8 @@ protected:
 	UPROPERTY(BlueprintAssignable)
 	FOnChanged OnMoveSpeedChanged;
 	UPROPERTY(BlueprintAssignable)
+	FOnChanged OnMeleeRangeChanged;
+	UPROPERTY(BlueprintAssignable)
 	FOnChanged OnPostureStrengthChanged;
 	UPROPERTY(BlueprintAssignable)
 	FOnChanged OnDefensePowerChanged;
@@ -225,9 +231,9 @@ protected:
 	UPROPERTY(BlueprintAssignable)
 	FOnChanged OnCriticalMultiChanged;
 
+	//On_XXX trigger
 	UPROPERTY(BlueprintAssignable)
 	FTrigger_OnMeleeAttack OnMeleeAttack;
-
 	UPROPERTY(BlueprintAssignable)
 	FTrigger_OnMeleeAttack OnMeleeKill;
 

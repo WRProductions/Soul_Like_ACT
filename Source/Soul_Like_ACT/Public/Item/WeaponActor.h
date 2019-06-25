@@ -9,6 +9,13 @@
 
 class ASoulCharacterBase;
 
+UENUM(BlueprintType)
+enum class EMeleeTraceType :  uint8
+{
+	Line,
+	Capsule,
+};
+
 UCLASS()
 class SOUL_LIKE_ACT_API AWeaponActor : public AActor
 {
@@ -25,7 +32,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GearInfo)
 		UDA_Gear *GearInfo;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
 		bool bCanDamageAllies;
 
@@ -35,12 +42,14 @@ protected:
 
 	bool bIsTracingCollision;
 
+
 	TArray<FVector>PrevVecs;
 	TArray<FVector>CurrVecs;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	TArray<AActor*> MyTargets;
 
+	EMeleeTraceType TraceType;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	float DmgMultiplier;
 
@@ -53,14 +62,15 @@ protected:
 
 	bool TryExcludeActor(AActor *HitActor);
 
-	void DrawTraceLine(FVector prevVec_, FVector currVec_, bool bDrawTraceLine);
+	//real collision detection. Apply Damage through here
+	void DrawTrace(FVector prevVec_, FVector currVec_, bool bDrawTraceLine);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, meta = (ExposeOnSpawn = 1))
 	bool bEnableDrawTraceLine;
 
 	UFUNCTION(BlueprintCallable)
-	void StartSwing(const float &InDmgMulti);
+	void StartSwing(EMeleeTraceType MeleeTraceType, const float InDmgMulti = 1.f, const float InAreaMulti = 1.f);
 	UFUNCTION(BlueprintCallable)
 	void EndSwing();
 

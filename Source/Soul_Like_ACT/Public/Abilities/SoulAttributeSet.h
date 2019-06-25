@@ -54,6 +54,10 @@ public:
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, DefensePower)
 
 	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+	FGameplayAttributeData MeleeRange;
+	ATTRIBUTE_ACCESSORS(USoulAttributeSet, MeleeRange)
+
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
 	FGameplayAttributeData AttackPower;
 	ATTRIBUTE_ACCESSORS(USoulAttributeSet, AttackPower)
 

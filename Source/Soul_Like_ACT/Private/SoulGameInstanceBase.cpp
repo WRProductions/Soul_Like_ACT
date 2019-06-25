@@ -4,6 +4,9 @@
 #include "SoulGameInstanceBase.h"
 #include "Item/ItemBasic.h"
 #include "Item/SoulAssetManager.h"
+#include "Player/Soul_Like_ACTCharacter.h"
+#include "Player/SoulPlayerController.h"
+#include "BpFunctionLib/SoulSerializerBpLib.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "SoulAssetManager.h"
@@ -114,7 +117,6 @@ void USoulGameInstanceBase::MakeSaveData()
 	}
 
 	UInventoryManager* MyInventoryManager = Cast<ASoul_Like_ACTCharacter>(TempPawn)->GetInventoryManager();
-
 }
 
 void USoulGameInstanceBase::MakeSoulItemSaveData(FSoulItemData InItemData, FSoulSaveItemData& OutSaveItemData)

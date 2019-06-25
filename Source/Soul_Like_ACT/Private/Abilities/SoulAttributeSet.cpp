@@ -13,6 +13,7 @@ USoulAttributeSet::USoulAttributeSet()
 	, MaxPosture(1.f)
 	, PostureStrength(0.0f)
 	, DefensePower(0.f)
+	, MeleeRange(0.f)
 	, AttackPower(0.0f)
 	, AttackSpeed(0.0f)
 	, Leech(0.0f)
@@ -245,6 +246,10 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	{
 		SetMoveSpeed(FMath::Clamp(GetMoveSpeed(), 0.0f, 3000.f));
 	}
+	else if (Data.EvaluatedData.Attribute == GetMeleeRangeAttribute())
+	{
+		SetMeleeRange(FMath::Clamp(GetMeleeRange(), 0.0f, 2.f));
+	}
 	//Posture Strength
 	else if (Data.EvaluatedData.Attribute == GetPostureStrengthAttribute())
 	{
@@ -253,7 +258,7 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	//DP
 	else if (Data.EvaluatedData.Attribute == GetDefensePowerAttribute())
 	{
-	SetDefensePower(FMath::Clamp(GetDefensePower(), 0.0f, 9999.0f));
+		SetDefensePower(FMath::Clamp(GetDefensePower(), 0.0f, 9999.0f));
 	}
 	else if (Data.EvaluatedData.Attribute == GetAttackPowerAttribute())
 	{
