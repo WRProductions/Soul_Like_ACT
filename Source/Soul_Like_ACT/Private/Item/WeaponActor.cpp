@@ -97,7 +97,7 @@ void AWeaponActor::DrawTrace(FVector prevVec_, FVector currVec_, bool bDrawTrace
 	}
 }
 
-void AWeaponActor::StartSwing(EMeleeTraceType MeleeTraceType, const float InDmgMulti /*= 1.f*/, const float InAreaMulti /*= 1.f*/)
+void AWeaponActor::StartSwing(EMeleeTraceType MeleeTraceType, const float InDmgMulti /*= 1.f*/, const float InAreaMulti /*= 100.f*/)
 {
 	bIsTracingCollision = 1;
 
@@ -119,7 +119,7 @@ void AWeaponActor::StartSwing(EMeleeTraceType MeleeTraceType, const float InDmgM
 		{
 			i += 25;
 			CurrVecs.Add(GetActorLocation() + i * GetActorUpVector());
-		} while (i <= GearInfo->BladeTail * InAreaMulti);
+		} while (i <= GearInfo->BladeTail * 0.01f * InAreaMulti);
 	}
 	else if (TraceType == EMeleeTraceType::Capsule)
 	{
@@ -130,7 +130,7 @@ void AWeaponActor::StartSwing(EMeleeTraceType MeleeTraceType, const float InDmgM
 		{
 			i += 60;
 			CurrVecs.Add(GetActorLocation() + i * GetActorUpVector());
-		} while (i <= GearInfo->BladeTail * InAreaMulti);
+		} while (i <= GearInfo->BladeTail * 0.01f * InAreaMulti);
 	}
 }
 

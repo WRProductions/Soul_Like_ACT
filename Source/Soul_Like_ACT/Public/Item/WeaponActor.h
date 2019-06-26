@@ -70,7 +70,7 @@ public:
 	bool bEnableDrawTraceLine;
 
 	UFUNCTION(BlueprintCallable)
-	void StartSwing(EMeleeTraceType MeleeTraceType, const float InDmgMulti = 1.f, const float InAreaMulti = 1.f);
+	void StartSwing(EMeleeTraceType MeleeTraceType, const float InDmgMulti = 1.f, const float InAreaMulti = 100.f);
 	UFUNCTION(BlueprintCallable)
 	void EndSwing();
 

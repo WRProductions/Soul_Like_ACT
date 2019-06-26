@@ -248,7 +248,7 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	}
 	else if (Data.EvaluatedData.Attribute == GetMeleeRangeAttribute())
 	{
-		SetMeleeRange(FMath::Clamp(GetMeleeRange(), 0.0f, 2.f));
+		SetMeleeRange(FMath::Clamp(GetMeleeRange(), 0.0f, 500.f));
 	}
 	//Posture Strength
 	else if (Data.EvaluatedData.Attribute == GetPostureStrengthAttribute())

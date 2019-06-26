@@ -19,10 +19,6 @@ void UAttributeSlot::SetAttributeType()
 
 void UAttributeSlot::OnAttributeChanged(const TArray<float>& values)
 {
-	FString TempTypeString;
-	USoulSerializerBpLib::AttributeToString(MyAttribute, TempTypeString);
-	LOG_FUNC_ERROR(TempTypeString);
-
 	if (MyAttribute == USoulAttributeSet::GetHealthAttribute()
 		|| MyAttribute == USoulAttributeSet::GetPostureAttribute())
 	{

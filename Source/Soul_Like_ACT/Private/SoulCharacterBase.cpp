@@ -162,6 +162,9 @@ void ASoulCharacterBase::BindOnAttributesChanged()
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(USoulAttributeSet::GetMoveSpeedAttribute())
 		.AddUObject(this, &ASoulCharacterBase::HandleMoveSpeedChanged);
 
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(USoulAttributeSet::GetMeleeRangeAttribute())
+		.AddUObject(this, &ASoulCharacterBase::HandleMeleeRangeChanged);
+
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(USoulAttributeSet::GetPostureStrengthAttribute())
 		.AddUObject(this, &ASoulCharacterBase::HandlePostureStrengthChanged);
 

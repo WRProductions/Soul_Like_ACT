@@ -66,6 +66,8 @@ public:
 	virtual void UnPossessed() override;
 
 protected:
+	//Notify UI on attributes changed via non-executions.
+	//Only used on player pawn at the moment.
 	UFUNCTION(BlueprintCallable)
 	void BindOnAttributesChanged();
 
