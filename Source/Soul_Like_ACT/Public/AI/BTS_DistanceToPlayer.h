@@ -4,17 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/Services/BTService_BlackboardBase.h"
-#include "MyBTService_DistanceToPlayer.generated.h"
+#include "BTS_DistanceToPlayer.generated.h"
 
-/**
- * 
- */
 UCLASS()
-class SOUL_LIKE_ACT_API UMyBTService_DistanceToPlayer : public UBTService_BlackboardBase
+class SOUL_LIKE_ACT_API UMyBTService_DistanceToPlayer : public UBTService
 {
 	GENERATED_BODY()
 public:
 	UMyBTService_DistanceToPlayer();
+
+	UPROPERTY(EditAnywhere, Category = Blackboard)
+	struct FBlackboardKeySelector TargetKey;
+
+	UPROPERTY(EditAnywhere, Category = Blackboard)
+	struct FBlackboardKeySelector DistanceToPlayerKey;
 
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };

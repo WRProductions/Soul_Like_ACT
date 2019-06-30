@@ -2,6 +2,7 @@
 
 #include "AI/MyBTTaskNode_EnableTargeting.h"
 #include "Mob/MobBasic.h"
+#include "Mob/Mob_TargetingComponent.h"
 #include "GameFramework/Controller.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -9,17 +10,26 @@
 
 EBTNodeResult::Type UMyBTTaskNode_EnableTargeting::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	AActor *TargetPawn = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("PlayerPawn"));
+	AActor *TargetPawn = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("Target"));
 
 	AMobBasic *LocalOwner = Cast<AMobBasic>(Cast<AController>(OwnerComp.GetOwner())->GetPawn());
-	if (!LocalOwner || !TargetPawn)
+	
+	if (!LocalOwner)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UMyBTTaskNode_EnableTargeting failed cast %s"), *OwnerComp.GetOwner()->GetName());
+		LOG_FUNC_FAIL();
 		return EBTNodeResult::Failed;
 	}
 
+	if (!TargetPawn)
+	{
+		LOG_FUNC_FAIL();
+		return EBTNodeResult::Failed;
+	}
+
+	LocalOwner->SetFocus(TargetPawn);
 	
-	LocalOwner->SetFocus(1, TargetPawn);
+	//TODO 
 	LocalOwner->GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	
 	return EBTNodeResult::Succeeded;
 }

@@ -4,19 +4,24 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/Services/BTService_BlackboardBase.h"
-#include "MyBTService_IsTargetAvailable.generated.h"
+#include "BTS_IsTargetAvailable.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SOUL_LIKE_ACT_API UMyBTService_IsTargetAvailable : public UBTService_BlackboardBase
+class SOUL_LIKE_ACT_API UBTS_IsTargetAvailable : public UBTService
 {
 	GENERATED_BODY()
 
-		int32 counter;
 public:
-	UMyBTService_IsTargetAvailable();
+	UBTS_IsTargetAvailable();
+
+	UPROPERTY(EditAnywhere, Category = Blackboard)
+	struct FBlackboardKeySelector TargetKey;
+
+	UPROPERTY(EditAnywhere, Category = Blackboard)
+	struct FBlackboardKeySelector IsTargetAliveKey;
 
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };

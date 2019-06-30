@@ -31,15 +31,9 @@ protected:
 	AActor *TargetPawn;
 	bool bIsFacingTarget;
 
-
-
-public:	
-	void FacingTarget_Init();
+public:
+	void FacingTarget_Init(AActor *TargetActor);
 	void FacingTarget_End();
-
-	//Toggled through AI BT
-	UFUNCTION(BlueprintCallable)
-	void ToggleTargetLocking();
 
 	UFUNCTION(BlueprintCallable)
 	void SetTarget(AActor *PlayerPawn) { TargetPawn = PlayerPawn; }

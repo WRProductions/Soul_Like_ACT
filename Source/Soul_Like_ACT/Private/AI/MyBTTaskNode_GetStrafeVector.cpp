@@ -12,25 +12,20 @@
 
 EBTNodeResult::Type UMyBTTaskNode_GetStrafeVector::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	AActor *PlayerPawn = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("PlayerPawn"));
-	AActor *SelfActor = Cast<AController>(OwnerComp.GetOwner())->GetPawn();
+	ACharacter *SelfActor = Cast<ACharacter>(Cast<AController>(OwnerComp.GetOwner())->GetPawn());
+
+	FVector StrafeVec = SelfActor->GetActorLocation() 
+		+ SelfActor->GetActorForwardVector() * FMath::RandBool() * FMath::RandRange(StrafeRadius_Min, StrafeRadius_Max)
+		+ SelfActor->GetActorRightVector() * FMath::RandBool() * FMath::RandRange(StrafeRadius_Min, StrafeRadius_Max);
 
 
-	FVector PlayerToMobVec = PlayerPawn->GetActorLocation() - SelfActor->GetActorLocation();
-	float MaxScale = PlayerToMobVec.Size();
-	FVector RightVecFromDistance = PlayerToMobVec.ToOrientationQuat().GetRightVector().GetSafeNormal();
-	FVector ForwardVecFromDistance = PlayerToMobVec.GetSafeNormal();
-
-	FVector StrafeVec = SelfActor->GetActorLocation() + ForwardVecFromDistance * FMath::RandBool() * FMath::RandRange(0.f, MaxScale - 0.3f)
-		+ RightVecFromDistance * FMath::RandBool() * FMath::RandRange(0.f, MaxScale - 0.3f);
-
-
-	FNavLocation StrafeVecOnNavMesh;
-	FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld())->ProjectPointToNavigation(
-		StrafeVec, StrafeVecOnNavMesh);
+ 	FNavLocation StrafeVecOnNavMesh;
+ 	FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld())->ProjectPointToNavigation(
+ 		StrafeVec, StrafeVecOnNavMesh);
 	
 	OwnerComp.GetBlackboardComponent()->SetValueAsVector("StrafeVector", StrafeVecOnNavMesh.Location);
 
 	DrawDebugLine(GetWorld(), SelfActor->GetActorLocation(), StrafeVecOnNavMesh.Location, FColor::Blue, 0, 10.f, 0, 3.f);
+
 	return EBTNodeResult::Succeeded;
 }

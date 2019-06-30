@@ -14,5 +14,10 @@ class SOUL_LIKE_ACT_API UMyBTTaskNode_GetStrafeVector : public UBTTaskNode
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(EditAnywhere, Category = Blackboard)
+		float StrafeRadius_Min = 5.f;
+	UPROPERTY(EditAnywhere, Category = Blackboard)
+		float StrafeRadius_Max = 15.f;
+
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 };

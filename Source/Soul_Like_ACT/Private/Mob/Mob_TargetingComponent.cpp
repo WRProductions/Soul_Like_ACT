@@ -38,25 +38,18 @@ void UMob_TargetingComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UMob_TargetingComponent::FacingTarget_Init()
+void UMob_TargetingComponent::FacingTarget_Init(AActor *TargetActor)
 {
+	TargetPawn = TargetActor;
+
 	if (TargetPawn)
-	{
 		bIsFacingTarget = 1;
-	}
 	else
 		UE_LOG(LogTemp, Warning, TEXT("UMob_TargetingComponent::FacingTarget_Init failed"));
 }
 
 void UMob_TargetingComponent::FacingTarget_End()
 {
+	SetTarget(nullptr);
 	bIsFacingTarget = 0;
-}
-
-void UMob_TargetingComponent::ToggleTargetLocking()
-{
-	if (bIsFacingTarget)
-		FacingTarget_End();
-	else if (TargetPawn)
-		FacingTarget_Init();
 }

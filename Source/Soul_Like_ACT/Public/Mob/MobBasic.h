@@ -42,7 +42,7 @@ public:
 
 	UMob_TargetingComponent *GetTargetingComponent() const { return TargetingComponent; }
 
-	void SetFocus(bool Enable, AActor * Target);
+	void SetFocus(AActor * Target);
 
 	bool GetIsTargetingEnabled() const;
 };

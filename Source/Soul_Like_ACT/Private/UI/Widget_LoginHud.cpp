@@ -15,13 +15,13 @@ void UWidget_LoginHud::CacheSaveSlot()
 	{
 		StartGame->SetIsEnabled(true);
 		ResetButton->SetIsEnabled(true);
-		PlayerID->SetVisibility(ESlateVisibility::Visible);
-		PlayerID->SetText(FText::FromString(MyGI->GetSaveSlot()->UserId));
+// 		PlayerID->SetVisibility(ESlateVisibility::Visible);
+// 		PlayerID->SetText(FText::FromString(MyGI->GetSaveSlot()->UserId));
 	}
 	else
 	{
-		PlayerID->SetVisibility(ESlateVisibility::Hidden);
-		PlayerID->SetIsEnabled(false);
+// 		PlayerID->SetVisibility(ESlateVisibility::Hidden);
+// 		PlayerID->SetIsEnabled(false);
 		ResetButton->SetIsEnabled(true);
 	}
 }

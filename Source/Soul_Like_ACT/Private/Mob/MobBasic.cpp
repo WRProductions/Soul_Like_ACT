@@ -66,21 +66,16 @@ void AMobBasic::SetTarget(AActor *PlayerPawn) const
 	TargetingComponent->SetTarget(PlayerPawn);
 }
 
-void AMobBasic::SetFocus(bool InputMode, AActor * Target)
+void AMobBasic::SetFocus(AActor * Target)
 {
 
-	if (TargetingComponent->GetIsEnabled() && InputMode == 0)
+	if (!Target)
 	{
 		TargetingComponent->FacingTarget_End();
-		TargetingComponent->SetTarget(nullptr);
 		return;
 	}
-	if (!TargetingComponent->GetIsEnabled() && InputMode == 1)
-	{
-		TargetingComponent->FacingTarget_Init();
-		TargetingComponent->SetTarget(Target);
-		return;
-	}
+	TargetingComponent->FacingTarget_Init(Target);
+	return;
 }
 
 bool AMobBasic::GetIsTargetingEnabled() const

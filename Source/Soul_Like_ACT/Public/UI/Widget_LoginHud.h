@@ -23,10 +23,6 @@ public:
 	UButton* StartGame;
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UButton* ResetButton;
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-	UImage* Rank;
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-	UTextBlock* PlayerID;
 
 	//Call this on CONSTRUCT
 	UFUNCTION(BlueprintCallable)

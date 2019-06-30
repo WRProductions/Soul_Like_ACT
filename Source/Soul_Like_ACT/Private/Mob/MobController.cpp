@@ -47,7 +47,6 @@ void AMobController::OnPossess(APawn* InPawn)
 	//set up bb and bt
 	check(BlockBoardData);
 	check(BehaviorTreeAsset);
-
 }
 
 void AMobController::OnUnPossess()
@@ -84,4 +83,4 @@ void AMobController::AISenseUpdateMessage(AActor* Actor, FAIStimulus Stimulus)
 			UE_LOG(LogTemp, Warning, TEXT("%s is lost by %s"), *Actor->GetName(), *PossessedMob->GetName());
 		}
 	}
-	}
+}

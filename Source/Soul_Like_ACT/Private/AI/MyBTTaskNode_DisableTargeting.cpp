@@ -10,7 +10,7 @@
 EBTNodeResult::Type UMyBTTaskNode_DisableTargeting::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	AMobBasic *LocalOwner = Cast<AMobBasic>(Cast<AController>(OwnerComp.GetOwner())->GetPawn());
-	LocalOwner->SetFocus(0, nullptr);
+	LocalOwner->SetFocus(nullptr);
 	LocalOwner->GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	return EBTNodeResult::Succeeded;
 }
