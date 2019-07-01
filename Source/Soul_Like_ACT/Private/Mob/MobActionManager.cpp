@@ -2,6 +2,7 @@
 
 #include "MobActionManager.h"
 #include "Mob/MobBasic.h"
+#include "Abilities/SoulModifierManager.h"
 #include "Abilities/SoulAbilitySystemComponent.h"
 #include "Abilities/SoulGameplayAbility.h"
 #include "Abilities/SoulAbilitySysBPLib.h"
@@ -14,7 +15,7 @@ UMobActionManager::UMobActionManager()
 	PrimaryComponentTick.bCanEverTick = 0;
 }
 
-bool UMobActionManager::TryUseActiveAbility(TSubclassOf<USoulActiveAbility> InActiveAbility, const float InMultiplier, const int32 InMontageIndex)
+bool UMobActionManager::TryUseActiveAbility(TSubclassOf<USoulActiveAbility> InActiveAbility, const int32 InMontageIndex)
 {
 	FGameplayAbilitySpecHandle GASpecHandle = USoulModifierManager::GetActiveAbilitySpecHandleFromCharacter(OwnerRef, InActiveAbility);
 
@@ -27,14 +28,14 @@ bool UMobActionManager::TryUseActiveAbility(TSubclassOf<USoulActiveAbility> InAc
 	return false;
 }
 
-bool UMobActionManager::TryUseCombo(TSubclassOf<USoulActiveAbility> InActiveAbility, const float InMultiplier, bool bForceNew)
+bool UMobActionManager::TryUseCombo(TSubclassOf<USoulActiveAbility> InActiveAbility, bool bForceNew)
 {
-	if (!CurrActiveAbility->IsValidLowLevel() || CurrActiveAbility != InActiveAbility || bForceNew)
+	if (!CurrActiveAbility->IsValidLowLevel() || CurrActiveAbility != InActiveAbility || bForceNew || !bNextComboInQuery)
 	{
 		CurrComboStage = 0;
 		CurrActiveAbility = InActiveAbility;
 
-		TryUseActiveAbility(CurrActiveAbility, InMultiplier, CurrComboStage);
+		TryUseActiveAbility(CurrActiveAbility, CurrComboStage);
 
 		return false;
 	}
@@ -45,15 +46,12 @@ bool UMobActionManager::TryUseCombo(TSubclassOf<USoulActiveAbility> InActiveAbil
 		UAnimMontage* GA_Montage;
 		USoulAbilitySysBPLib::GetMontageFromActiveAbility(InActiveAbility, GA_Montage);
 
-		//Reset
-		if (GA_Montage->IsValidSectionIndex(CurrComboStage))
-		{
+		//Get next combo section index if the NEXT section index is valid
+		if (GA_Montage->IsValidSectionIndex(CurrComboStage + 1))
 			++CurrComboStage;
-		}
+		//Reset the combo section index if the next index is invalid
 		else
-		{
 			CurrComboStage = 0;
-		}
 
 		OwnerAnimInstance->Montage_JumpToSection(GA_Montage->GetSectionName(CurrComboStage), GA_Montage);
 		

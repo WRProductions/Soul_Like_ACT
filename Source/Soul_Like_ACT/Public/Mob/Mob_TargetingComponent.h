@@ -6,7 +6,6 @@
 #include "Components/ActorComponent.h"
 #include "Mob_TargetingComponent.generated.h"
 
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SOUL_LIKE_ACT_API UMob_TargetingComponent : public UActorComponent
 {

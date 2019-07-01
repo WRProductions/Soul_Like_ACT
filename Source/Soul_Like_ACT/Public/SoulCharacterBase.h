@@ -12,7 +12,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChanged, const TArray<float> &, values);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FTrigger_OnMeleeAttack, AActor*, SourceActor, AActor*, TargetActor, const FHitResult, HitResult);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FTrigger_ThreeParams, AActor*, SourceActor, AActor*, TargetActor, const FHitResult, HitResult);
 
 UENUM(BlueprintType)
 enum class EIsControllerValid : uint8
@@ -150,6 +150,14 @@ public:
 			OnMeleeKill.Broadcast(SourceActor, TargetActor, HitResult);
 	}
 
+	void Notify_OnStun(AActor* SourceActor, const FHitResult HitResult)
+	{
+		if (OnStun.IsBound())
+		{
+			OnStun.Broadcast(SourceActor, this, HitResult);
+		}
+	}
+
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_TwoParams(Health);
 	ATTRIBUTE_GETTER(MaxHealth);
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_TwoParams(Posture);
@@ -235,9 +243,11 @@ protected:
 
 	//On_XXX trigger
 	UPROPERTY(BlueprintAssignable)
-	FTrigger_OnMeleeAttack OnMeleeAttack;
+	FTrigger_ThreeParams OnMeleeAttack;
 	UPROPERTY(BlueprintAssignable)
-	FTrigger_OnMeleeAttack OnMeleeKill;
+	FTrigger_ThreeParams OnMeleeKill;
+	UPROPERTY(BlueprintAssignable)
+	FTrigger_ThreeParams OnStun;
 
 	// Called from RPGAttributeSet, these call BP events above
 	virtual void HandleDamage(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);

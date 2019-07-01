@@ -9,19 +9,6 @@
 class USoulActiveAbility;
 class AMobBasic;
 
-UENUM(BlueprintType)
-enum class EMobActionState : uint8
-{
-	Idel,
-	Attack,
-	Dodge,
-	Parry,
-	Block,
-	OnHit,
-	OnStun,
-	OnDead,
-};
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SOUL_LIKE_ACT_API UMobActionManager : public UActorComponent
 {
@@ -33,21 +20,22 @@ protected:
 	bool bNextComboInQuery;
 
 	uint8 CurrComboStage;
+	
 	TSubclassOf<USoulActiveAbility> CurrActiveAbility;
 
 public:	
-	// Sets default values for this component's properties
 	UMobActionManager();
 
-	EMobActionState MobActionState;
-
+	UFUNCTION(BlueprintCallable)
 	void EnableComboQuery() { bNextComboInQuery = true; }
+	UFUNCTION(BlueprintCallable)
+	void InterruptComboQuery() { bNextComboInQuery = false; }
 
-	void RenewComboStatge(TSubclassOf<USoulActiveAbility> InActiveAbility, const bool bNewGA);
+	UFUNCTION(BlueprintCallable)
+	bool TryUseActiveAbility(TSubclassOf<USoulActiveAbility> InActiveAbility, const int32 InMontageIndex);
 
-	bool TryUseActiveAbility(TSubclassOf<USoulActiveAbility> InActiveAbility, const float InMultiplier, const int32 InMontageIndex);
-
-	bool TryUseCombo(TSubclassOf<USoulActiveAbility> InActiveAbility, const float InMultiplier, bool bForceNew);
+	UFUNCTION(BlueprintCallable)
+	bool TryUseCombo(TSubclassOf<USoulActiveAbility> InActiveAbility, bool bForceNew);
 
 	friend class AMobBasic;
 };
