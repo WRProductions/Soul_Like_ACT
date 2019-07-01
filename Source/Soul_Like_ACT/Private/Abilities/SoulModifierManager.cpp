@@ -5,6 +5,7 @@
 #include "SoulCharacterBase.h"
 #include "GameFramework/Actor.h"
 #include "Types/SoulItemTypes.h"
+#include "Animation/AnimInstance.h"
 #include "Abilities/SoulGameplayAbility.h"
 #include "Abilities/SoulAbilitySystemComponent.h"
 
@@ -42,6 +43,25 @@ class USoulAbilitySystemComponent* USoulModifierManager::GetOwnerGameplayAbility
 FGameplayAbilitySpec* USoulModifierManager::FindAbilitySpecFromHandle(FGameplayAbilitySpecHandle& InSpecHandle)
 {
 	return (GetOwnerGameplayAbilityComponent()->FindAbilitySpecFromHandle(InSpecHandle));
+}
+
+FGameplayAbilitySpecHandle USoulModifierManager::GetActiveAbilitySpecHandleFromCharacter(ASoulCharacterBase* InCharacter, TSubclassOf<USoulActiveAbility> InActiveAbility)
+{
+	USoulModifierManager* LocalModManager = InCharacter->GetModifierManager();
+	USoulAbilitySystemComponent* OwnerAbilityComponent = USoulAbilitySystemComponent::GetAbilitySystemComponentFromActor(InCharacter);
+
+	if (!LocalModManager) return FGameplayAbilitySpecHandle();
+
+	for (auto& LocalSpecHandle : LocalModManager->GrantedActiveAbilities)
+	{
+		FGameplayAbilitySpec *LocalGASpec = OwnerAbilityComponent->FindAbilitySpecFromHandle(LocalSpecHandle);
+		if (LocalGASpec && LocalGASpec->Ability->StaticClass() == InActiveAbility)
+		{
+			return LocalSpecHandle;
+		}
+	}
+
+	return FGameplayAbilitySpecHandle();
 }
 
 void USoulModifierManager::AddStartupGameplayAbilities()

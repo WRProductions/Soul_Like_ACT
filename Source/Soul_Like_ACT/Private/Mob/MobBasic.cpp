@@ -17,8 +17,10 @@ AMobBasic::AMobBasic()
 	PrimaryActorTick.bCanEverTick = true;
 
 	TargetingComponent = CreateDefaultSubobject<UMob_TargetingComponent>(TEXT("TargetingComponent"));
+	TargetingComponent->OwnerRef = this;
 
 	ActionManager = CreateDefaultSubobject<UMobActionManager>(TEXT("ActionManager"));
+	ActionManager->OwnerRef = this;
 
 	Faction = EActorFaction::Enemy;
 
@@ -80,5 +82,5 @@ void AMobBasic::SetFocus(AActor * Target)
 
 bool AMobBasic::GetIsTargetingEnabled() const
 {
-	return TargetingComponent->GetIsEnabled();
+	return TargetingComponent->GetIsFacingTarget();
 }

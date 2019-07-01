@@ -26,12 +26,20 @@ protected:
 	virtual void BeginPlay() override;
 
 	class AMobBasic *OwnerRef;
-	class AMobController *OwnerController;
 
 	AActor *TargetPawn;
 	bool bIsFacingTarget;
+	bool bFreeRotation;
+
+	float MoveSpeedCoe = 1.0f;
+
+	void SetMoveSpeedCoe(bool bEnabled);
 
 public:
+	//Whether the rotation can interp to facing the target
+	UFUNCTION(BlueprintCallable)
+	void SetFreeRotation(bool bEnabled);
+
 	void FacingTarget_Init(AActor *TargetActor);
 	void FacingTarget_End();
 
@@ -39,5 +47,9 @@ public:
 	void SetTarget(AActor *PlayerPawn) { TargetPawn = PlayerPawn; }
 
 	UFUNCTION(BlueprintCallable)
-	bool GetIsEnabled() const{ return bIsFacingTarget; }
+	bool GetIsFacingTarget() const{ return bIsFacingTarget; }
+	UFUNCTION(BlueprintCallable)
+	bool GetIsFreeRotation() const { return bFreeRotation; }
+
+	friend class AMobBasic;
 };

@@ -9,7 +9,9 @@
 
 struct FGameplayAbilitySpecHandle;
 struct FGameplayAbilitySpec;
+class USoulActiveAbility;
 class UGameplayAbility;
+class ASoulCharacterBase;
 struct FSoulItemData;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -73,6 +75,9 @@ protected:
 
 	FGameplayAbilitySpec* FindAbilitySpecFromHandle(FGameplayAbilitySpecHandle& InSpecHandle);
 
+	static FGameplayAbilitySpecHandle GetActiveAbilitySpecHandleFromCharacter(ASoulCharacterBase *InCharacter, TSubclassOf<USoulActiveAbility> InActiveAbility);
+
 	friend class ASoulCharacterBase;
 	friend class UInventoryManager;
+	friend class UMobActionManager;
 };

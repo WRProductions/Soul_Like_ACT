@@ -7,12 +7,8 @@
 // Sets default values for this component's properties
 UMob_TargetingComponent::UMob_TargetingComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = 1;
+	PrimaryComponentTick.bCanEverTick = true;
 	//PrimaryComponentTick.bStartWithTickEnabled = 1;
-
-	// ...
 }
 
 
@@ -21,7 +17,7 @@ void UMob_TargetingComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 	//Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "UMob_TargetingComponent::TickComponent successful");
 
-	if (bIsFacingTarget /* && !OwnerRef->GetIsStun()*/)
+	if (bIsFacingTarget /* && !OwnerRef->GetIsStun()*/ && !bFreeRotation)
 	{
 		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetOwner()->GetActorLocation(), TargetPawn->GetActorLocation());
 
@@ -36,6 +32,23 @@ void UMob_TargetingComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 void UMob_TargetingComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	check(OwnerRef);
+}
+
+void UMob_TargetingComponent::SetMoveSpeedCoe(bool bEnabled)
+{
+	if (bEnabled)
+		MoveSpeedCoe = .7f;
+	else
+		MoveSpeedCoe = 1.0f;
+
+	OwnerRef->HandleMoveSpeedChanged(FOnAttributeChangeData());
+}
+
+void UMob_TargetingComponent::SetFreeRotation(bool bEnabled)
+{
+	bFreeRotation = bEnabled;
 }
 
 void UMob_TargetingComponent::FacingTarget_Init(AActor *TargetActor)
@@ -43,7 +56,10 @@ void UMob_TargetingComponent::FacingTarget_Init(AActor *TargetActor)
 	TargetPawn = TargetActor;
 
 	if (TargetPawn)
+	{
+		SetMoveSpeedCoe(true);
 		bIsFacingTarget = 1;
+	}
 	else
 		UE_LOG(LogTemp, Warning, TEXT("UMob_TargetingComponent::FacingTarget_Init failed"));
 }
@@ -51,5 +67,6 @@ void UMob_TargetingComponent::FacingTarget_Init(AActor *TargetActor)
 void UMob_TargetingComponent::FacingTarget_End()
 {
 	SetTarget(nullptr);
+	SetMoveSpeedCoe(false);
 	bIsFacingTarget = 0;
 }

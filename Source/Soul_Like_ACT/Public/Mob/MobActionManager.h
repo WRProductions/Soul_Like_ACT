@@ -6,6 +6,9 @@
 #include "Components/ActorComponent.h"
 #include "MobActionManager.generated.h"
 
+class USoulActiveAbility;
+class AMobBasic;
+
 UENUM(BlueprintType)
 enum class EMobActionState : uint8
 {
@@ -24,20 +27,27 @@ class SOUL_LIKE_ACT_API UMobActionManager : public UActorComponent
 {
 	GENERATED_BODY()
 
+protected:
+	AMobBasic* OwnerRef;
+
+	bool bNextComboInQuery;
+
+	uint8 CurrComboStage;
+	TSubclassOf<USoulActiveAbility> CurrActiveAbility;
+
 public:	
 	// Sets default values for this component's properties
 	UMobActionManager();
 
 	EMobActionState MobActionState;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		bool bIsActing;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		bool bIsBlocking;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		bool bCanParry;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		bool bIsSwinging;
-	UPROPERTY(BlueprintReadWrite)
-		bool bIsStun;
+	void EnableComboQuery() { bNextComboInQuery = true; }
+
+	void RenewComboStatge(TSubclassOf<USoulActiveAbility> InActiveAbility, const bool bNewGA);
+
+	bool TryUseActiveAbility(TSubclassOf<USoulActiveAbility> InActiveAbility, const float InMultiplier, const int32 InMontageIndex);
+
+	bool TryUseCombo(TSubclassOf<USoulActiveAbility> InActiveAbility, const float InMultiplier, bool bForceNew);
+
+	friend class AMobBasic;
 };
