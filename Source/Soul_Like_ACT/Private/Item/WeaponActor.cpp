@@ -4,7 +4,6 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Abilities/SoulAbilitySysBPLib.h"
 #include "SoulCharacterBase.h"
 #include "DrawDebugHelpers.h"
 

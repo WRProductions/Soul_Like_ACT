@@ -3,21 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BehaviorTree/BTTaskNode.h"
+#include "BehaviorTree/Tasks/BTTask_BlueprintBase.h"
 #include "BTT_TryUseActiveAbility.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SOUL_LIKE_ACT_API UBTT_TryUseActiveAbility : public UBTTaskNode
+class SOUL_LIKE_ACT_API UBTT_TryUseActiveAbility : public UBTTask_BlueprintBase
 {
 	GENERATED_BODY()
 	
 public:
-
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-
 	UFUNCTION(BlueprintCallable)
-	void BindOnGameplayAbilityEnded(UGameplayAbility *GameplayAbilityInstance);
+	void BindOnGameplayAbilityEnded(AActor *SourceActor, TSubclassOf<USoulActiveAbility> ActiveAbility);
+
+	void EndTaskTrigger(class UGameplayAbility* GA);
 };

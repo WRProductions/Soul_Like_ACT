@@ -5,12 +5,9 @@
 #include "CoreMinimal.h"
 #include "Types/SoulItemTypes.h"
 #include "Components/ActorComponent.h"
+#include "Abilities/SoulGameplayAbility.h"
 #include "SoulModifierManager.generated.h"
 
-struct FGameplayAbilitySpecHandle;
-struct FGameplayAbilitySpec;
-class USoulActiveAbility;
-class UGameplayAbility;
 class ASoulCharacterBase;
 struct FSoulItemData;
 
@@ -68,14 +65,14 @@ protected:
 	 * bIsAdded is false represents the gear is unequipped
 	 * Warning: The function shall only be called in UInventoryManager. Don't call it manually
 	 */
-	bool UpdateModifierToPlayer(const FSoulItemData& InputItemData, bool bIsAdded = true);
+	bool UpdateModifier(const FSoulItemData& InputItemData, bool bIsAdded = true);
+	
+public:
+	UFUNCTION(BlueprintCallable)
+		bool FindActiveAbilitySpecHandle(TSubclassOf<USoulActiveAbility> ActiveAbilityClass, FGameplayAbilitySpecHandle& OutGASpecHandle);
 
 	UFUNCTION(BlueprintCallable)
-	class USoulAbilitySystemComponent* GetOwnerGameplayAbilityComponent();
-
-	FGameplayAbilitySpec* FindAbilitySpecFromHandle(FGameplayAbilitySpecHandle& InSpecHandle);
-
-	static FGameplayAbilitySpecHandle GetActiveAbilitySpecHandleFromCharacter(ASoulCharacterBase *InCharacter, TSubclassOf<USoulActiveAbility> InActiveAbility);
+		static USoulModifierManager* GetModifierManager(AActor* SourceActor);
 
 	friend class ASoulCharacterBase;
 	friend class UInventoryManager;

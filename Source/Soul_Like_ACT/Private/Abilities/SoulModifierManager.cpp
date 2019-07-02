@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "Types/SoulItemTypes.h"
 #include "Animation/AnimInstance.h"
-#include "Abilities/SoulGameplayAbility.h"
 #include "Abilities/SoulAbilitySystemComponent.h"
 
 USoulModifierManager::USoulModifierManager()
@@ -30,40 +29,49 @@ USoulModifierManager* USoulModifierManager::GetSoulModifierManger(class AActor* 
 	return nullptr;
 }
 
-class USoulAbilitySystemComponent* USoulModifierManager::GetOwnerGameplayAbilityComponent()
+bool USoulModifierManager::FindActiveAbilitySpecHandle(TSubclassOf<USoulActiveAbility> ActiveAbilityClass, FGameplayAbilitySpecHandle& OutGASpecHandle)
 {
-	return USoulAbilitySystemComponent::GetAbilitySystemComponentFromActor(GetOwner());
-}
+	USoulAbilitySystemComponent* AbilityComponent = USoulAbilitySystemComponent::GetAbilitySystemComponentFromActor(GetOwner());
+	ASoulCharacterBase* SoulChar = Cast<ASoulCharacterBase>(GetOwner());
 
-FGameplayAbilitySpec* USoulModifierManager::FindAbilitySpecFromHandle(FGameplayAbilitySpecHandle& InSpecHandle)
-{
-	return (GetOwnerGameplayAbilityComponent()->FindAbilitySpecFromHandle(InSpecHandle));
-}
-
-FGameplayAbilitySpecHandle USoulModifierManager::GetActiveAbilitySpecHandleFromCharacter(ASoulCharacterBase* InCharacter, TSubclassOf<USoulActiveAbility> InActiveAbility)
-{
-	USoulModifierManager* LocalModManager = InCharacter->GetModifierManager();
-	USoulAbilitySystemComponent* OwnerAbilityComponent = USoulAbilitySystemComponent::GetAbilitySystemComponentFromActor(InCharacter);
-
-	if (!LocalModManager) return FGameplayAbilitySpecHandle();
-
-	for (auto& LocalSpecHandle : LocalModManager->GrantedActiveAbilities)
+	if (SoulChar)
 	{
-		FGameplayAbilitySpec *LocalGASpec = OwnerAbilityComponent->FindAbilitySpecFromHandle(LocalSpecHandle);
-		if (LocalGASpec && LocalGASpec->Ability->StaticClass() == InActiveAbility)
+		for (auto& GASpecHandle : GrantedActiveAbilities)
 		{
-			return LocalSpecHandle;
+			FGameplayAbilitySpec* TempSpec = AbilityComponent->FindAbilitySpecFromHandle(GASpecHandle);
+			if (TempSpec->Ability->StaticClass() == ActiveAbilityClass)
+			{
+				OutGASpecHandle = GASpecHandle;
+			}
 		}
-	}
 
-	return FGameplayAbilitySpecHandle();
+		LOG_FUNC_ERROR("Cannot find GASpecHandle");
+		return false;
+	}
+	else
+	{
+		LOG_FUNC_ERROR("Can't access ModifierManager");
+		return false;
+	}
+}
+
+USoulModifierManager* USoulModifierManager::GetModifierManager(AActor* SourceActor)
+{
+	ASoulCharacterBase* SoulChar = Cast<ASoulCharacterBase>(SourceActor);
+	
+	if (!SoulChar)
+	{
+		return nullptr;
+	}
+	return SoulChar->GetModifierManager();
 }
 
 void USoulModifierManager::AddStartupGameplayAbilities()
 {
-	check(GetOwnerGameplayAbilityComponent());
+	USoulAbilitySystemComponent* AbilitySysComp = USoulAbilitySystemComponent::GetAbilitySystemComponentFromActor(GetOwner());
+	check(AbilitySysComp);
 
-	GetOwnerGameplayAbilityComponent()->InitAbilityActorInfo(GetOwner(), GetOwner());
+	AbilitySysComp->InitAbilityActorInfo(GetOwner(), GetOwner());
 
 	if (!(GetOwner()->Role == ROLE_Authority))
 	{
@@ -73,15 +81,17 @@ void USoulModifierManager::AddStartupGameplayAbilities()
 	{
 		if (TempActiveAbility.Key)
 		{
-			FGameplayAbilitySpecHandle LocalGrantedActiveGA = GetOwnerGameplayAbilityComponent()->GiveAbility(
-				FGameplayAbilitySpec(
+			auto GrantedAbilitySpecHandle = AbilitySysComp->GiveAbility(
+				FGameplayAbilitySpec
+				(
 					TempActiveAbility.Key
 					, TempActiveAbility.Value
 					, INDEX_NONE
-					, GetOwner())
+					, GetOwner()
+				)
 			);
 
-			GrantedActiveAbilities.Add(LocalGrantedActiveGA);
+			GrantedActiveAbilities.Add(GrantedAbilitySpecHandle);
 		}
 	}
 
@@ -89,29 +99,29 @@ void USoulModifierManager::AddStartupGameplayAbilities()
 	{
 		if (TempModifier.Key)
 		{
-			auto LocalGrantedMod = GetOwnerGameplayAbilityComponent()->GiveAbility(
-				FGameplayAbilitySpec(
+			auto LocalGrantedMod = AbilitySysComp->GiveAbility(
+				FGameplayAbilitySpec
+				(
 					TempModifier.Key
 					, TempModifier.Value
 					, INDEX_NONE
-					, GetOwner())
+					, GetOwner()
+				)
 			);
 
 			GrantedModifierAbilities.Add(LocalGrantedMod);
 
-			GetOwnerGameplayAbilityComponent()->TryActivateAbility(LocalGrantedMod, true);
+			AbilitySysComp->TryActivateAbility(LocalGrantedMod, true);
 		}
 	}
 
 	bAbilitiesInitialized = true;
 }
 
-bool USoulModifierManager::UpdateModifierToPlayer(const FSoulItemData& InputItemData, bool bIsAdded /*= true*/)
+bool USoulModifierManager::UpdateModifier(const FSoulItemData& InputItemData, bool bIsAdded /*= true*/)
 {
-// 	if (PlayerRef->Role != ROLE_Authority)
-// 	{
-// 		return false;
-// 	}
+	USoulAbilitySystemComponent* AbilityComponent = USoulAbilitySystemComponent::GetAbilitySystemComponentFromActor(GetOwner());
+
 	if (!InputItemData.IsValid())
 	{
 		LOG_FUNC_ERROR("Invalid InputItemData");
@@ -125,7 +135,7 @@ bool USoulModifierManager::UpdateModifierToPlayer(const FSoulItemData& InputItem
 		for (int i = 0; i < SlottedAbilities.Num(); ++i)
 		{
 
-			auto* CurrGASpec = FindAbilitySpecFromHandle(SlottedAbilities[i]);
+			auto* CurrGASpec = AbilityComponent->FindAbilitySpecFromHandle(SlottedAbilities[i]);
 
 			UE_LOG(LogTemp, Warning, TEXT("%s vs %s"), *((ItemModifier.Key.GetDefaultObject())->GetName()), *CurrGASpec->Ability->GetName());
 
@@ -158,7 +168,7 @@ bool USoulModifierManager::UpdateModifierToPlayer(const FSoulItemData& InputItem
 				
 				//Remove the old modifier
 				//GetOwnerGameplayAbilityComponent()->CancelAbilityHandle(SlottedAbilities[i]);
-				GetOwnerGameplayAbilityComponent()->ClearAbility(SlottedAbilities[i]);
+				AbilityComponent->ClearAbility(SlottedAbilities[i]);
 
 				//remove the spec handle from the SlottedAbilities if the GA is completely removed
 				if (CurrGALevel <= 0)
@@ -169,10 +179,10 @@ bool USoulModifierManager::UpdateModifierToPlayer(const FSoulItemData& InputItem
 				else
 				{
 					//Assign a new spec handle to it
-					FGameplayAbilitySpecHandle LocalGrantedMod = GetOwnerGameplayAbilityComponent()->GiveAbility(
+					FGameplayAbilitySpecHandle LocalGrantedMod = AbilityComponent->GiveAbility(
 						FGameplayAbilitySpec(ItemModifier.Key, CurrGALevel, INDEX_NONE, GetOwner()));
 
-					GetOwnerGameplayAbilityComponent()->TryActivateAbility(LocalGrantedMod, true);
+					AbilityComponent->TryActivateAbility(LocalGrantedMod, true);
 
 					SlottedAbilities.Add(LocalGrantedMod);
 				}
@@ -182,10 +192,10 @@ bool USoulModifierManager::UpdateModifierToPlayer(const FSoulItemData& InputItem
 
 		if (!bIsModNew)
 		{
-			FGameplayAbilitySpecHandle NewGrantedMod = GetOwnerGameplayAbilityComponent()->GiveAbility(
+			FGameplayAbilitySpecHandle NewGrantedMod = AbilityComponent->GiveAbility(
 				FGameplayAbilitySpec(ItemModifier.Key, ItemModifier.Value, INDEX_NONE, GetOwner()));
 
-			GetOwnerGameplayAbilityComponent()->TryActivateAbility(NewGrantedMod, true);
+			AbilityComponent->TryActivateAbility(NewGrantedMod, true);
 
 			SlottedAbilities.Add(NewGrantedMod);
 

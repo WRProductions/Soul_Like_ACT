@@ -112,7 +112,7 @@ bool UInventoryManager::AddEquipment(FSoulInventSlot InventorySlot)
 
 			//remove the current GA
  			if (MyModiferManager)
- 				MyModiferManager->UpdateModifierToPlayer(EquipedItems[EquipSlot], false);
+ 				MyModiferManager->UpdateModifier(EquipedItems[EquipSlot], false);
 
 			SetItemSlot(EquipedItems[EquipSlot], InventorySlot);
 
@@ -141,7 +141,7 @@ bool UInventoryManager::RemoveEquipment(FSoulEquipmentSlot FromEquipSlot)
 
  		//remove the current GA
  		if (MyModiferManager)
-			MyModiferManager->UpdateModifierToPlayer(OldData, false);
+			MyModiferManager->UpdateModifier(OldData, false);
 
 		EquipedItems[FromEquipSlot] = FSoulItemData();
 		NotifyEquipmentChanged(FromEquipSlot, EquipedItems[FromEquipSlot]);
@@ -344,7 +344,7 @@ bool UInventoryManager::InventoryToEquipment(FSoulItemData FromItem, FSoulEquipm
 			USoulModifierManager* MyModiferManager = USoulModifierManager::GetSoulModifierManger(GetOwner());
 			
 			if (MyModiferManager)
-				MyModiferManager->UpdateModifierToPlayer(EquipedItems[MyEquipSlot], true);
+				MyModiferManager->UpdateModifier(EquipedItems[MyEquipSlot], true);
 			
 			return true;
 		}

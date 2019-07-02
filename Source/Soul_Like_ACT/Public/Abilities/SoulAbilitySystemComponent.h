@@ -37,6 +37,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static FActiveGameplayEffectHandle ApplyGE_ToTarget(const AActor* FromActor, const AActor* TargetActor, const TSubclassOf<UGameplayEffect> GameplayEffect, const int32 AbilityLevel);
 
+	UFUNCTION(BlueprintCallable, Category = Ability, Meta = (Tooltip = "This function can be used to create the event data through weapon on hit"))
+	static void CreateEventData(const AActor* Target, const AActor* Source, const FHitResult& InpHitResult, const FGameplayTag EventTag, const float EventMagnitude, FGameplayEventData& OutpEventData);
+
+	UFUNCTION(BlueprintCallable)
+	static bool GetMontageFromActiveAbility(TSubclassOf<USoulActiveAbility> ActiveAbilityClass, UAnimMontage*& AnimMontage);
+
+	UFUNCTION(BlueprintCallable)
+	static float GetMontageSectionLength(UAnimMontage* AnimMontage, FName SectionName);
+
 	void BindOnGameplayAbilityEndFromActiveSpecHandle(
 		const FGameplayAbilitySpecHandle& GameplaySpecHandle
 		, const FOnGameplayAbilityEnded::FDelegate& OnGameplayAbilityEndedDelegate

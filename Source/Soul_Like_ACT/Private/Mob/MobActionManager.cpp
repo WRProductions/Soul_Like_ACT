@@ -5,7 +5,6 @@
 #include "Abilities/SoulModifierManager.h"
 #include "Abilities/SoulAbilitySystemComponent.h"
 #include "Abilities/SoulGameplayAbility.h"
-#include "Abilities/SoulAbilitySysBPLib.h"
 
 UMobActionManager::UMobActionManager()
 {
@@ -14,7 +13,8 @@ UMobActionManager::UMobActionManager()
 
 bool UMobActionManager::TryUseActiveAbility(TSubclassOf<USoulActiveAbility> InActiveAbility, bool bUseCombo /*= false*/)
 {
-	FGameplayAbilitySpecHandle GASpecHandle = USoulModifierManager::GetActiveAbilitySpecHandleFromCharacter(OwnerRef, InActiveAbility);
+	FGameplayAbilitySpecHandle GASpecHandle;
+	OwnerRef->GetModifierManager()->FindActiveAbilitySpecHandle(InActiveAbility, GASpecHandle);
 
 	if (GASpecHandle.IsValid())
 	{

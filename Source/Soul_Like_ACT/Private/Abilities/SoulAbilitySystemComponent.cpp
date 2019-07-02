@@ -2,6 +2,7 @@
 
 #include "Abilities/SoulAbilitySystemComponent.h"
 #include "SoulCharacterBase.h"
+#include "Abilities/SoulModifierManager.h"
 #include "Abilities/SoulGameplayAbility.h"
 #include "AbilitySystemGlobals.h"
 
@@ -72,18 +73,50 @@ FActiveGameplayEffectHandle USoulAbilitySystemComponent::ApplyGE_ToTarget(const 
 	return FActiveGameplayEffectHandle();
 }
 
+void USoulAbilitySystemComponent::CreateEventData(const AActor* Target, const AActor* Source, const FHitResult& InpHitResult, const FGameplayTag EventTag, const float EventMagnitude, FGameplayEventData& OutpEventData)
+{
+	FGameplayEffectContextHandle TempContextHandle(new FGameplayEffectContext());
+	TempContextHandle.AddHitResult(InpHitResult);
+
+	FGameplayEventData TempEventData;
+	TempEventData.Instigator = Source;
+	TempEventData.Target = Target;
+	//TODO damage magnitude
+	TempEventData.EventMagnitude = EventMagnitude;
+	TempEventData.EventTag = EventTag;
+	TempEventData.ContextHandle = TempContextHandle;
+
+	OutpEventData = TempEventData;
+}
+
+bool USoulAbilitySystemComponent::GetMontageFromActiveAbility(TSubclassOf<USoulActiveAbility> ActiveAbilityClass, UAnimMontage*& AnimMontage)
+{
+	USoulActiveAbility* LocalAbility = Cast<USoulActiveAbility>(ActiveAbilityClass->GetDefaultObject());
+	if (LocalAbility)
+	{
+		AnimMontage = LocalAbility->MontageToPlay;
+		return (AnimMontage != nullptr);
+	}
+
+	AnimMontage = NULL;
+	return false;
+}
+
+float USoulAbilitySystemComponent::GetMontageSectionLength(UAnimMontage* AnimMontage, FName SectionName)
+{
+	int32 SectionIndex = AnimMontage->GetSectionIndex(SectionName);
+
+	if (SectionIndex == INDEX_NONE)
+		return 0.f;
+
+	return AnimMontage->GetSectionLength(SectionIndex);
+}
+
 void USoulAbilitySystemComponent::BindOnGameplayAbilityEndFromActiveSpecHandle(
 	const FGameplayAbilitySpecHandle& GameplaySpecHandle
 	, const FOnGameplayAbilityEnded::FDelegate& OnGameplayAbilityEndedDelegate)
 {
 	auto *LocalGASpec = FindAbilitySpecFromHandle(GameplaySpecHandle);
 	
-	if (auto * PrimGAInstance = LocalGASpec->GetPrimaryInstance())
-	{
-		PrimGAInstance->OnGameplayAbilityEnded.Add(OnGameplayAbilityEndedDelegate);
-	}
-	else
-	{
-		LOG_FUNC_ERROR("GameplayAbility is not instantiaed");
-	}
+	
 }
