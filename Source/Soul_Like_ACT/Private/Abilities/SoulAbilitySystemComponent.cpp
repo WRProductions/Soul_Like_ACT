@@ -71,3 +71,19 @@ FActiveGameplayEffectHandle USoulAbilitySystemComponent::ApplyGE_ToTarget(const 
 
 	return FActiveGameplayEffectHandle();
 }
+
+void USoulAbilitySystemComponent::BindOnGameplayAbilityEndFromActiveSpecHandle(
+	const FGameplayAbilitySpecHandle& GameplaySpecHandle
+	, const FOnGameplayAbilityEnded::FDelegate& OnGameplayAbilityEndedDelegate)
+{
+	auto *LocalGASpec = FindAbilitySpecFromHandle(GameplaySpecHandle);
+	
+	if (auto * PrimGAInstance = LocalGASpec->GetPrimaryInstance())
+	{
+		PrimGAInstance->OnGameplayAbilityEnded.Add(OnGameplayAbilityEndedDelegate);
+	}
+	else
+	{
+		LOG_FUNC_ERROR("GameplayAbility is not instantiaed");
+	}
+}

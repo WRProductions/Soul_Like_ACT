@@ -37,6 +37,7 @@ public:
 	virtual TArray<FActiveGameplayEffectHandle> ApplyEffectContainer(FGameplayTag ContainerTag,
 	                                                                 const FGameplayEventData& EventData,
 	                                                                 int32 OverrideGameplayLevel = -1);
+
 protected:
 	/** Make gameplay effect container spec to be applied later, using the passed in container */
 	UFUNCTION(BlueprintCallable, Category = Ability, meta = (AutoCreateRefTerm = "EventData"))

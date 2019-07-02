@@ -9,7 +9,7 @@
 class USoulActiveAbility;
 class AMobBasic;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class SOUL_LIKE_ACT_API UMobActionManager : public UActorComponent
 {
 	GENERATED_BODY()
@@ -20,22 +20,29 @@ protected:
 	bool bNextComboInQuery;
 
 	uint8 CurrComboStage;
-	
-	TSubclassOf<USoulActiveAbility> CurrActiveAbility;
 
-public:	
+public:
 	UMobActionManager();
 
 	UFUNCTION(BlueprintCallable)
-	void EnableComboQuery() { bNextComboInQuery = true; }
+		void EnableComboQuery() 
+	{
+		bNextComboInQuery = true;
+		CurrComboStage = 0;
+	}
+
+	//Call that to prevent the combo being triggered.
 	UFUNCTION(BlueprintCallable)
-	void InterruptComboQuery() { bNextComboInQuery = false; }
+		void ResetComboQuery() { bNextComboInQuery = false; CurrComboStage = 0; }
 
 	UFUNCTION(BlueprintCallable)
-	bool TryUseActiveAbility(TSubclassOf<USoulActiveAbility> InActiveAbility, const int32 InMontageIndex);
+		const bool GetIsComboInQuery() const { return bNextComboInQuery; }
 
 	UFUNCTION(BlueprintCallable)
-	bool TryUseCombo(TSubclassOf<USoulActiveAbility> InActiveAbility, bool bForceNew);
+		bool TryUseActiveAbility(TSubclassOf<USoulActiveAbility> InActiveAbility, bool bUseCombo = false);
+
+	UFUNCTION(BlueprintCallable)
+		bool UseNextCombo(class UAnimInstance *AnimInstance);
 
 	friend class AMobBasic;
 };

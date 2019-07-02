@@ -7,53 +7,59 @@
 #include "Abilities/SoulGameplayAbility.h"
 #include "Abilities/SoulAbilitySysBPLib.h"
 
-// Sets default values for this component's properties
 UMobActionManager::UMobActionManager()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = 0;
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
-bool UMobActionManager::TryUseActiveAbility(TSubclassOf<USoulActiveAbility> InActiveAbility, const int32 InMontageIndex)
+bool UMobActionManager::TryUseActiveAbility(TSubclassOf<USoulActiveAbility> InActiveAbility, bool bUseCombo /*= false*/)
 {
 	FGameplayAbilitySpecHandle GASpecHandle = USoulModifierManager::GetActiveAbilitySpecHandleFromCharacter(OwnerRef, InActiveAbility);
 
 	if (GASpecHandle.IsValid())
 	{
 		if (OwnerRef->GetAbilitySystemComponent()->TryActivateAbilityByClass(InActiveAbility, true))
+		{
+			if (bUseCombo)
+			{
+				EnableComboQuery();
+			}
+			else
+			{
+				ResetComboQuery();
+			}
 			return true;
+		}
 	}
 
 	return false;
 }
 
-bool UMobActionManager::TryUseCombo(TSubclassOf<USoulActiveAbility> InActiveAbility, bool bForceNew)
+bool UMobActionManager::UseNextCombo(class UAnimInstance* AnimInstance)
 {
-	if (!CurrActiveAbility->IsValidLowLevel() || CurrActiveAbility != InActiveAbility || bForceNew || !bNextComboInQuery)
+	if (!GetIsComboInQuery())
 	{
-		CurrComboStage = 0;
-		CurrActiveAbility = InActiveAbility;
+		LOG_FUNC_ERROR("Can't use combo.");
+		
+		ResetComboQuery();
+		return false;
+	}
 
-		TryUseActiveAbility(CurrActiveAbility, CurrComboStage);
+	UAnimMontage* CurrMontage = AnimInstance->GetCurrentActiveMontage();
+	
+	if (!CurrMontage || CurrMontage->IsValidSectionIndex(CurrComboStage + 1))
+	{
+		ResetComboQuery();
+
+		LOG_FUNC_ERROR("No montage is playing or No connected combo")
 
 		return false;
 	}
 	else
 	{
-		UAnimInstance* OwnerAnimInstance = OwnerRef->GetMesh()->GetAnimInstance();
+		++CurrComboStage;
 		
-		UAnimMontage* GA_Montage;
-		USoulAbilitySysBPLib::GetMontageFromActiveAbility(InActiveAbility, GA_Montage);
-
-		//Get next combo section index if the NEXT section index is valid
-		if (GA_Montage->IsValidSectionIndex(CurrComboStage + 1))
-			++CurrComboStage;
-		//Reset the combo section index if the next index is invalid
-		else
-			CurrComboStage = 0;
-
-		OwnerAnimInstance->Montage_JumpToSection(GA_Montage->GetSectionName(CurrComboStage), GA_Montage);
+		AnimInstance->Montage_JumpToSection(CurrMontage->GetSectionName(CurrComboStage), CurrMontage);
 		
 		return true;
 	}
