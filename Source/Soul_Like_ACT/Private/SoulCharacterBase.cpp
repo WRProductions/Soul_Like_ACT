@@ -35,7 +35,6 @@ ASoulCharacterBase::ASoulCharacterBase()
 
 void ASoulCharacterBase::ToggleLockIcon()
 {
-
 	if (!IsTargetable() || TargetIcon->IsVisible())
 	{
 		TargetIcon->SetVisibility(false);

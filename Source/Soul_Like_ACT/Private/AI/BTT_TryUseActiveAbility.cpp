@@ -7,7 +7,7 @@
 #include "Abilities/SoulModifierManager.h"
 
 
-void UBTT_TryUseActiveAbility::BindOnGameplayAbilityEnded(AActor* SourceActor, TSubclassOf<USoulActiveAbility> ActiveAbility)
+void UBTT_TryUseActiveAbility::BindOnGameplayAbilityEnded(AActor* SourceActor, TSubclassOf<USoulActiveAbility> InActiveAbility)
 {
 	USoulAbilitySystemComponent* PawnAblityComponent = USoulAbilitySystemComponent::GetAbilitySystemComponentFromActor(SourceActor, false);
 	if (!PawnAblityComponent->IsValidLowLevel())
@@ -16,14 +16,20 @@ void UBTT_TryUseActiveAbility::BindOnGameplayAbilityEnded(AActor* SourceActor, T
 		return;
 	}
 	FGameplayAbilitySpecHandle SpecHandle;
-	USoulModifierManager::GetModifierManager(SourceActor)->FindActiveAbilitySpecHandle(ActiveAbility, SpecHandle);
-	FGameplayAbilitySpec* GASpec = PawnAblityComponent->FindAbilitySpecFromHandle(SpecHandle);
-	UGameplayAbility* PrimaryAbility;
-
-	if (GASpec->IsActive())
+	
+	if (!USoulModifierManager::GetModifierManager(SourceActor)->FindActiveAbilitySpecHandle(InActiveAbility, SpecHandle))
 	{
-		PrimaryAbility = GASpec->GetPrimaryInstance();
-		PrimaryAbility->OnGameplayAbilityEnded.AddUObject(this, &UBTT_TryUseActiveAbility::EndTaskTrigger);
+		LOG_FUNC_ERROR("Cannot find the active ability spec handle");
+		return;
+	}
+
+	FGameplayAbilitySpec* GASpec = PawnAblityComponent->FindAbilitySpecFromHandle(SpecHandle);
+	UGameplayAbility* LatestGAInstance;
+
+	if (ensure(GASpec) && GASpec->IsActive())
+	{
+		LatestGAInstance = GASpec->NonReplicatedInstances[GASpec->NonReplicatedInstances.Num() - 1];
+		LatestGAInstance->OnGameplayAbilityEnded.AddUObject(this, &UBTT_TryUseActiveAbility::EndTaskTrigger);
 	}
 	else
 	{

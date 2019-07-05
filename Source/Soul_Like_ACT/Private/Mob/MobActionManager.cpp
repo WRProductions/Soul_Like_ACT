@@ -64,3 +64,16 @@ bool UMobActionManager::UseNextCombo(class UAnimInstance* AnimInstance)
 		return true;
 	}
 }
+
+UMobActionManager* UMobActionManager::GetMobActionManager(AActor* SourceActor)
+{
+	AMobBasic* MobActor = Cast<AMobBasic>(SourceActor);
+	if (MobActor->IsValidLowLevel())
+	{
+		return MobActor->ActionManager;
+	}
+	else
+	{
+		return nullptr;
+	}
+}

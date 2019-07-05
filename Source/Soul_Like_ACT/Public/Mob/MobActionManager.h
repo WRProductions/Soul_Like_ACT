@@ -44,5 +44,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		bool UseNextCombo(class UAnimInstance *AnimInstance);
 
+	UFUNCTION(BlueprintCallable)
+		static UMobActionManager* GetMobActionManager(AActor* SourceActor);
 	friend class AMobBasic;
 };

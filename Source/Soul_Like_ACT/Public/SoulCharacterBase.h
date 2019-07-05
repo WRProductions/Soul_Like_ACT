@@ -248,6 +248,10 @@ protected:
 	FTrigger_ThreeParams OnMeleeKill;
 	UPROPERTY(BlueprintAssignable)
 	FTrigger_ThreeParams OnStun;
+	UPROPERTY(BlueprintAssignable)
+	FTrigger_ThreeParams OnParryFailed;
+	UPROPERTY(BlueprintAssignable)
+	FTrigger_ThreeParams OnParrySucced;
 
 	// Called from RPGAttributeSet, these call BP events above
 	virtual void HandleDamage(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);

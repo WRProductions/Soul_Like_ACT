@@ -72,7 +72,7 @@ public:
 		bool FindActiveAbilitySpecHandle(TSubclassOf<USoulActiveAbility> ActiveAbilityClass, FGameplayAbilitySpecHandle& OutGASpecHandle);
 
 	UFUNCTION(BlueprintCallable)
-		static USoulModifierManager* GetModifierManager(AActor* SourceActor);
+	static USoulModifierManager* GetModifierManager(AActor* SourceActor);
 
 	friend class ASoulCharacterBase;
 	friend class UInventoryManager;

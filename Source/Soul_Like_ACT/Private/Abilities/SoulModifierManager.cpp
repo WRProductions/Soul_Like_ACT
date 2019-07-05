@@ -32,27 +32,25 @@ USoulModifierManager* USoulModifierManager::GetSoulModifierManger(class AActor* 
 bool USoulModifierManager::FindActiveAbilitySpecHandle(TSubclassOf<USoulActiveAbility> ActiveAbilityClass, FGameplayAbilitySpecHandle& OutGASpecHandle)
 {
 	USoulAbilitySystemComponent* AbilityComponent = USoulAbilitySystemComponent::GetAbilitySystemComponentFromActor(GetOwner());
-	ASoulCharacterBase* SoulChar = Cast<ASoulCharacterBase>(GetOwner());
 
-	if (SoulChar)
-	{
-		for (auto& GASpecHandle : GrantedActiveAbilities)
-		{
-			FGameplayAbilitySpec* TempSpec = AbilityComponent->FindAbilitySpecFromHandle(GASpecHandle);
-			if (TempSpec->Ability->StaticClass() == ActiveAbilityClass)
-			{
-				OutGASpecHandle = GASpecHandle;
-			}
-		}
-
-		LOG_FUNC_ERROR("Cannot find GASpecHandle");
-		return false;
-	}
-	else
+	if (!AbilityComponent)
 	{
 		LOG_FUNC_ERROR("Can't access ModifierManager");
 		return false;
 	}
+
+	for (FGameplayAbilitySpecHandle& GASpecHandle : GrantedActiveAbilities)
+	{
+		FGameplayAbilitySpec* TempSpec = AbilityComponent->FindAbilitySpecFromHandle(GASpecHandle);
+		if (TempSpec->Ability->GetClass() == ActiveAbilityClass)
+		{
+			OutGASpecHandle = GASpecHandle;
+			return true;
+		}
+	}
+
+	LOG_FUNC_ERROR("Cannot find GASpecHandle");
+	return false;
 }
 
 USoulModifierManager* USoulModifierManager::GetModifierManager(AActor* SourceActor)

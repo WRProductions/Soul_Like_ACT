@@ -9,14 +9,17 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract, Blueprintable)
 class SOUL_LIKE_ACT_API UBTT_TryUseActiveAbility : public UBTTask_BlueprintBase
 {
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
+	TSubclassOf<USoulActiveAbility> ActiveAbility;
+
 	UFUNCTION(BlueprintCallable)
-	void BindOnGameplayAbilityEnded(AActor *SourceActor, TSubclassOf<USoulActiveAbility> ActiveAbility);
+	void BindOnGameplayAbilityEnded(AActor *SourceActor, TSubclassOf<USoulActiveAbility> InActiveAbility);
 
 	void EndTaskTrigger(class UGameplayAbility* GA);
 };

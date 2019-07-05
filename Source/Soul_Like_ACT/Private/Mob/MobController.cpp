@@ -61,6 +61,11 @@ void AMobController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AMobController::GainRageOnHit(AActor* SourceActor, AActor* TargetActor, const FHitResult HitResult)
+{
+
+}
+
 void AMobController::AISenseUpdateMessage(AActor* Actor, FAIStimulus Stimulus)
 {
 

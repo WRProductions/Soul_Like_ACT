@@ -41,6 +41,12 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	/**
+	* AI usages
+	*/
+	UFUNCTION(BlueprintCallable)
+		void GainRageOnHit(AActor* SourceActor, AActor* TargetActor, const FHitResult HitResult);
+
 	UFUNCTION(BlueprintCallable)
 	void AISenseUpdateMessage(AActor* Actor, FAIStimulus Stimulus);
 
