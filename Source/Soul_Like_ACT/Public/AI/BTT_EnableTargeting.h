@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "MyBTTaskNode_EnableTargeting.generated.h"
+#include "BTT_EnableTargeting.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SOUL_LIKE_ACT_API UMyBTTaskNode_EnableTargeting : public UBTTaskNode
+class SOUL_LIKE_ACT_API UBTT_EnableTargeting : public UBTTaskNode
 {
 	GENERATED_BODY()
 

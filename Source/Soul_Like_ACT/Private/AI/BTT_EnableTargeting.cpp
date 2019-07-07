@@ -1,14 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "AI/MyBTTaskNode_EnableTargeting.h"
+#include "AI/BTT_EnableTargeting.h"
 #include "Mob/MobBasic.h"
-#include "Mob/Mob_TargetingComponent.h"
-#include "GameFramework/Controller.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
-EBTNodeResult::Type UMyBTTaskNode_EnableTargeting::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UBTT_EnableTargeting::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	AActor *TargetPawn = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject("Target"));
 
@@ -27,9 +24,6 @@ EBTNodeResult::Type UMyBTTaskNode_EnableTargeting::ExecuteTask(UBehaviorTreeComp
 	}
 
 	LocalOwner->SetFocus(TargetPawn);
-	
-	//TODO 
-	LocalOwner->GetCharacterMovement()->MaxWalkSpeed = 300.f;
 	
 	return EBTNodeResult::Succeeded;
 }

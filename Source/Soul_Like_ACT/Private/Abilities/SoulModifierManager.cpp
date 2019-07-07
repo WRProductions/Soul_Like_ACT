@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "Types/SoulItemTypes.h"
 #include "Animation/AnimInstance.h"
-#include "Abilities/SoulAbilitySystemComponent.h"
 
 USoulModifierManager::USoulModifierManager()
 {

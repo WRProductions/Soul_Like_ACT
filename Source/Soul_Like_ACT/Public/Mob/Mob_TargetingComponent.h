@@ -6,6 +6,13 @@
 #include "Components/ActorComponent.h"
 #include "Mob_TargetingComponent.generated.h"
 
+UENUM(BlueprintType)
+enum class EFacingPriority : uint8
+{
+	MovingDirection,
+	Target
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SOUL_LIKE_ACT_API UMob_TargetingComponent : public UActorComponent
 {
@@ -26,29 +33,26 @@ protected:
 
 	class AMobBasic *OwnerRef;
 
+	EFacingPriority FacingPriority;
+
 	AActor *TargetPawn;
-	bool bIsFacingTarget;
-	bool bFreeRotation;
 
 	float MoveSpeedCoe = 1.0f;
 
 	void SetMoveSpeedCoe(bool bEnabled);
 
 public:
-	//Whether the rotation can interp to facing the target
 	UFUNCTION(BlueprintCallable)
-	void SetFreeRotation(bool bEnabled);
+	void SetFacingPriority(EFacingPriority InFacingPriority);
 
-	void FacingTarget_Init(AActor *TargetActor);
+	void FacingTarget_Init(AActor *TargetActor, EFacingPriority InFacingPriority = EFacingPriority::Target);
 	void FacingTarget_End();
 
 	UFUNCTION(BlueprintCallable)
 	void SetTarget(AActor *PlayerPawn) { TargetPawn = PlayerPawn; }
 
 	UFUNCTION(BlueprintCallable)
-	bool GetIsFacingTarget() const{ return bIsFacingTarget; }
-	UFUNCTION(BlueprintCallable)
-	bool GetIsFreeRotation() const { return bFreeRotation; }
+	bool GetIsFacingTarget() const{ return FacingPriority == EFacingPriority::MovingDirection; }
 
 	friend class AMobBasic;
 };

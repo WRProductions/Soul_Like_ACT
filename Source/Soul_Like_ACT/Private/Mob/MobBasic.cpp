@@ -76,7 +76,7 @@ void AMobBasic::SetFocus(AActor * Target)
 		TargetingComponent->FacingTarget_End();
 		return;
 	}
-	TargetingComponent->FacingTarget_Init(Target);
+	TargetingComponent->FacingTarget_Init(Target, EFacingPriority::Target);
 	return;
 }
 

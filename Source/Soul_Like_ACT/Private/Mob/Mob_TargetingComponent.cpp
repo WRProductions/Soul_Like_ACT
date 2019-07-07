@@ -17,15 +17,14 @@ void UMob_TargetingComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 	//Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "UMob_TargetingComponent::TickComponent successful");
 
-	if (bIsFacingTarget /* && !OwnerRef->GetIsStun()*/ && !bFreeRotation)
-	{
+	if(FacingPriority == EFacingPriority::Target){
 		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetOwner()->GetActorLocation(), TargetPawn->GetActorLocation());
-
 		//TODO: Set rotate speed
 		FRotator Interped_LookAtRotation = FMath::RInterpConstantTo(GetOwner()->GetActorRotation(), LookAtRotation, DeltaTime, 300.f);
 
 		GetOwner()->SetActorRotation(Interped_LookAtRotation);
 	}
+		
 }
 
 // Called when the game starts
@@ -46,27 +45,47 @@ void UMob_TargetingComponent::SetMoveSpeedCoe(bool bEnabled)
 	OwnerRef->HandleMoveSpeedChanged(FOnAttributeChangeData());
 }
 
-void UMob_TargetingComponent::SetFreeRotation(bool bEnabled)
+void UMob_TargetingComponent::SetFacingPriority(EFacingPriority InFacingPriority)
 {
-	bFreeRotation = bEnabled;
+	FacingPriority = InFacingPriority;
+
+	UCharacterMovementComponent* LocalCharMovement = OwnerRef->GetCharacterMovement();
+	check(LocalCharMovement);
+
+	switch (FacingPriority)
+	{
+	case EFacingPriority::Target:
+		LocalCharMovement->bOrientRotationToMovement = false;
+		break;
+	case EFacingPriority::MovingDirection:
+		LocalCharMovement->bOrientRotationToMovement = true;
+		break;
+	default:
+		LOG_FUNC_ERROR("Invalid EFacingPriority Input");
+		break;
+	}
 }
 
-void UMob_TargetingComponent::FacingTarget_Init(AActor *TargetActor)
+void UMob_TargetingComponent::FacingTarget_Init(AActor* TargetActor, EFacingPriority InFacingPriority /*= EFacingPriority::Target*/)
 {
 	TargetPawn = TargetActor;
 
 	if (TargetPawn)
 	{
+		SetFacingPriority(InFacingPriority);
 		SetMoveSpeedCoe(true);
-		bIsFacingTarget = 1;
 	}
 	else
+	{
+		SetMoveSpeedCoe(false);
+		SetFacingPriority(EFacingPriority::MovingDirection);
 		UE_LOG(LogTemp, Warning, TEXT("UMob_TargetingComponent::FacingTarget_Init failed"));
+	}
 }
 
 void UMob_TargetingComponent::FacingTarget_End()
 {
 	SetTarget(nullptr);
 	SetMoveSpeedCoe(false);
-	bIsFacingTarget = 0;
+	SetFacingPriority(EFacingPriority::MovingDirection);
 }
