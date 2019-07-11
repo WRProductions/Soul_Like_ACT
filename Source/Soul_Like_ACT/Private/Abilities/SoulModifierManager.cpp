@@ -3,8 +3,6 @@
 
 #include "SoulModifierManager.h"
 #include "SoulCharacterBase.h"
-#include "GameFramework/Actor.h"
-#include "Types/SoulItemTypes.h"
 #include "Animation/AnimInstance.h"
 
 USoulModifierManager::USoulModifierManager()

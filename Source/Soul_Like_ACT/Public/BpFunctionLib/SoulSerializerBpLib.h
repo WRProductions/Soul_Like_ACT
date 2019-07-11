@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Abilities/SoulAttributeSet.h"
 #include "SoulGameplayAbility.h"
+#include "Types/SoulItemTypes.h"
 #include "SoulSerializerBpLib.generated.h"
 
-struct FGameplayAttribute;
 class USoulGameplayAbility;
 class USoulItem;
 
@@ -22,9 +23,20 @@ UCLASS()
 public:
 
 	UFUNCTION(BlueprintCallable)
-	static void GetModifiersFromItem(const USoulItem* ItemRef, TArray<FText>& ModifierNames,
-	                              TArray<FText>& ModifierLevels, bool& Successful);
+	static bool GetModifiersFromItemBase(
+		const USoulItem* ItemRef
+		, TArray<FText>& ModifierNames
+		, TArray<FText>& ModifierLevels);
 
+	UFUNCTION(BlueprintCallable)
+		static bool GetModifiersFromItemData(
+			const FSoulItemData &InItemData
+			, TArray<FText>& ModifierNames
+			, TArray<FText>& ModifierLevels
+			, TArray<FText>& SlotModNames
+			, TArray<FText>& SlotModLevels
+			, int32& EmptySlots);
+	
 	UFUNCTION(BlueprintCallable)
 	static void GetPrimaryStatusFromItem(const USoulItem* ItemRef, TArray<FText>& ModifierNames,
 								TArray<FText>& ModifierLevels, bool& Successful);
@@ -32,8 +44,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static void AttributeToString(FGameplayAttribute Attribute, FString& Output);
 
-	static void ModiferToText(const TPair<TSubclassOf<USoulModifierGameplayAbility>, int32>& InputAbilityInfo,
-		FText& ModifierName, FText& ModifierLevel);
+	static void ModiferToText(const TPair<TSubclassOf<USoulModifierGameplayAbility>
+		, int32>& InputAbilityInfo
+		, FText& ModifierName
+		, FText& ModifierLevel);
 
 	template<typename T, typename Y>
 	static FORCEINLINE void AddKeysToMap(TArray<T>& InKeys, TMap<T, Y>& InMap)
