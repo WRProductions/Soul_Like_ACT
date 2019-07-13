@@ -8,9 +8,7 @@
 
 class UTextBlock;
 
-/**
- * The 
- */
+
 UCLASS()
 class SOUL_LIKE_ACT_API UModifierSlot : public UUserWidget
 {

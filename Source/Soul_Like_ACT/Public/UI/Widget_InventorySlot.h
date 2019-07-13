@@ -5,12 +5,13 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Types/SoulItemTypes.h"
+#include "Interfaces/DropDownWidget.h"
 #include "Widget_InventorySlot.generated.h"
 /**
  * 
  */
 UCLASS()
-class SOUL_LIKE_ACT_API UWidget_InventorySlot : public UUserWidget
+class SOUL_LIKE_ACT_API UWidget_InventorySlot : public UUserWidget, public IDropDownWidget
 {
 	GENERATED_BODY()
 
@@ -30,6 +31,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetupSlot(FSoulInventSlot InItemSlot, FSoulItemData InItemData);
+
+	virtual void SwitchDropDownWidget_Implementation() override;
 };
 
 UCLASS()

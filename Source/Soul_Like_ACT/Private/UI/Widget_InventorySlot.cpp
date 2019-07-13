@@ -30,6 +30,10 @@ void UWidget_InventorySlot::SetupSlot(FSoulInventSlot InItemSlot, FSoulItemData 
 	}
 }
 
+void UWidget_InventorySlot::SwitchDropDownWidget_Implementation()
+{
+}
+
 void UWidget_EquipmentSlot::SetupSlot(FSoulEquipmentSlot InItemSlot, FSoulItemData InItemData)
 {
 	USoulItem* ItemBase = InItemData.ItemBase;

@@ -3,16 +3,12 @@
 
 #include "SoulModifierManager.h"
 #include "SoulCharacterBase.h"
+#include "Types/SoulItemTypes.h"
 #include "Animation/AnimInstance.h"
 
 USoulModifierManager::USoulModifierManager()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-}
-
-void USoulModifierManager::BeginPlay()
-{
-	Super::BeginPlay();
 }
 
 USoulModifierManager* USoulModifierManager::GetSoulModifierManger(class AActor* Owner)

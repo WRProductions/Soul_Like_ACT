@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Types/SoulItemTypes.h"
 #include "Components/ActorComponent.h"
 #include "Abilities/SoulGameplayAbility.h"
 #include "SoulModifierManager.generated.h"
@@ -21,9 +20,6 @@ public:
 	USoulModifierManager();
 
 public:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
 	UFUNCTION(BlueprintCallable, Category = Player)
 	static USoulModifierManager* GetSoulModifierManger(class AActor* Owner);
 
@@ -69,7 +65,7 @@ protected:
 	
 public:
 	UFUNCTION(BlueprintCallable)
-		bool FindActiveAbilitySpecHandle(TSubclassOf<USoulActiveAbility> ActiveAbilityClass, FGameplayAbilitySpecHandle& OutGASpecHandle);
+	bool FindActiveAbilitySpecHandle(TSubclassOf<USoulActiveAbility> ActiveAbilityClass, FGameplayAbilitySpecHandle& OutGASpecHandle);
 
 	UFUNCTION(BlueprintCallable)
 	static USoulModifierManager* GetModifierManager(AActor* SourceActor);
