@@ -16,7 +16,13 @@ class SOUL_LIKE_ACT_API UBTT_TryUseActiveAbility : public UBTTask_BlueprintBase
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
+	bool bCanEncounter;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
 	TSubclassOf<USoulActiveAbility> ActiveAbility;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
+	TSubclassOf<USoulActiveAbility> EncounterAbility;
 
 	UFUNCTION(BlueprintCallable)
 	void BindOnGameplayAbilityEnded(AActor *SourceActor, TSubclassOf<USoulActiveAbility> InActiveAbility);

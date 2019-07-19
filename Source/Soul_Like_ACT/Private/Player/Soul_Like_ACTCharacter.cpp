@@ -168,6 +168,11 @@ void ASoul_Like_ACTCharacter::GetPlayer(UWorld* InWorld, bool& Successful, ASoul
 	return;
 }
 
+void ASoul_Like_ACTCharacter::GetWeapon_Implementation(AWeaponActor*& OutWeaponActor)
+{
+	OutWeaponActor = InventoryManager->CurrentWeapon;
+}
+
 void ASoul_Like_ACTCharacter::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information

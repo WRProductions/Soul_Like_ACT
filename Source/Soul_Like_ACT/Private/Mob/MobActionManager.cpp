@@ -47,21 +47,21 @@ bool UMobActionManager::UseNextCombo(class UAnimInstance* AnimInstance)
 
 	UAnimMontage* CurrMontage = AnimInstance->GetCurrentActiveMontage();
 	
-	if (!CurrMontage || CurrMontage->IsValidSectionIndex(CurrComboStage + 1))
+	if (CurrMontage && CurrMontage->IsValidSectionIndex(CurrComboStage + 1))
+	{
+		++CurrComboStage;
+
+		AnimInstance->Montage_JumpToSection(CurrMontage->GetSectionName(CurrComboStage), CurrMontage);
+
+		return true;
+	}
+	else
 	{
 		ResetComboQuery();
 
 		LOG_FUNC_ERROR("No montage is playing or No connected combo")
 
 		return false;
-	}
-	else
-	{
-		++CurrComboStage;
-		
-		AnimInstance->Montage_JumpToSection(CurrMontage->GetSectionName(CurrComboStage), CurrMontage);
-		
-		return true;
 	}
 }
 

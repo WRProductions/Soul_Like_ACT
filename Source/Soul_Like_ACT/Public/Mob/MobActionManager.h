@@ -25,7 +25,7 @@ public:
 	UMobActionManager();
 
 	UFUNCTION(BlueprintCallable)
-		void EnableComboQuery() 
+	void EnableComboQuery() 
 	{
 		bNextComboInQuery = true;
 		CurrComboStage = 0;

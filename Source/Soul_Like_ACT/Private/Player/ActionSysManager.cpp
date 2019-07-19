@@ -28,6 +28,11 @@ void UActionSysManager::TickComponent(float DeltaTime, enum ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+bool UActionSysManager::SetKatanaStance(EKatanaStance InKatanaStance)
+{
+
+}
+
 bool UActionSysManager::DoMeleeAttack()
 {
 	if (!bCanUseAnyGA() || bIsUsingParry())

@@ -17,7 +17,7 @@ void UActorFXManager::SpawnParticleWithHitResult(const FHitResult &HitResult, UP
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld()
 		, OnHitParticles[0]
 		, GetOwner()->GetActorLocation()
-		, FRotator::ZeroRotator
+		, UKismetMathLibrary::MakeRotFromX(HitResult.Normal)
 		, FVector::OneVector
 		, true);
 }

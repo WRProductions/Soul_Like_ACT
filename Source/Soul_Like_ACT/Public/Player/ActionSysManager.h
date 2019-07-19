@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GeneralEnums.h"
 #include "ActionSysManager.generated.h"
 
 class USoulGameplayAbility;
@@ -34,11 +35,17 @@ protected:
 	FName JumpSectionName;
 	UAnimMontage *JumpMontage;
 
+	EKatanaStance KatanaStance;
+
 public:
 	bool bIsUsingMelee() const;
 	bool bIsUsingSkills() const;
 	bool bCanUseAnyGA() const;
 	bool bIsUsingParry() const;
+
+	bool bIsFree() const { return bCanUseAnyGA() && !bIsUsingParry() && !bIsUsingMelee(); }
+
+	bool SetKatanaStance(EKatanaStance InKatanaStance);
 
 	UFUNCTION(BlueprintCallable)
 	bool DoMeleeAttack();

@@ -84,3 +84,8 @@ bool AMobBasic::GetIsTargetingEnabled() const
 {
 	return TargetingComponent->GetIsFacingTarget();
 }
+
+void AMobBasic::GetWeapon_Implementation(AWeaponActor*& OutWeaponActor)
+{
+	OutWeaponActor = Weapon;
+}

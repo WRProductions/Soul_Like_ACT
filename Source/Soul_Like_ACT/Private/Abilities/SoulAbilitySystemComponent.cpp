@@ -42,6 +42,12 @@ bool USoulAbilitySystemComponent::TryActivateAbility_Soul(FGameplayAbilitySpecHa
 	return TryActivateAbility(AbilityToActivate, bAllowRemoteActivation);
 }
 
+void USoulAbilitySystemComponent::TryActiveAbilityOnce(TSubclassOf<USoulGameplayAbility> InGameplayAbility, int32 Level)
+{
+	FGameplayAbilitySpec GA_Spec(InGameplayAbility, Level, INDEX_NONE, GetOwner());
+	GiveAbilityAndActivateOnce(GA_Spec);
+}
+
 USoulAbilitySystemComponent * USoulAbilitySystemComponent::GetAbilitySystemComponentFromActor(const AActor * Actor, bool LookForComponent)
 {
 	return Cast<USoulAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Actor, LookForComponent));

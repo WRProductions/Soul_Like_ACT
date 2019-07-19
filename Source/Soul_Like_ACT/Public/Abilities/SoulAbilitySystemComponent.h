@@ -27,6 +27,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool TryActivateAbility_Soul(FGameplayAbilitySpecHandle AbilityToActivate, bool bAllowRemoteActivation);
 
+	UFUNCTION(BlueprintCallable)
+	void TryActiveAbilityOnce(TSubclassOf<USoulGameplayAbility> InGameplayAbility, int32 Level);
+
 	/** Version of function in AbilitySystemGlobals that returns correct type */
 	UFUNCTION(BlueprintCallable)
 	static USoulAbilitySystemComponent* GetAbilitySystemComponentFromActor(const AActor* Actor, bool LookForComponent = false);

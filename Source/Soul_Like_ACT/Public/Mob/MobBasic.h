@@ -26,7 +26,7 @@ public:
 	AMobBasic();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class UMobActionManager *ActionManager;
+	class UMobActionManager *ActionManager;
 
 protected:
 	// Called when the game starts or when spawned
@@ -45,4 +45,6 @@ public:
 	void SetFocus(AActor * Target);
 
 	bool GetIsTargetingEnabled() const;
+
+	virtual void GetWeapon_Implementation(AWeaponActor*& OutWeaponActor) override;
 };

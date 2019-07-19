@@ -62,6 +62,11 @@ void ASoulCharacterBase::HandleMoveSpeedChanged(const FOnAttributeChangeData& Da
 		OnMoveSpeedChanged.Broadcast(TArray<float>{GetMoveSpeed(), -1.f});
 }
 
+void ASoulCharacterBase::GetWeapon_Implementation(AWeaponActor*& OutWeaponActor)
+{
+
+}
+
 void ASoulCharacterBase::AddStartupGameplayAbilities()
 {
 	ModifierManager->AddStartupGameplayAbilities();

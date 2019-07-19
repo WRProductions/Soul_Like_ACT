@@ -108,5 +108,7 @@ public:
 	static void GetPlayer(UWorld *InWorld, bool &Successful, ASoulPlayerController *&SoulPlayerController, ASoul_Like_ACTCharacter *&SoulCharacter, UInventoryManager *&SoulInventoryManager);
 
 	friend UActionSysManager;
+
+	virtual void GetWeapon_Implementation(AWeaponActor *&OutWeaponActor) override;
 };
 

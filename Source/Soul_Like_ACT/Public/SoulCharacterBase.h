@@ -190,6 +190,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		bool GetIsHealthZero() const { return GetHealth() <= 0.f; }
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void GetWeapon(AWeaponActor *&OutWeaponActor);
+
 protected:
 	/** Apply the startup GAs and GEs */
 	UFUNCTION(BlueprintCallable)
