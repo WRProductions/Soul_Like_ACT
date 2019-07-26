@@ -54,7 +54,6 @@ public:
 
 	float ForwardAxisValue, RightAxisValue;
 	float LeanAmount_Char, LeanSpeed_Char;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	float LeanAmount_Anim;
 
@@ -96,7 +95,7 @@ public:
 	void ResetRotation();
 
 	UFUNCTION(BlueprintCallable)
-		AWeaponActor *EquipGear(TSubclassOf<AWeaponActor> WeaponClassRef, bool bShowTracelines);
+	AWeaponActor *AttachWeapon(AWeaponActor* InWeaponActor, bool bShowTracelines, FName BoneName);
 	
 	UFUNCTION(BlueprintCallable, meta = (ExpandEnumAsExecs = "Outp", BlueprintInternalUseOnly))
 	void GetMyPlayerController(class ASoulPlayerController*& MyController, EIsControllerValid & Outp);

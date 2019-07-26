@@ -21,17 +21,14 @@ class SOUL_LIKE_ACT_API AWeaponActor : public AActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = 1))
-	class USkeletalMeshComponent *MeshComp;
-
 	ASoulCharacterBase *OwnerRef;
 
 public:	
 	// Sets default values for this actor's properties
 	AWeaponActor();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GearInfo)
-		UDA_Gear *GearInfo;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (ExposeOnSpawn = 1), Category = Default)
+	UDA_Gear *GearInfo;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
 		bool bCanDamageAllies;

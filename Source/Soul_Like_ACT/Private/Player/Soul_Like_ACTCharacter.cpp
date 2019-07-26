@@ -134,18 +134,15 @@ void ASoul_Like_ACTCharacter::ResetRotation()
 }
 
 
-AWeaponActor * ASoul_Like_ACTCharacter::EquipGear(TSubclassOf<AWeaponActor> WeaponClassRef, bool bShowTracelines)
+AWeaponActor* ASoul_Like_ACTCharacter::AttachWeapon(AWeaponActor* InWeaponActor, bool bShowTracelines, FName BoneName)
 {
 	//UnEquip and delete the item
+	InWeaponActor->Instigator = this;
+	InWeaponActor->SetOwner(this);
+	InWeaponActor->bEnableDrawTraceLine = bShowTracelines;
+	InventoryManager->EquipGear(InWeaponActor, BoneName);
 
-
-	AWeaponActor *LocalWeapon = Cast<AWeaponActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), WeaponClassRef, FTransform::Identity, ESpawnActorCollisionHandlingMethod::AlwaysSpawn, this));
-	LocalWeapon->Instigator = this;
-	LocalWeapon->SetOwner(this);
-	LocalWeapon->bEnableDrawTraceLine = bShowTracelines;
-	InventoryManager->EquipGear(LocalWeapon);
-
-	return LocalWeapon;
+	return InWeaponActor;
 }
 
 void ASoul_Like_ACTCharacter::GetPlayer(UWorld* InWorld, bool& Successful, ASoulPlayerController*& SoulPlayerController, ASoul_Like_ACTCharacter*& SoulCharacter, UInventoryManager*& SoulInventoryManager)
@@ -234,6 +231,8 @@ void ASoul_Like_ACTCharacter::MoveRight(float Value)
 
 void ASoul_Like_ACTCharacter::MakeMove()
 {
+	if (bMoveBlock) return;
+
 	FVector Direction = PredictMovement();
 
 	AddMovementInput(Direction, TargetLockingComponent->MoveSpeedMulti);

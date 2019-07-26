@@ -275,9 +275,9 @@ const EGearType UInventoryManager::GetGearType(FSoulInventSlot InItemSlot)
 	return bSuccessful ? LocalItemData.ItemBase->ItemSlotType : EGearType::Non_Gear;
 }
 
-void UInventoryManager::EquipGear(AWeaponActor *const Inp)
+void UInventoryManager::EquipGear(AWeaponActor * const Inp, FName BoneToAttach, bool bDestroyOld /*=false*/)
 {
-	if (CurrentWeapon)
+	if (CurrentWeapon && bDestroyOld)
 	{
 		FDetachmentTransformRules LocalDetRules{ EDetachmentRule::KeepWorld, 1 };
 		CurrentWeapon->DetachFromActor(LocalDetRules);
@@ -287,12 +287,12 @@ void UInventoryManager::EquipGear(AWeaponActor *const Inp)
 	CurrentWeapon = Inp;
 
 	FAttachmentTransformRules LocalTransRules{ EAttachmentRule::SnapToTarget, 1 };
-	if(Inp->GearInfo->WeaponType == EWeaponType::VE_1HSword)
-		Inp->AttachToComponent(Cast<ACharacter>(GetOwner())->GetMesh(), LocalTransRules, TEXT("2H_Mace"));
-	else if (Inp->GearInfo->WeaponType == EWeaponType::VE_2HMace)
-		Inp->AttachToComponent(Cast<ACharacter>(GetOwner())->GetMesh(), LocalTransRules, TEXT("2H_Mace"));
-	else if (Inp->GearInfo->WeaponType == EWeaponType::VE_Fist)
-		Inp->AttachToComponent(Cast<ACharacter>(GetOwner())->GetMesh(), LocalTransRules, TEXT("2H_Mace"));	
+	if(Inp->GearInfo->WeaponType == EWeaponType::SwordShield)
+		Inp->AttachToComponent(Cast<ACharacter>(GetOwner())->GetMesh(), LocalTransRules, BoneToAttach);
+	else if (Inp->GearInfo->WeaponType == EWeaponType::Odachi)
+		Inp->AttachToComponent(Cast<ACharacter>(GetOwner())->GetMesh(), LocalTransRules, BoneToAttach);
+	else if (Inp->GearInfo->WeaponType == EWeaponType::Katana)
+		Inp->AttachToComponent(Cast<ACharacter>(GetOwner())->GetMesh(), LocalTransRules, BoneToAttach);
 }
 
 bool UInventoryManager::SaveInventory()

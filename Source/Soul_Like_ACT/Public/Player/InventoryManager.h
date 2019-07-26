@@ -80,7 +80,7 @@ public:
 	AWeaponActor* CurrentWeapon;
 
 	UFUNCTION(BlueprintCallable)
-	void EquipGear(AWeaponActor * const Inp);
+	void EquipGear(AWeaponActor * const Inp, FName BoneToAttach, bool bDestroyOld = false);
 
 	/** Manually save the inventory, this is called from add/remove functions automatically */
 	UFUNCTION(BlueprintCallable, Category = Inventory)

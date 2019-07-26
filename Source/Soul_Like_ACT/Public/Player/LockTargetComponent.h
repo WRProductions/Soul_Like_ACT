@@ -97,5 +97,5 @@ public:
 
 	FVector GetNormalizedVec(FVector Inp);
 
-	friend ASoul_Like_ACTCharacter;
+	friend class ASoul_Like_ACTCharacter;
 };

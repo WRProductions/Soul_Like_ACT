@@ -7,8 +7,18 @@
 UENUM(BlueprintType)
 enum class EKatanaStance : uint8
 {
-	SheathedUnguard,
-	SheathedGuard,
-	UnSheathedUnguard,
-	UnsheathedGuard
+	Idle,
+	Battao,
+	MidStance,
+	HeavyStance,
+	Guard,
+	Invalid	
+};
+
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	Katana,
+	Odachi,
+	SwordShield,
 };

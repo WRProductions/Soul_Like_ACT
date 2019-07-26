@@ -20,7 +20,6 @@ protected:
 	bool bNextComboInQuery;
 
 	uint8 CurrComboStage;
-
 public:
 	UMobActionManager();
 

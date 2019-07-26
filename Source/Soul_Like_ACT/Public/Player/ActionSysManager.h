@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "GeneralEnums.h"
+#include "Interfaces/GeneralEnums.h"
+#include "Types/DA_Gear.h"
 #include "ActionSysManager.generated.h"
 
+class ASoul_Like_ACTCharacter;
 class USoulGameplayAbility;
 class UGameplayAbility;
 class UAnimMontage;
@@ -22,6 +24,9 @@ public:
 
 	class ASoul_Like_ACTCharacter *PlayerRef;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = ActiveAbilities)
+	UDA_AbilitiesPreset* ActiveAbilitiesPreset;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -32,38 +37,50 @@ protected:
 
 	bool bCanJumpSection;
 	bool bWillJumpSection;
-	FName JumpSectionName;
-	UAnimMontage *JumpMontage;
+	uint8 CurrentComboSectionIndex;
+	UAnimMontage *MontageToPlay;
 
-	EKatanaStance KatanaStance;
+	EKatanaStance CurrentStance = EKatanaStance::Idle;
 
 public:
-	bool bIsUsingMelee() const;
-	bool bIsUsingSkills() const;
-	bool bCanUseAnyGA() const;
-	bool bIsUsingParry() const;
+	bool CanUseAnyGA() const;
+	bool IsUsingMelee() const;
+	bool IsUsingSkills() const;
+	bool IsUsingParry() const;
 
-	bool bIsFree() const { return bCanUseAnyGA() && !bIsUsingParry() && !bIsUsingMelee(); }
+	bool bIsFree() const { return CanUseAnyGA() && !IsUsingParry() && !IsUsingMelee(); }
 
-	bool SetKatanaStance(EKatanaStance InKatanaStance);
+	UFUNCTION(BlueprintCallable)
+	void GetStance(EKatanaStance &OutStance) const { OutStance = CurrentStance;}
 
+	UFUNCTION(BlueprintCallable)
+	bool SetNewStance(EKatanaStance InStance);
+	UFUNCTION(BlueprintCallable)
+	bool CanChangeStance(EKatanaStance InStance);
+	
 	UFUNCTION(BlueprintCallable)
 	bool DoMeleeAttack();
 	UFUNCTION(BlueprintCallable)
 	bool DoSpecialMeleeAttack();
 	UFUNCTION(BlueprintCallable)
 	bool DoDodge();
+	UFUNCTION(BlueprintCallable)
+	bool DoChangeStance(EKatanaStance InStance);
 
 	UFUNCTION(BlueprintCallable)
-		bool DoParry_Start();
+	bool DoParry_Start();
 	UFUNCTION(BlueprintCallable)
-		bool DoParry_End();
+	bool DoParry_End();
 
-	/**
-	 * These 2 functions are called via Active Melee GameplayAbilities
-	 */
+
+	//************************************
+	// Method:    SetJumpSection
+	// Qualifier: 
+	// Parameter: FName InpComboScetionName
+	// Parameter: UAnimMontage * InpMontage nullptr by default, it the jump section will calculated according to the montage index
+	//************************************
 	UFUNCTION(BlueprintCallable)
-	bool SetJumpSection(const FName InpComboScetionName, UAnimMontage *InpMontage);
+	bool SetJumpSection(uint8 ComboSectionIndex, const UAnimMontage *InpMontage);
 	UFUNCTION(BlueprintCallable)
 	bool JumpSectionForCombo();
 	

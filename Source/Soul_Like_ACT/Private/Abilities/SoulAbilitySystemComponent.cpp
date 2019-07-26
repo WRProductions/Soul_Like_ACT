@@ -4,7 +4,7 @@
 #include "SoulCharacterBase.h"
 #include "Abilities/SoulModifierManager.h"
 #include "Abilities/SoulGameplayAbility.h"
-#include "AbilitySystemGlobals.h"
+  #include "AbilitySystemGlobals.h"
 
 
 void USoulAbilitySystemComponent::GetActiveAbilitiesWithTags(const FGameplayTagContainer & GameplayTagContainer, TArray<USoulGameplayAbility*>& ActiveAbilities)

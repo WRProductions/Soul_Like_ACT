@@ -28,17 +28,69 @@ void UActionSysManager::TickComponent(float DeltaTime, enum ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-bool UActionSysManager::SetKatanaStance(EKatanaStance InKatanaStance)
+bool UActionSysManager::SetNewStance(EKatanaStance InStance)
 {
+	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.MidStance", true));
+	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.Idle", true));
+	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.Battao", true));
+	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.HeavyStance", true));
+	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.Guard", true));
 
+	if (InStance == EKatanaStance::Idle)
+	{
+		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.Idle", true), 1);
+	}
+	if (InStance == EKatanaStance::Battao)
+	{
+		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.Battao", true), 1);
+	}
+	if (InStance == EKatanaStance::MidStance)
+	{
+		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.MidStance", true), 1);
+	}
+	if (InStance == EKatanaStance::HeavyStance)
+	{
+		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.HeavyStance", true), 1);
+	}
+	if (InStance == EKatanaStance::Guard)
+	{
+		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.Guard", true), 1);
+	}
+	CurrentStance = InStance;
+
+	return true;
+}
+
+bool UActionSysManager::CanChangeStance(EKatanaStance InStance)
+{
+	if (InStance == EKatanaStance::Idle)
+	{
+		return CurrentStance == EKatanaStance::Battao;
+	}
+	else if (InStance == EKatanaStance::Battao)
+	{
+		return CurrentStance == EKatanaStance::Idle || CurrentStance == EKatanaStance::MidStance;
+	}
+	else if (InStance == EKatanaStance::MidStance)
+	{
+		return (CurrentStance == EKatanaStance::Battao
+			|| CurrentStance == EKatanaStance::HeavyStance
+			|| CurrentStance == EKatanaStance::Idle);
+	}
+	else if (InStance == EKatanaStance::HeavyStance)
+	{
+		return CurrentStance == EKatanaStance::MidStance;
+	}
+
+	return false;
 }
 
 bool UActionSysManager::DoMeleeAttack()
 {
-	if (!bCanUseAnyGA() || bIsUsingParry())
+	if (!CanUseAnyGA() || IsUsingParry())
 		return 0;
 
- 	if (bIsUsingMelee())
+ 	if (IsUsingMelee())
  		return TryEnableJumpSection();
 	
 	return PlayerRef->AbilitySystemComponent->TryActivateAbilitiesByTag(
@@ -48,10 +100,10 @@ bool UActionSysManager::DoMeleeAttack()
 
 bool UActionSysManager::DoSpecialMeleeAttack()
 {
-	if (!bCanUseAnyGA())
+	if (!CanUseAnyGA())
 		return 0;
 
-	if (bIsUsingMelee())
+	if (IsUsingMelee())
 		return TryEnableJumpSection();
 
 	return PlayerRef->AbilitySystemComponent->TryActivateAbilitiesByTag(
@@ -62,7 +114,7 @@ bool UActionSysManager::DoSpecialMeleeAttack()
 
 bool UActionSysManager::DoDodge()
 {
-	if (!bCanUseAnyGA())
+	if (!CanUseAnyGA())
 	{
 		TArray<USoulGameplayAbility*> tempGAs;
 		PlayerRef->AbilitySystemComponent->GetActiveAbilitiesWithTags(
@@ -82,9 +134,64 @@ bool UActionSysManager::DoDodge()
 		true);
 }
 
+bool UActionSysManager::DoChangeStance(EKatanaStance InStance)
+{
+	if(!CanChangeStance(InStance)) return false;
+
+	if (!CanUseAnyGA() || IsUsingMelee() || IsUsingParry())
+		return false;
+
+	if (InStance == EKatanaStance::MidStance && CurrentStance == EKatanaStance::Idle)
+	{
+		PlayerRef->GetAbilitySystemComponent()->GiveAbilityAndActivateOnce(
+			FGameplayAbilitySpec(ActiveAbilitiesPreset->GA_Unsheathe, 1, INDEX_NONE, GetOwner()));
+	}
+	else if (InStance == EKatanaStance::Idle && CurrentStance == EKatanaStance::MidStance)
+	{
+		PlayerRef->GetAbilitySystemComponent()->GiveAbilityAndActivateOnce(
+			FGameplayAbilitySpec(ActiveAbilitiesPreset->GA_Sheathe, 1, INDEX_NONE, GetOwner()));
+	}
+	else if (InStance == EKatanaStance::HeavyStance && CurrentStance == EKatanaStance::MidStance)
+	{
+		PlayerRef->GetAbilitySystemComponent()->GiveAbilityAndActivateOnce(
+			FGameplayAbilitySpec(ActiveAbilitiesPreset->GA_MidToHeavy, 1, INDEX_NONE, GetOwner()));
+	}
+	else if (InStance == EKatanaStance::MidStance && CurrentStance == EKatanaStance::HeavyStance)
+	{
+		PlayerRef->GetAbilitySystemComponent()->GiveAbilityAndActivateOnce(
+			FGameplayAbilitySpec(ActiveAbilitiesPreset->GA_HeavyToMid, 1, INDEX_NONE, GetOwner()));
+	}
+	else if (InStance == EKatanaStance::Battao && CurrentStance == EKatanaStance::MidStance)
+	{
+		PlayerRef->GetAbilitySystemComponent()->GiveAbilityAndActivateOnce(
+			FGameplayAbilitySpec(ActiveAbilitiesPreset->GA_MidToBatto, 1, INDEX_NONE, GetOwner()));
+	}
+	else if (InStance == EKatanaStance::MidStance && CurrentStance == EKatanaStance::Battao)
+	{
+		PlayerRef->GetAbilitySystemComponent()->GiveAbilityAndActivateOnce(
+			FGameplayAbilitySpec(ActiveAbilitiesPreset->GA_BattoToMid, 1, INDEX_NONE, GetOwner()));
+	}
+	else if (InStance == EKatanaStance::Battao && CurrentStance == EKatanaStance::Idle)
+	{
+		PlayerRef->GetAbilitySystemComponent()->GiveAbilityAndActivateOnce(
+			FGameplayAbilitySpec(ActiveAbilitiesPreset->GA_SheathedToBatto, 1, INDEX_NONE, GetOwner()));
+	}
+	else if (InStance == EKatanaStance::Idle && CurrentStance == EKatanaStance::Battao)
+	{
+		PlayerRef->GetAbilitySystemComponent()->GiveAbilityAndActivateOnce(
+			FGameplayAbilitySpec(ActiveAbilitiesPreset->GA_BattoToSheathed, 1, INDEX_NONE, GetOwner()));
+	}
+	else
+	{
+		return false;
+	}
+
+	return true;
+}
+
 bool UActionSysManager::DoParry_Start()
 {
-	if (!bCanUseAnyGA())
+	if (!CanUseAnyGA())
 	{
 		TArray<USoulGameplayAbility*> tempGAs;
 		PlayerRef->AbilitySystemComponent->GetActiveAbilitiesWithTags(
@@ -119,38 +226,64 @@ bool UActionSysManager::DoParry_End()
 	return false;
 }
 
-bool UActionSysManager::SetJumpSection(const FName InpComboScetionName, UAnimMontage *InpMontage)
+bool UActionSysManager::SetJumpSection(uint8 ComboSectionIndex, const UAnimMontage* InpMontage)
 {
 	bWillJumpSection = 0;
 	bCanJumpSection = 1;
 
-	JumpSectionName = InpComboScetionName;
-	JumpMontage = InpMontage;
+	if (InpMontage)
+	{
+		if (InpMontage->IsValidSectionIndex(ComboSectionIndex))
+			CurrentComboSectionIndex = ComboSectionIndex;
+		else
+			CurrentComboSectionIndex = 0;
 
-	return true;
+		MontageToPlay = const_cast<UAnimMontage*>(InpMontage);
+		return true;
+	}
+	else
+	{
+		UAnimInstance* AnimInstance = PlayerRef->GetMesh()->GetAnimInstance();
+		
+		if (AnimInstance)
+			MontageToPlay = AnimInstance->GetCurrentActiveMontage();
+		else
+			return false;
+
+		if (MontageToPlay && MontageToPlay->IsValidSectionIndex(CurrentComboSectionIndex + 1))
+		{
+			++CurrentComboSectionIndex;
+			
+			return true;
+		}
+
+		return false;
+	}
 }
 
 bool UActionSysManager::JumpSectionForCombo()
 {
+	//FName CurrentSection = AnimInstance->Montage_GetCurrentSection(CurrentMontage);
+
+	if (MontageToPlay && bCanJumpSection && bWillJumpSection)
+	{
+		UAnimInstance* AnimInstance = PlayerRef->GetMesh()->GetAnimInstance();
+		
+		if (AnimInstance)
+			MontageToPlay = AnimInstance->GetCurrentActiveMontage();
+		else
+			return false;
+
+		AnimInstance->Montage_JumpToSection(MontageToPlay->GetSectionName(CurrentComboSectionIndex), MontageToPlay);
+//		UE_LOG(LogTemp, Warning, TEXT("Current Montage: %s"), *(CurrentMontage->GetName()));
+	}
+
 	bCanJumpSection = false;
 
 	if (!bWillJumpSection) return false;
 
 	bWillJumpSection = false;
 
-	UAnimInstance *AnimInstance = PlayerRef->GetMesh()->GetAnimInstance();
-	UAnimMontage *CurrentMontage = AnimInstance->GetCurrentActiveMontage();
-	//FName CurrentSection = AnimInstance->Montage_GetCurrentSection(CurrentMontage);
-	
-	if (!JumpMontage || JumpMontage == CurrentMontage)
-	{
-		FName CurrentSectionName = AnimInstance->Montage_GetCurrentSection(CurrentMontage);
-		
-		AnimInstance->Montage_JumpToSection(JumpSectionName, CurrentMontage);
-
-		UE_LOG(LogTemp, Warning, TEXT("Current Montage: %s"),
-			*(CurrentMontage->GetName()));
-	}
 	return true;
 }
 
@@ -201,7 +334,7 @@ void UActionSysManager::GetActiveAbilitiesWithTags(FGameplayTagContainer Ability
 		PlayerRef->AbilitySystemComponent->GetActiveAbilitiesWithTags(AbilityTags, ActiveAbilities);
 }
 
-bool UActionSysManager::bIsUsingMelee() const
+bool UActionSysManager::IsUsingMelee() const
 {
 	USoulAbilitySystemComponent *LocalComp = Cast<USoulAbilitySystemComponent>(PlayerRef->GetAbilitySystemComponent());
 
@@ -219,7 +352,7 @@ bool UActionSysManager::bIsUsingMelee() const
 	}
 }
 
-bool UActionSysManager::bIsUsingSkills() const
+bool UActionSysManager::IsUsingSkills() const
 {
 	UAbilitySystemComponent * MyAbilityComponent = PlayerRef->GetAbilitySystemComponent();
 	
@@ -227,14 +360,16 @@ bool UActionSysManager::bIsUsingSkills() const
 		FGameplayTag::RequestGameplayTag(FName{ "Ability.Skill" }, true)));
 }
 
-bool UActionSysManager::bCanUseAnyGA() const
+bool UActionSysManager::CanUseAnyGA() const
 {
-	return (PlayerRef->GetHealth() > 0.f &&
+	return (
+		PlayerRef->GetHealth() > 0.f &&
 		!UGameplayStatics::IsGamePaused(GetWorld()) &&
-		!bIsUsingSkills());
+		!IsUsingSkills()
+	);
 }
 
-bool UActionSysManager::bIsUsingParry() const
+bool UActionSysManager::IsUsingParry() const
 {
 	UAbilitySystemComponent *MyAbilityComponent = USoulAbilitySystemComponent::GetAbilitySystemComponentFromActor(GetOwner(), false);
 

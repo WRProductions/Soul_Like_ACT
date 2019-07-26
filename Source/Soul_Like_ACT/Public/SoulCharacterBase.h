@@ -116,6 +116,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Default)
+	bool bMoveBlock;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EActorFaction Faction;
 
@@ -188,7 +191,7 @@ public:
 	bool GetIsDead() const { return bIsDead; }
 
 	UFUNCTION(BlueprintCallable)
-		bool GetIsHealthZero() const { return GetHealth() <= 0.f; }
+	bool GetIsHealthZero() const { return GetHealth() <= 0.f; }
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void GetWeapon(AWeaponActor *&OutWeaponActor);

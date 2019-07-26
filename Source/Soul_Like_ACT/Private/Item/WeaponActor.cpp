@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Item/WeaponActor.h"
-#include "Components/SkeletalMeshComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "SoulCharacterBase.h"
@@ -14,9 +13,6 @@ AWeaponActor::AWeaponActor()
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>("Root");
-
-	MeshComp = CreateDefaultSubobject<USkeletalMeshComponent>("MeshComp");
-	MeshComp->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
