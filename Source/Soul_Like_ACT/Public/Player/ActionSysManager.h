@@ -40,7 +40,7 @@ protected:
 	uint8 CurrentComboSectionIndex;
 	UAnimMontage *MontageToPlay;
 
-	EKatanaStance CurrentStance = EKatanaStance::Idle;
+	EKatanaStanceType CurrentStance = EKatanaStanceType::Idle;
 
 public:
 	bool CanUseAnyGA() const;
@@ -51,12 +51,12 @@ public:
 	bool bIsFree() const { return CanUseAnyGA() && !IsUsingParry() && !IsUsingMelee(); }
 
 	UFUNCTION(BlueprintCallable)
-	void GetStance(EKatanaStance &OutStance) const { OutStance = CurrentStance;}
+	void GetStance(EKatanaStanceType &OutStance) const { OutStance = CurrentStance;}
 
 	UFUNCTION(BlueprintCallable)
-	bool SetNewStance(EKatanaStance InStance);
+	bool SetNewStance(EKatanaStanceType InStance);
 	UFUNCTION(BlueprintCallable)
-	bool CanChangeStance(EKatanaStance InStance);
+	bool CanChangeStance(EKatanaStanceType InStance);
 	
 	UFUNCTION(BlueprintCallable)
 	bool DoMeleeAttack();
@@ -65,7 +65,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool DoDodge();
 	UFUNCTION(BlueprintCallable)
-	bool DoChangeStance(EKatanaStance InStance);
+	bool DoChangeStance(EKatanaStanceType InStance);
 
 	UFUNCTION(BlueprintCallable)
 	bool DoParry_Start();

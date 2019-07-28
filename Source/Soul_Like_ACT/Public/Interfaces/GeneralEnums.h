@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 UENUM(BlueprintType)
-enum class EKatanaStance : uint8
+enum class EKatanaStanceType : uint8
 {
 	Idle,
 	Battao,

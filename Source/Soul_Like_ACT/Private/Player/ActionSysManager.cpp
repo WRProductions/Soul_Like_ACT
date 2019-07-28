@@ -28,7 +28,7 @@ void UActionSysManager::TickComponent(float DeltaTime, enum ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-bool UActionSysManager::SetNewStance(EKatanaStance InStance)
+bool UActionSysManager::SetNewStance(EKatanaStanceType InStance)
 {
 	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.MidStance", true));
 	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.Idle", true));
@@ -36,23 +36,23 @@ bool UActionSysManager::SetNewStance(EKatanaStance InStance)
 	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.HeavyStance", true));
 	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.Guard", true));
 
-	if (InStance == EKatanaStance::Idle)
+	if (InStance == EKatanaStanceType::Idle)
 	{
 		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.Idle", true), 1);
 	}
-	if (InStance == EKatanaStance::Battao)
+	if (InStance == EKatanaStanceType::Battao)
 	{
 		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.Battao", true), 1);
 	}
-	if (InStance == EKatanaStance::MidStance)
+	if (InStance == EKatanaStanceType::MidStance)
 	{
 		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.MidStance", true), 1);
 	}
-	if (InStance == EKatanaStance::HeavyStance)
+	if (InStance == EKatanaStanceType::HeavyStance)
 	{
 		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.HeavyStance", true), 1);
 	}
-	if (InStance == EKatanaStance::Guard)
+	if (InStance == EKatanaStanceType::Guard)
 	{
 		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.Guard", true), 1);
 	}
@@ -61,25 +61,25 @@ bool UActionSysManager::SetNewStance(EKatanaStance InStance)
 	return true;
 }
 
-bool UActionSysManager::CanChangeStance(EKatanaStance InStance)
+bool UActionSysManager::CanChangeStance(EKatanaStanceType InStance)
 {
-	if (InStance == EKatanaStance::Idle)
+	if (InStance == EKatanaStanceType::Idle)
 	{
-		return CurrentStance == EKatanaStance::Battao;
+		return CurrentStance == EKatanaStanceType::Battao;
 	}
-	else if (InStance == EKatanaStance::Battao)
+	else if (InStance == EKatanaStanceType::Battao)
 	{
-		return CurrentStance == EKatanaStance::Idle || CurrentStance == EKatanaStance::MidStance;
+		return CurrentStance == EKatanaStanceType::Idle || CurrentStance == EKatanaStanceType::MidStance;
 	}
-	else if (InStance == EKatanaStance::MidStance)
+	else if (InStance == EKatanaStanceType::MidStance)
 	{
-		return (CurrentStance == EKatanaStance::Battao
-			|| CurrentStance == EKatanaStance::HeavyStance
-			|| CurrentStance == EKatanaStance::Idle);
+		return (CurrentStance == EKatanaStanceType::Battao
+			|| CurrentStance == EKatanaStanceType::HeavyStance
+			|| CurrentStance == EKatanaStanceType::Idle);
 	}
-	else if (InStance == EKatanaStance::HeavyStance)
+	else if (InStance == EKatanaStanceType::HeavyStance)
 	{
-		return CurrentStance == EKatanaStance::MidStance;
+		return CurrentStance == EKatanaStanceType::MidStance;
 	}
 
 	return false;
@@ -134,49 +134,49 @@ bool UActionSysManager::DoDodge()
 		true);
 }
 
-bool UActionSysManager::DoChangeStance(EKatanaStance InStance)
+bool UActionSysManager::DoChangeStance(EKatanaStanceType InStance)
 {
 	if(!CanChangeStance(InStance)) return false;
 
 	if (!CanUseAnyGA() || IsUsingMelee() || IsUsingParry())
 		return false;
 
-	if (InStance == EKatanaStance::MidStance && CurrentStance == EKatanaStance::Idle)
+	if (InStance == EKatanaStanceType::MidStance && CurrentStance == EKatanaStanceType::Idle)
 	{
 		PlayerRef->GetAbilitySystemComponent()->GiveAbilityAndActivateOnce(
 			FGameplayAbilitySpec(ActiveAbilitiesPreset->GA_Unsheathe, 1, INDEX_NONE, GetOwner()));
 	}
-	else if (InStance == EKatanaStance::Idle && CurrentStance == EKatanaStance::MidStance)
+	else if (InStance == EKatanaStanceType::Idle && CurrentStance == EKatanaStanceType::MidStance)
 	{
 		PlayerRef->GetAbilitySystemComponent()->GiveAbilityAndActivateOnce(
 			FGameplayAbilitySpec(ActiveAbilitiesPreset->GA_Sheathe, 1, INDEX_NONE, GetOwner()));
 	}
-	else if (InStance == EKatanaStance::HeavyStance && CurrentStance == EKatanaStance::MidStance)
+	else if (InStance == EKatanaStanceType::HeavyStance && CurrentStance == EKatanaStanceType::MidStance)
 	{
 		PlayerRef->GetAbilitySystemComponent()->GiveAbilityAndActivateOnce(
 			FGameplayAbilitySpec(ActiveAbilitiesPreset->GA_MidToHeavy, 1, INDEX_NONE, GetOwner()));
 	}
-	else if (InStance == EKatanaStance::MidStance && CurrentStance == EKatanaStance::HeavyStance)
+	else if (InStance == EKatanaStanceType::MidStance && CurrentStance == EKatanaStanceType::HeavyStance)
 	{
 		PlayerRef->GetAbilitySystemComponent()->GiveAbilityAndActivateOnce(
 			FGameplayAbilitySpec(ActiveAbilitiesPreset->GA_HeavyToMid, 1, INDEX_NONE, GetOwner()));
 	}
-	else if (InStance == EKatanaStance::Battao && CurrentStance == EKatanaStance::MidStance)
+	else if (InStance == EKatanaStanceType::Battao && CurrentStance == EKatanaStanceType::MidStance)
 	{
 		PlayerRef->GetAbilitySystemComponent()->GiveAbilityAndActivateOnce(
 			FGameplayAbilitySpec(ActiveAbilitiesPreset->GA_MidToBatto, 1, INDEX_NONE, GetOwner()));
 	}
-	else if (InStance == EKatanaStance::MidStance && CurrentStance == EKatanaStance::Battao)
+	else if (InStance == EKatanaStanceType::MidStance && CurrentStance == EKatanaStanceType::Battao)
 	{
 		PlayerRef->GetAbilitySystemComponent()->GiveAbilityAndActivateOnce(
 			FGameplayAbilitySpec(ActiveAbilitiesPreset->GA_BattoToMid, 1, INDEX_NONE, GetOwner()));
 	}
-	else if (InStance == EKatanaStance::Battao && CurrentStance == EKatanaStance::Idle)
+	else if (InStance == EKatanaStanceType::Battao && CurrentStance == EKatanaStanceType::Idle)
 	{
 		PlayerRef->GetAbilitySystemComponent()->GiveAbilityAndActivateOnce(
 			FGameplayAbilitySpec(ActiveAbilitiesPreset->GA_SheathedToBatto, 1, INDEX_NONE, GetOwner()));
 	}
-	else if (InStance == EKatanaStance::Idle && CurrentStance == EKatanaStance::Battao)
+	else if (InStance == EKatanaStanceType::Idle && CurrentStance == EKatanaStanceType::Battao)
 	{
 		PlayerRef->GetAbilitySystemComponent()->GiveAbilityAndActivateOnce(
 			FGameplayAbilitySpec(ActiveAbilitiesPreset->GA_BattoToSheathed, 1, INDEX_NONE, GetOwner()));
