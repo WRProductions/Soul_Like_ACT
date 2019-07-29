@@ -10,6 +10,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/ArrowComponent.h"
+#include "UFSM_StateMachineComponent.h"
+
 #include "Components/InputComponent.h"
 #include "Perception/AIPerceptionSystem.h"
 #include "Perception/AISenseConfig_Sight.h"
@@ -72,6 +74,21 @@ ASoul_Like_ACTCharacter::ASoul_Like_ACTCharacter()
 	Faction = EActorFaction::Player;
 
 	AIPerceptionStimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("AIPerceptionStimuliSource"));
+
+	StateMachineComponent = CreateDefaultSubobject<UStateMachineComponent>("FSMComponent");
+	if(StateMachineComponent->IsValidLowLevelFast())
+	{
+		StateMachineComponent->SetActive(true, false);
+		StateMachineComponent->SetIsReplicated(false);
+
+		StateMachineComponent->AddState(0, FName("Idle"));
+		StateMachineComponent->AddState(1, FName("Walk"));
+		StateMachineComponent->AddState(2, FName("Attack"));
+		StateMachineComponent->AddState(3, FName("Parry"));
+
+		StateMachineComponent->bAutoActivate = true;
+		StateMachineComponent->Debug = true;
+	}
 }
 
 void ASoul_Like_ACTCharacter::BeginPlay()

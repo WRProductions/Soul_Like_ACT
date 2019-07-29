@@ -136,7 +136,7 @@ bool UActionSysManager::DoDodge()
 
 bool UActionSysManager::DoChangeStance(EKatanaStanceType InStance)
 {
-	if(!CanChangeStance(InStance)) return false;
+	//if(!CanChangeStance(InStance)) return false;
 
 	if (!CanUseAnyGA() || IsUsingMelee() || IsUsingParry())
 		return false;
@@ -342,7 +342,7 @@ bool UActionSysManager::IsUsingMelee() const
 
 	else
 	{
-		TArray<class USoulGameplayAbility*> LocalAbilities;
+		TArray<USoulGameplayAbility*> LocalAbilities;
 
 		LocalComp->GetActiveAbilitiesWithTags(
 			FGameplayTagContainer{ FGameplayTag::RequestGameplayTag(FName{"Ability.Melee"}, true) },

@@ -40,6 +40,9 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	class UStateMachineComponent* StateMachineComponent;
+
 	ASoul_Like_ACTCharacter();
 
 	virtual void Tick(float DeltaTime) override;
