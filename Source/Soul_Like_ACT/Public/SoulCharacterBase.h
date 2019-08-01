@@ -161,6 +161,26 @@ public:
 		}
 	}
 
+	void OnParry(AActor* SourceActor, const FHitResult HitResult, bool bPerfectParry, bool bFailed)
+	{
+// 		if (bFailed)
+// 		{
+// 			if (OnParryFailed.IsBound())
+// 				OnParryFailed.Broadcast(SourceActor, this, HitResult);
+// 			return;
+// 		}
+// 		else if (bPerfectParry)
+// 		{
+// 			if (OnParrySucced.IsBound())
+// 				OnParrySucced.Broadcast(SourceActor, this, HitResult);
+// 		}
+// 		else
+// 		{
+// 			if (OnParryNormal.IsBound())
+// 				OnParryNormal.Broadcast(SourceActor, this, HitResult);
+// 		}
+	}
+
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_TwoParams(Health);
 	ATTRIBUTE_GETTER(MaxHealth);
 	ATTRIBUTE_GETTER_AND_HANDLECHANGED_TwoParams(Posture);
@@ -258,9 +278,14 @@ protected:
 	FTrigger_ThreeParams OnParryFailed;
 	UPROPERTY(BlueprintAssignable)
 	FTrigger_ThreeParams OnParrySucced;
+	UPROPERTY(BlueprintAssignable)
+	FTrigger_ThreeParams OnParryNormal;
 
 	// Called from RPGAttributeSet, these call BP events above
+	virtual void HandleParry(float DamageAmount, const bool IsCriticaled, const bool bIsPerfectParry, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+	
 	virtual void HandleDamage(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+	
 	virtual void HandleDotDamage(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 
 	virtual void HandlePostureDamage(float PostureDamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
