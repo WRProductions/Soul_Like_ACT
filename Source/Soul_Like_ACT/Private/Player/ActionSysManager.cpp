@@ -193,17 +193,12 @@ bool UActionSysManager::DoParry_Start()
 {
 	if (!CanUseAnyGA())
 	{
-		TArray<USoulGameplayAbility*> tempGAs;
-		PlayerRef->AbilitySystemComponent->GetActiveAbilitiesWithTags(
-			FGameplayTagContainer{ FGameplayTag::RequestGameplayTag(FName{"Ability.Skill"}, true) },
-			tempGAs);
+		return false;
+	}
 
-		for (USoulGameplayAbility* localGA : tempGAs)
-		{
-			LOG_FUNC_ERROR(localGA->GetName());
-		}
-
-		return 0;
+	if (CurrentStance != EKatanaStanceType::Idle || CurrentStance != EKatanaStanceType::MidStance)
+	{
+		return false;
 	}
 
 	return PlayerRef->AbilitySystemComponent->TryActivateAbilitiesByTag(

@@ -2,6 +2,8 @@
 
 #include "SoulDamageExecution.h"
 #include "Abilities/SoulAttributeSet.h"
+#include "Abilities/GameplayAbilityTypes.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include "SoulCharacterBase.h"
 #include "AbilitySystemComponent.h"
 
@@ -136,38 +138,55 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 
 	FVector TargetFacingVec = TargetActor->GetActorRotation().Vector();
 	FVector TargetToSourceVec = (SourceActor->GetActorLocation() - TargetActor->GetActorLocation()).GetSafeNormal();
-	float TempCrossProduct = FVector::CrossProduct(TargetFacingVec, TargetToSourceVec);
+	float TempCrossProduct = FVector::CrossProduct(TargetFacingVec, TargetToSourceVec).Size();
 
+	FGameplayEventData TempEventPayload;
+	TempEventPayload.Instigator = TargetActor;
+	TempEventPayload.Target = SourceActor;
+	TempEventPayload.EventMagnitude = 1.f;
 
-		//Perfect Parry
-	if (TempCrossProduct > 0.f)
+	//Perfect Parry
+	if (TargetTags->HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Buffer.Parry.Perfect" }, true)))
 	{
-		Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Damage.Parry" }, true));
-
-		if (TargetTags->HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Buffer.Parry.Perfect" }, true)))
+		if (TempCrossProduct > 0.f)
 		{
 			//Send a reflection effect back to the damage source
-			TargetAbilitySystemComponent->HandleGameplayEvent
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor
 			(
-				FGameplayTag::RequestGameplayTag(FName{ "Event.Montage.Shared.PerfectParry" }),
-				//Target and source must be reversed
-				FGameplayEventData
-				(
-					TargetActor,
-					SourceActor,
-					nullptr,
-					nullptr,
-					1.f
-				)
+				TargetActor,
+				FGameplayTag::RequestGameplayTag(FName{ "Event.Montage.Shared.PerfectParry" }, true),
+				TempEventPayload
 			);
 
-			(Cast<ASoulCharacterBase>(TargetActor))->HandleParry()
-				return;
+			Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Damage.PerfectParry" }, true));
+			DamageDone *= 0.f;
+			PostureDamageDone *= 0.f;
 		}
-		else if (TargetTags->HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Buffer.Parry.Normal" }, true)))
+		else
 		{
+			Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Damage.Stun" }, true));
+		}
+	}
+	//Normal Parry
+	else if (TargetTags->HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Buffer.Parry.Normal" }, true)))
+	{
+		if (TempCrossProduct > 0.f)
+		{
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor
+			(
+				TargetActor,
+				FGameplayTag::RequestGameplayTag(FName{ "Event.Montage.Shared.PerfectParry" }, true),
+				TempEventPayload
+			);
+
+			Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Damage.Parry" }, true));
+
 			DamageDone *= 0.1f;
 			PostureDamageDone *= 0.65f;
+		}
+		else
+		{
+			Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Damage.Stun" }, true));
 		}
 	}
 	else
@@ -175,20 +194,13 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 		Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Damage.Stun" }, true));
 	}
 
+	//Passed the critical tag to the gameplay effect spec
+	//We shall see that when the change of the Damage is passed to the target's AttriuteSet
+	(Cast<ASoulCharacterBase>(SourceActor))->Notify_OnMeleeAttack(TargetActor, *(Spec->GetContext().GetHitResult()));
 
+	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().DamageProperty, EGameplayModOp::Additive, DamageDone));
+	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().PostureDamageProperty, EGameplayModOp::Additive, PostureDamageDone));
 
-	if (DamageDone >= 0.f)
-	{
-		//Passed the critical tag to the gameplay effect spec
-		//We shall see that when the change of the Damage is passed to the target's AttriuteSet
-
-		
-
-		(Cast<ASoulCharacterBase>(SourceActor))->Notify_OnMeleeAttack(TargetActor, *(Spec->GetContext().GetHitResult()));
-
-		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().DamageProperty, EGameplayModOp::Additive, DamageDone));
-		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().PostureDamageProperty, EGameplayModOp::Additive, PostureDamageDone));
-	}
 }
 
 void USoulDotDamageExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, OUT FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const

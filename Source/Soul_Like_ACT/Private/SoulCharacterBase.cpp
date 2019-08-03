@@ -72,12 +72,7 @@ void ASoulCharacterBase::AddStartupGameplayAbilities()
 	ModifierManager->AddStartupGameplayAbilities();
 }
 
-void ASoulCharacterBase::HandleParry(float DamageAmount, const bool IsCriticaled, const bool bIsPerfectParry, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
-{
-
-}
-
-void ASoulCharacterBase::HandleDamage(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
+void ASoulCharacterBase::HandleDamage(float DamageAmount, bool IsCriticaled, bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
 {
 	OnDamaged(DamageAmount, IsCriticaled, bIsStun, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
 	
@@ -87,7 +82,7 @@ void ASoulCharacterBase::HandleDamage(float DamageAmount, const bool IsCriticale
 	}
 }
 
-void ASoulCharacterBase::HandleDotDamage(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
+void ASoulCharacterBase::HandleDotDamage(float DamageAmount, bool IsCriticaled, bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
 {
 	OnDotDamaged(DamageAmount, IsCriticaled, bIsStun, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
 
@@ -97,7 +92,7 @@ void ASoulCharacterBase::HandleDotDamage(float DamageAmount, const bool IsCritic
 	}
 }
 
-void ASoulCharacterBase::HandlePostureDamage(float PostureDamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
+void ASoulCharacterBase::HandlePostureDamage(float PostureDamageAmount, bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
 {
 	OnPostureDamaged(PostureDamageAmount, IsCriticaled, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
 }
