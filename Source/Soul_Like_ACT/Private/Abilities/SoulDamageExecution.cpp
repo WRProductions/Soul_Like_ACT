@@ -124,7 +124,7 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 
 	if (bIsCrit)
 	{
-		Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Damage.Critical" }, true));
+		Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Event.Hit.Critical" }, true));
 		DamageDone = (DamageMulti + 1.f) * AttackPower * (1 + CriticalMulti / 100.f);
 	}
 	else
@@ -148,9 +148,10 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 	//Perfect Parry
 	if (TargetTags->HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Buffer.Parry.Perfect" }, true)))
 	{
+		//If the hit comes from -90 to 90 degrees angle
 		if (TempCrossProduct > 0.f)
 		{
-			//Send a reflection effect back to the damage source
+			//Send a reflection effect back to the damage source actor
 			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor
 			(
 				TargetActor,
@@ -158,49 +159,56 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 				TempEventPayload
 			);
 
-			Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Damage.PerfectParry" }, true));
+			Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Event.Hit.Parry.Perfect" }, true));
+			
 			DamageDone *= 0.f;
 			PostureDamageDone *= 0.f;
 		}
+		//If the hit comes from the back
 		else
 		{
-			Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Damage.Stun" }, true));
+			Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Event.Hit.Parry.Failed" }, true));
 		}
 	}
 	//Normal Parry
 	else if (TargetTags->HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Buffer.Parry.Normal" }, true)))
 	{
+		//If the hit comes from -90 to 90 degrees angle
 		if (TempCrossProduct > 0.f)
 		{
 			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor
 			(
 				TargetActor,
-				FGameplayTag::RequestGameplayTag(FName{ "Event.Montage.Shared.PerfectParry" }, true),
+				FGameplayTag::RequestGameplayTag(FName{ "Event.Montage.Shared.Parry" }, true),
 				TempEventPayload
 			);
 
-			Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Damage.Parry" }, true));
+			Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Event.Hit.Parry.Normal" }, true));
 
-			DamageDone *= 0.1f;
-			PostureDamageDone *= 0.65f;
+			DamageDone *= 0.15f;
+			PostureDamageDone *= 0.4f;
 		}
+		//If the hit comes from the back
 		else
 		{
-			Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Damage.Stun" }, true));
+			Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Event.Hit.Parry.Failed" }, true));
 		}
 	}
+	//Not parrying
 	else
 	{
-		Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Damage.Stun" }, true));
+		Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Event.Hit.GetHit" }, true));
 	}
 
 	//Passed the critical tag to the gameplay effect spec
 	//We shall see that when the change of the Damage is passed to the target's AttriuteSet
-	(Cast<ASoulCharacterBase>(SourceActor))->Notify_OnMeleeAttack(TargetActor, *(Spec->GetContext().GetHitResult()));
+	/*(Cast<ASoulCharacterBase>(SourceActor))->Notify_OnMeleeAttack(TargetActor, *(Spec->GetContext().GetHitResult()));*/
 
+	//Health Damage
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().DamageProperty, EGameplayModOp::Additive, DamageDone));
-	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().PostureDamageProperty, EGameplayModOp::Additive, PostureDamageDone));
 
+	//Posture Damage
+	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().PostureDamageProperty, EGameplayModOp::Additive, PostureDamageDone));
 }
 
 void USoulDotDamageExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, OUT FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const

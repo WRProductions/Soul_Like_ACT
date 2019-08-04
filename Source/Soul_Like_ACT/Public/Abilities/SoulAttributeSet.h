@@ -1,5 +1,4 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "EngineMinimal.h"
@@ -7,6 +6,15 @@
 #include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
 #include "SoulAttributeSet.generated.h"
+
+UENUM(BlueprintType)
+enum class EParryResult : uint8
+{
+	Unguard,
+	Normal,
+	Perfect,
+	Failed
+};
 
 // Uses macros from AttributeSet.h
 #define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
@@ -96,4 +104,6 @@ public:
 
 protected:
 	void AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty);
+
+	void GetHitEventFromTagContainer(const FGameplayTagContainer& InTagContainer, EParryResult &OutParryResult, bool &IsCritical, bool &IsStun);
 };

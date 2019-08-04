@@ -72,10 +72,10 @@ void ASoulCharacterBase::AddStartupGameplayAbilities()
 	ModifierManager->AddStartupGameplayAbilities();
 }
 
-void ASoulCharacterBase::HandleDamage(float DamageAmount, bool IsCriticaled, bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
+void ASoulCharacterBase::HandleDamage(float DamageAmount, bool IsCriticaled, EParryResult ParryResult, bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser)
 {
-	OnDamaged(DamageAmount, IsCriticaled, bIsStun, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
-	
+	OnDamaged(DamageAmount, IsCriticaled, ParryResult, bIsStun, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
+
 	if (GetIsHealthZero())
 	{
 		HandleOnDead();

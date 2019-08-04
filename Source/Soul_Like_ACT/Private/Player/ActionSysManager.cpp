@@ -30,32 +30,32 @@ void UActionSysManager::TickComponent(float DeltaTime, enum ELevelTick TickType,
 
 bool UActionSysManager::SetNewStance(EKatanaStanceType InStance)
 {
-	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.MidStance", true));
-	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.Idle", true));
-	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.Battao", true));
-	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.HeavyStance", true));
-	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.Guard", true));
-
-	if (InStance == EKatanaStanceType::Idle)
-	{
-		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.Idle", true), 1);
-	}
-	if (InStance == EKatanaStanceType::Battao)
-	{
-		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.Battao", true), 1);
-	}
-	if (InStance == EKatanaStanceType::MidStance)
-	{
-		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.MidStance", true), 1);
-	}
-	if (InStance == EKatanaStanceType::HeavyStance)
-	{
-		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.HeavyStance", true), 1);
-	}
-	if (InStance == EKatanaStanceType::Guard)
-	{
-		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.Guard", true), 1);
-	}
+// 	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.MidStance", true));
+// 	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.Idle", true));
+// 	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.Battao", true));
+// 	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.HeavyStance", true));
+// 	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.Guard", true));
+// 
+// 	if (InStance == EKatanaStanceType::Idle)
+// 	{
+// 		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.Idle", true), 1);
+// 	}
+// 	if (InStance == EKatanaStanceType::Battao)
+// 	{
+// 		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.Battao", true), 1);
+// 	}
+// 	if (InStance == EKatanaStanceType::MidStance)
+// 	{
+// 		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.MidStance", true), 1);
+// 	}
+// 	if (InStance == EKatanaStanceType::HeavyStance)
+// 	{
+// 		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.HeavyStance", true), 1);
+// 	}
+// 	if (InStance == EKatanaStanceType::Guard)
+// 	{
+// 		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.Guard", true), 1);
+// 	}
 	CurrentStance = InStance;
 
 	return true;
@@ -196,7 +196,7 @@ bool UActionSysManager::DoParry_Start()
 		return false;
 	}
 
-	if (CurrentStance != EKatanaStanceType::Idle || CurrentStance != EKatanaStanceType::MidStance)
+	if (CurrentStance != EKatanaStanceType::Idle && CurrentStance != EKatanaStanceType::MidStance)
 	{
 		return false;
 	}

@@ -14,6 +14,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChanged, const TArray<float> &, v
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FTrigger_ThreeParams, AActor*, SourceActor, AActor*, TargetActor, const FHitResult, HitResult);
 
+
+
 UENUM(BlueprintType)
 enum class EIsControllerValid : uint8
 {
@@ -216,6 +218,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void GetWeapon(AWeaponActor *&OutWeaponActor);
 
+	// Called from RPGAttributeSet, these call BP events above
+	virtual void HandleDamage(float DamageAmount, bool IsCriticaled, EParryResult ParryResult, bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+
+	virtual void HandleDotDamage(float DamageAmount, bool IsCriticaled, bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+
+	virtual void HandlePostureDamage(float PostureDamageAmount, bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 protected:
 	/** Apply the startup GAs and GEs */
 	UFUNCTION(BlueprintCallable)
@@ -231,17 +239,14 @@ protected:
 	 * @param DamageCauser The actual actor that did the damage, might be a weapon or projectile
 	 */
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnDamaged(float DamageAmount, bool IsCriticaled, bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+	void OnDamaged(float DamageAmount, bool IsCriticaled, EParryResult ParryResult, bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnDotDamaged(float DamageAmount, bool IsCriticaled, bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnParry(float DamageAmount, float PostureDamageAmount, bool IsCriticaled, bool bIsPerfectParry, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 	
 	//Called when character takes posture damage
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnPostureDamaged(float PostureDamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
+	void OnPostureDamaged(float PostureDamage, bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnChanged OnHealthChanged;
@@ -281,13 +286,6 @@ protected:
 	FTrigger_ThreeParams OnParrySucced;
 	UPROPERTY(BlueprintAssignable)
 	FTrigger_ThreeParams OnParryNormal;
-
-	// Called from RPGAttributeSet, these call BP events above
-	virtual void HandleDamage(float DamageAmount, bool IsCriticaled, bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
-	
-	virtual void HandleDotDamage(float DamageAmount, const bool IsCriticaled, const bool bIsStun, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
-
-	virtual void HandlePostureDamage(float PostureDamageAmount, const bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void MakeStepDecelAndSound();

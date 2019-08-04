@@ -42,6 +42,66 @@ void USoulAttributeSet::AdjustAttributeForMaxChange(FGameplayAttributeData& Affe
 	}
 }
 
+void USoulAttributeSet::GetHitEventFromTagContainer(const FGameplayTagContainer& InTagContainer, EParryResult& OutParryResult, bool& IsCritical, bool& IsStun)
+{
+	static FGameplayTagContainer StunTagContainer;
+	if (!StunTagContainer.IsValid())
+	{
+		StunTagContainer.AddTagFast(FGameplayTag::RequestGameplayTag(FName("Event.Hit.Parry.Failed"), true));
+		StunTagContainer.AddTagFast(FGameplayTag::RequestGameplayTag(FName("Event.Hit.GetHit"), true));
+	}
+	
+	static FGameplayTag ParryTag;
+	if(!ParryTag.IsValid()) ParryTag = FGameplayTag::RequestGameplayTag(FName("Event.Hit.Parry"), true);
+
+	static FGameplayTag CriticalTag;
+	if (!CriticalTag.IsValid()) FGameplayTag::RequestGameplayTag(FName("Event.Hit.Critical"), true);
+	
+	bool bFindParryTag = false;
+	//Set ParryResult
+	for (TArray<FGameplayTag>::TConstIterator TagIter = InTagContainer.CreateConstIterator(); TagIter; ++TagIter)
+	{
+		if (!bFindParryTag && TagIter->MatchesTag(ParryTag))
+		{
+			bFindParryTag = true;
+
+			TArray<FString> TempParsedTag;
+			TagIter->ToString().ParseIntoArray(TempParsedTag, *FString("."));
+			
+			if (TempParsedTag.Num() > 0)
+			{
+				FString ParryTagLeaf = TempParsedTag.Last();
+				if (ParryTagLeaf == "Perfect")
+				{
+					OutParryResult = EParryResult::Perfect;
+				}
+				else if (ParryTagLeaf == "Normal")
+				{
+					OutParryResult = EParryResult::Normal;
+				}
+				else if (ParryTagLeaf == "Failed")
+				{
+					OutParryResult = EParryResult::Failed;
+				}
+				else if (ParryTagLeaf == "Unguard")
+				{
+					OutParryResult = EParryResult::Unguard;
+				}
+			}
+		}
+		if (!IsStun && TagIter->MatchesAnyExact(StunTagContainer))
+		{
+			IsStun = true;
+		}
+		if (!IsCritical && TagIter->MatchesTagExact(CriticalTag))
+		{
+			IsCritical = true;
+		}
+	}
+
+	if (!bFindParryTag) OutParryResult = EParryResult::Unguard;
+}
+
 void USoulAttributeSet::PreAttributeChange(const FGameplayAttribute & Attribute, float & NewValue)
 {
 	// This is called whenever attributes change, so for max health/mana we want to scale the current totals to match
@@ -61,6 +121,7 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 
 	FGameplayEffectContextHandle Context = Data.EffectSpec.GetContext();
 	UAbilitySystemComponent* Source = Context.GetOriginalInstigatorAbilitySystemComponent();
+	//Dynamic tags from GE
 	const FGameplayTagContainer& SourceTags = *Data.EffectSpec.CapturedSourceTags.GetAggregatedTags();
 
 	// Compute the delta between old and new, if it is available
@@ -124,13 +185,10 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			HitResult = *Context.GetHitResult();
 		}
 
-		/**
-		 * Data.EffectSpec == FGameplayEffectSpec
-		 * Data.EffectSpec.DynamicAssetTags
-		 */ 
-		bool bIsCritic = Data.EffectSpec.DynamicAssetTags.HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Damage.Critical" }, true));
-
-		bool bIsStun = Data.EffectSpec.DynamicAssetTags.HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Damage.Stun" }, true));
+		//Get Hit results for HitEvents
+		bool bIsCritic, bIsStun;
+		EParryResult ParryResult;
+		GetHitEventFromTagContainer(Data.EffectSpec.DynamicAssetTags, ParryResult, bIsCritic, bIsStun);
 
 		// Store a local copy of the amount of damage done and clear the damage attribute
 		const float LocalDamageDone = GetDamage();
@@ -156,7 +214,7 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 					if (GetHealth() <= 0.f)
 						(Cast<ASoulCharacterBase>(SourceActor))->Notify_OnMeleeKill(SourceActor, TargetActor, HitResult);
 
-					TargetCharacter->HandleDamage(LocalDamageDone, bIsCritic, bIsStun, HitResult, SourceTags, SourceCharacter, SourceActor);
+					TargetCharacter->HandleDamage(LocalDamageDone, bIsCritic, ParryResult, bIsStun, HitResult, SourceTags, SourceCharacter, SourceActor);
 				}
 			}
 		}
