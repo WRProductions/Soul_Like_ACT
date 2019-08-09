@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Interfaces/GeneralEnums.h"
-#include "Types/DA_Gear.h"
+#include "SoulDataAssets.h"
 #include "ActionSysManager.generated.h"
 
 class ASoul_Like_ACTCharacter;
@@ -71,7 +71,6 @@ public:
 	bool DoParry_Start();
 	UFUNCTION(BlueprintCallable)
 	bool DoParry_End();
-
 
 	//************************************
 	// Method:    SetJumpSection

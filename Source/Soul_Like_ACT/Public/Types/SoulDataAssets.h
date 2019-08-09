@@ -5,9 +5,11 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "Interfaces/GeneralEnums.h"
-#include "DA_Gear.generated.h"
+#include "SoulDataAssets.generated.h"
 
 class USoulActiveAbility;
+class USoundBase;
+class UParticleSystem;
 
 /**
  * 
@@ -80,4 +82,29 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Abilities)
 	TSubclassOf<USoulActiveAbility> GA_BattoToSheathed;
+};
+
+UCLASS()
+class SOUL_LIKE_ACT_API UDA_FXPresets : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
+	TArray<USoundBase*> Sound_OnHitUnguard;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
+	TArray<USoundBase*> Sound_OnParryNormal;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
+	TArray<USoundBase*> Sound_OnParryPerfect;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
+	TArray<USoundBase*> Sound_OnParryFailed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Visual)
+	TArray<UParticleSystem*> PS_OnHitUnguard;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Visual)
+	TArray<UParticleSystem*> PS_OnParryNormal;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Visual)
+	TArray<UParticleSystem*> PS_OnParryPerfect;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Visual)
+	TArray<UParticleSystem*> PS_OnParryFailed;
 };

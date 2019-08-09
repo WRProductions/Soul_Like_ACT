@@ -15,22 +15,55 @@ UActorFXManager::UActorFXManager()
 void UActorFXManager::SpawnParticleWithHitResult(const FHitResult &HitResult, UParticleSystem *ParticleClass)
 {
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld()
-		, OnHitParticles[0]
+		, ParticleClass
 		, GetOwner()->GetActorLocation()
 		, UKismetMathLibrary::MakeRotFromX(HitResult.Normal)
 		, FVector::OneVector
 		, true);
 }
 
-void UActorFXManager::SpawnSoundWithHitResult(const FHitResult &HitResult, USoundBase *SoundCue)
+void UActorFXManager::PlaySoundWithHitResult(const FHitResult &HitResult, USoundBase *SoundCue)
 {
 	UGameplayStatics::PlaySound2D(GetWorld(), SoundCue);
 }	
 
 bool UActorFXManager::PlayEffects(const FHitResult& HitResult, const EFXType InputType)
 {
-	SpawnParticleWithHitResult(HitResult, OnHitParticles[0]);
-	SpawnSoundWithHitResult(HitResult, OnHitSounds[0]);
+	UParticleSystem* ParticalToUse;
+	USoundBase* SoudToUse;
+	
+	switch (InputType)
+	{
+	case EFXType::OnHit:
+		ParticalToUse = GetArrayRandom(FXPresets->PS_OnHitUnguard);
+		SoudToUse = GetArrayRandom(FXPresets->Sound_OnHitUnguard);
+		break;
+	case EFXType::OnParry_Normal:
+		ParticalToUse = GetArrayRandom(FXPresets->PS_OnParryNormal);
+		SoudToUse = GetArrayRandom(FXPresets->Sound_OnParryNormal);
+		break;
+	case EFXType::OnParry_Perfect:
+		ParticalToUse = GetArrayRandom(FXPresets->PS_OnParryPerfect);
+		SoudToUse = GetArrayRandom(FXPresets->Sound_OnParryPerfect);
+		break;
+	case EFXType::OnParry_Failed:
+		ParticalToUse = GetArrayRandom(FXPresets->PS_OnParryFailed);
+		SoudToUse = GetArrayRandom(FXPresets->Sound_OnParryFailed);
+		break;
+	case EFXType::PowerShot:
+		ParticalToUse = GetArrayRandom(FXPresets->PS_OnParryFailed);
+		SoudToUse = GetArrayRandom(FXPresets->Sound_OnParryFailed);
+		break;
+	case EFXType::Immune:
+		ParticalToUse = GetArrayRandom(FXPresets->PS_OnParryPerfect);
+		SoudToUse = GetArrayRandom(FXPresets->Sound_OnParryPerfect);
+		break;
+	default:
+		return false;
+	}
 
-	return 1;
+
+	SpawnParticleWithHitResult(HitResult, ParticalToUse);
+	PlaySoundWithHitResult(HitResult, SoudToUse);
+	return true;
 }

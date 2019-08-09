@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Types/DA_Gear.h"
+#include "SoulDataAssets.h"
 #include "WeaponActor.generated.h"
 
 class ASoulCharacterBase;

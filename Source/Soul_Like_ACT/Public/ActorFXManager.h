@@ -4,16 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "SoulDataAssets.h"
 #include "ActorFXManager.generated.h"
 
 UENUM(BlueprintType)
 enum class EFXType : uint8
 {
-	VE_OnHit	UMETA(DisplayName = "OnHit"),
-	VE_OnParry	UMETA(DisplayName = "OnParry"),
-	VE_OnBlock	UMETA(DisplayName = "OnBlock"),
+	OnHit,
+	OnParry_Normal,
+	OnParry_Perfect,
+	OnParry_Failed,
+	PowerShot,
+	Immune,
 };
-
 
 class ASoulCharacterBase;
 
@@ -22,30 +25,31 @@ class SOUL_LIKE_ACT_API UActorFXManager : public UActorComponent
 {
 	GENERATED_BODY()
 
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = FX)
+	UDA_FXPresets* FXPresets;
+	
+	template<class T>
+	T GetArrayRandom(TArray<T>& InArray);
+
 public:	
 	// Sets default values for this component's properties
 	UActorFXManager();
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
-		TArray<USoundBase*> OnHitSounds;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
-		TArray<USoundBase*> OnBlockSounds;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sound)
-		TArray<USoundBase*> OnParrySounds;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Visual)
-		TArray<UParticleSystem*> OnHitParticles;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Visual)
-		TArray<UParticleSystem*> OnBlockParticles;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Visual)
-		TArray<UParticleSystem*> OnParryParticles;
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnParticleWithHitResult(const FHitResult& HitResult, UParticleSystem* ParticleClass);
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnSoundWithHitResult(const FHitResult& HitResult, USoundBase* SoundCue);
+	void PlaySoundWithHitResult(const FHitResult& HitResult, USoundBase* SoundCue);
 
 	UFUNCTION(BlueprintCallable)
 	bool PlayEffects(const FHitResult &HitResult, const EFXType InputType);
 };
+
+template<class T>
+T UActorFXManager::GetArrayRandom(TArray<T>& InArray)
+{
+	uint32 ArraySize = InArray.Num();
+
+	return InArray[FMath::RandRange(0, ArraySize - 1)];
+}
