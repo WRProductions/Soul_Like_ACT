@@ -30,34 +30,7 @@ void UActionSysManager::TickComponent(float DeltaTime, enum ELevelTick TickType,
 
 bool UActionSysManager::SetNewStance(EKatanaStanceType InStance)
 {
-// 	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.MidStance", true));
-// 	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.Idle", true));
-// 	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.Battao", true));
-// 	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.HeavyStance", true));
-// 	PlayerRef->AbilitySystemComponent->RemoveGameplayTag(FGameplayTag::RequestGameplayTag("Stance.Katana.Guard", true));
-// 
-// 	if (InStance == EKatanaStanceType::Idle)
-// 	{
-// 		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.Idle", true), 1);
-// 	}
-// 	if (InStance == EKatanaStanceType::Battao)
-// 	{
-// 		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.Battao", true), 1);
-// 	}
-// 	if (InStance == EKatanaStanceType::MidStance)
-// 	{
-// 		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.MidStance", true), 1);
-// 	}
-// 	if (InStance == EKatanaStanceType::HeavyStance)
-// 	{
-// 		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.HeavyStance", true), 1);
-// 	}
-// 	if (InStance == EKatanaStanceType::Guard)
-// 	{
-// 		PlayerRef->AbilitySystemComponent->SetTagMapCount(FGameplayTag::RequestGameplayTag("Stance.Katana.Guard", true), 1);
-// 	}
 	CurrentStance = InStance;
-
 	return true;
 }
 
@@ -292,6 +265,8 @@ float UActionSysManager::PredictMovingDirection(ASoul_Like_ACTCharacter *Charact
 		FVector ForwardVector = RotMatrix.GetScaledAxis(EAxis::X);
 		FVector RightVector = RotMatrix.GetScaledAxis(EAxis::Y);
 		FVector NormalizedVel = PlayerVelocity.GetSafeNormal2D();
+
+		if (NormalizedVel.IsZero()) return 0.f;
 
 		// get a cos(alpha) of forward vector vs velocity
 		float ForwardCosAngle = FVector::DotProduct(ForwardVector, NormalizedVel);
