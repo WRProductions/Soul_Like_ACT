@@ -61,6 +61,8 @@ void USoulAttributeSet::GetHitEventFromTagContainer(const FGameplayTagContainer&
 	//Set ParryResult
 	for (TArray<FGameplayTag>::TConstIterator TagIter = InTagContainer.CreateConstIterator(); TagIter; ++TagIter)
 	{
+		LOG_FUNC_NORMAL(TagIter->ToString());
+
 		if (!bFindParryTag && TagIter->MatchesTag(ParryTag))
 		{
 			bFindParryTag = true;
@@ -74,6 +76,8 @@ void USoulAttributeSet::GetHitEventFromTagContainer(const FGameplayTagContainer&
 				if (ParryTagLeaf == "Perfect")
 				{
 					OutParryResult = EParryResult::Perfect;
+
+
 				}
 				else if (ParryTagLeaf == "Normal")
 				{
@@ -185,37 +189,55 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			HitResult = *Context.GetHitResult();
 		}
 
-		//Get Hit results for HitEvents
-		bool bIsCritic, bIsStun;
-		EParryResult ParryResult;
-		GetHitEventFromTagContainer(Data.EffectSpec.DynamicAssetTags, ParryResult, bIsCritic, bIsStun);
-
 		// Store a local copy of the amount of damage done and clear the damage attribute
 		const float LocalDamageDone = GetDamage();
 		SetDamage(0.f);
 
+		//Health Change
 		if (LocalDamageDone > 0)
 		{
-			// Apply the health change and then clamp it
 			const float OldHealth = GetHealth();
 			SetHealth(FMath::Clamp(OldHealth - LocalDamageDone, 0.0f, GetMaxHealth()));
+		}
 
-			if (TargetCharacter)
+		//Handle damage notifications
+		if (TargetCharacter)
+		{
+			FGameplayTagContainer LocalContainer;
+			Data.EffectSpec.GetAllAssetTags(LocalContainer);
+
+			//Get Hit results for HitEvents
+			bool bIsCritic, bIsStun;
+			EParryResult ParryResult;
+			GetHitEventFromTagContainer(LocalContainer, ParryResult, bIsCritic, bIsStun);
+
+			if (ParryResult == EParryResult::Normal)
 			{
-				FGameplayTagContainer LocalContainer;
-				Data.EffectSpec.GetAllAssetTags(LocalContainer);
+				if(TargetCharacter->OnParryNormal.IsBound())
+					TargetCharacter->OnParryNormal.Broadcast(SourceActor, TargetActor, HitResult);
+			}
+			else if (ParryResult == EParryResult::Perfect)
+			{
+				if (TargetCharacter->OnParrySucced.IsBound())
+					TargetCharacter->OnParrySucced.Broadcast(SourceActor, TargetActor, HitResult);
+			}
+			else if (ParryResult == EParryResult::Failed)
+			{
 
-				if (LocalContainer.HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Damage.Dot" }, true)))
-				{
-					TargetCharacter->HandleDotDamage(LocalDamageDone, bIsCritic, bIsStun, HitResult, SourceTags, SourceCharacter, SourceActor);
-				}
-				else
-				{
-					if (GetHealth() <= 0.f)
-						(Cast<ASoulCharacterBase>(SourceActor))->Notify_OnMeleeKill(SourceActor, TargetActor, HitResult);
+				if (TargetCharacter->OnParryFailed.IsBound())
+					TargetCharacter->OnParryFailed.Broadcast(SourceActor, TargetActor, HitResult);
+			}
 
-					TargetCharacter->HandleDamage(LocalDamageDone, bIsCritic, ParryResult, bIsStun, HitResult, SourceTags, SourceCharacter, SourceActor);
-				}
+			if (LocalContainer.HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Damage.Dot" }, true)))
+			{
+				TargetCharacter->HandleDotDamage(LocalDamageDone, bIsCritic, bIsStun, HitResult, SourceTags, SourceCharacter, SourceActor);
+			}
+			else
+			{
+				if (GetHealth() <= 0.f)
+					(Cast<ASoulCharacterBase>(SourceActor))->Notify_OnMeleeKill(SourceActor, TargetActor, HitResult);
+
+				TargetCharacter->HandleDamage(LocalDamageDone, bIsCritic, ParryResult, bIsStun, HitResult, SourceTags, SourceCharacter, SourceActor);
 			}
 		}
 	}

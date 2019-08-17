@@ -138,27 +138,22 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 
 	FVector TargetFacingVec = TargetActor->GetActorRotation().Vector();
 	FVector TargetToSourceVec = (SourceActor->GetActorLocation() - TargetActor->GetActorLocation()).GetSafeNormal();
-	float TempCrossProduct = FVector::CrossProduct(TargetFacingVec, TargetToSourceVec).Size();
+	float VectorAngle = FMath::Asin(FVector::CrossProduct(TargetFacingVec, TargetToSourceVec).Size());
 
-	FGameplayEventData TempEventPayload;
-	TempEventPayload.Instigator = TargetActor;
-	TempEventPayload.Target = SourceActor;
-	TempEventPayload.EventMagnitude = 1.f;
+	FGameplayTagContainer LocalContainer;
+
+	TargetAbilitySystemComponent->GetOwnedGameplayTags(LocalContainer);
+
+	LOG_FUNC_NORMAL(LocalContainer.ToString());
+	LOG_FUNC_NORMAL("Hit Angle : " + FString::SanitizeFloat(VectorAngle));
+
 
 	//Perfect Parry
-	if (TargetTags->HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Buffer.Parry.Perfect" }, true)))
+	if (TargetAbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName{ "Buffer.Parry.Perfect" }, true)))
 	{
 		//If the hit comes from -90 to 90 degrees angle
-		if (TempCrossProduct > 0.f)
+		if (VectorAngle > 0.f)
 		{
-			//Send a reflection effect back to the damage source actor
-			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor
-			(
-				TargetActor,
-				FGameplayTag::RequestGameplayTag(FName{ "Event.Montage.Shared.PerfectParry" }, true),
-				TempEventPayload
-			);
-
 			Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Event.Hit.Parry.Perfect" }, true));
 			
 			DamageDone *= 0.f;
@@ -171,18 +166,11 @@ void USoulDamageExecution::Execute_Implementation(const FGameplayEffectCustomExe
 		}
 	}
 	//Normal Parry
-	else if (TargetTags->HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Buffer.Parry.Normal" }, true)))
+	else if (TargetAbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName{ "Buffer.Parry.Normal" }, true)))
 	{
 		//If the hit comes from -90 to 90 degrees angle
-		if (TempCrossProduct > 0.f)
+		if (VectorAngle > 0.f)
 		{
-			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor
-			(
-				TargetActor,
-				FGameplayTag::RequestGameplayTag(FName{ "Event.Montage.Shared.Parry" }, true),
-				TempEventPayload
-			);
-
 			Spec->DynamicAssetTags.AddTagFast(FGameplayTag::RequestGameplayTag(FName{ "Event.Hit.Parry.Normal" }, true));
 
 			DamageDone *= 0.15f;
