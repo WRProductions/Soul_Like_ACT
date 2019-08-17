@@ -29,8 +29,8 @@ void UActorFXManager::PlaySoundWithHitResult(const FHitResult &HitResult, USound
 
 bool UActorFXManager::PlayEffects(const FHitResult& HitResult, const EFXType InputType)
 {
-	UParticleSystem* ParticalToUse;
-	USoundBase* SoudToUse;
+	UParticleSystem** ParticalToUse;
+	USoundBase** SoudToUse;
 	
 	switch (InputType)
 	{
@@ -62,8 +62,11 @@ bool UActorFXManager::PlayEffects(const FHitResult& HitResult, const EFXType Inp
 		return false;
 	}
 
+	if (ParticalToUse != nullptr && (*ParticalToUse)->IsValidLowLevel())
+		SpawnParticleWithHitResult(HitResult, *ParticalToUse);
 
-	SpawnParticleWithHitResult(HitResult, ParticalToUse);
-	PlaySoundWithHitResult(HitResult, SoudToUse);
+	if (SoudToUse != nullptr && (*SoudToUse)->IsValidLowLevel())
+		PlaySoundWithHitResult(HitResult, *SoudToUse);
+
 	return true;
 }

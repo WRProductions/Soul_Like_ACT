@@ -30,7 +30,7 @@ protected:
 	UDA_FXPresets* FXPresets;
 	
 	template<class T>
-	T GetArrayRandom(TArray<T>& InArray);
+	T* GetArrayRandom(TArray<T>& InArray);
 
 public:	
 	// Sets default values for this component's properties
@@ -47,9 +47,12 @@ public:
 };
 
 template<class T>
-T UActorFXManager::GetArrayRandom(TArray<T>& InArray)
+T* UActorFXManager::GetArrayRandom(TArray<T>& InArray)
 {
-	uint32 ArraySize = InArray.Num();
+	uint8 ArraySize = InArray.Num();
 
-	return InArray[FMath::RandRange(0, ArraySize - 1)];
+	if (ArraySize > 0)
+		return &InArray[FMath::RandRange(0, ArraySize - 1)];
+	else
+		return nullptr;
 }

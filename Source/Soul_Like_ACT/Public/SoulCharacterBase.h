@@ -118,9 +118,28 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	/////////////////////////////////////////////////////////////////////////////////////
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Default)
 	bool bMoveBlock;
 
+	bool CachedMoveBlock ,bCached;
+	//Remember to call ResetBlockMove after this function is called
+	UFUNCTION(BlueprintCallable)
+	void TemporaryBlockMove() { CachedMoveBlock = bMoveBlock; bMoveBlock = true;  bCached = true; }
+	UFUNCTION(BlueprintCallable)
+	void ResetBlockMove()
+	{
+		bMoveBlock = false;
+	}
+	UFUNCTION(BlueprintCallable)
+	void ResetBlockMove_UseCache(bool& Succeed) 
+	{
+		if(bCached)
+			bMoveBlock = CachedMoveBlock;
+		Succeed = bCached;
+		bCached = false; 
+	}
+	/////////////////////////////////////////////////////////////////////////////////////
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EActorFaction Faction;
 
