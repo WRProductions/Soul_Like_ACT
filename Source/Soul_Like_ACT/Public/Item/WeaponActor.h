@@ -31,14 +31,13 @@ public:
 	UDA_Gear *GearInfo;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = 1))
-		bool bCanDamageAllies;
+	bool bCanDamageAllies;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	bool bIsTracingCollision;
-
 
 	TArray<FVector>PrevVecs;
 	TArray<FVector>CurrVecs;
@@ -49,6 +48,8 @@ protected:
 	EMeleeTraceType TraceType;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	float DmgMultiplier;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	bool bHeavyAttack;
 
 public:	
 	// Called every frame
@@ -67,7 +68,7 @@ public:
 	bool bEnableDrawTraceLine;
 
 	UFUNCTION(BlueprintCallable)
-	void StartSwing(EMeleeTraceType MeleeTraceType, const float InDmgMulti = 1.f, const float InAreaMulti = 100.f);
+	void StartSwing(EMeleeTraceType MeleeTraceType, const float InDmgMulti = 1.f, const float InAreaMulti = 100.f, bool InHeavyAttack = false);
 	UFUNCTION(BlueprintCallable)
 	void EndSwing();
 

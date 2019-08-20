@@ -47,10 +47,12 @@ void ASoulCharacterBase::ToggleLockIcon()
 
 void ASoulCharacterBase::TriggerSlowMotion_WithDelay(float Delay)
 {
+	if (FMath::IsNearlyEqual(Delay, 0.f)) return;
+
 	if (GetWorldTimerManager().GetTimerRemaining(Handler_SlowMotionDelay) <= 0.f)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "Handler_SlowMotionDelay.IsValid()");
-		GetWorldTimerManager().SetTimer(Handler_SlowMotionDelay, this, &ASoulCharacterBase::TriggerSlowMotion, 1.f, 0, Delay);
+		GetWorldTimerManager().SetTimer(Handler_SlowMotionDelay, this, &ASoulCharacterBase::TriggerSlowMotion, 1.f, false, Delay);
 	}
 }
 

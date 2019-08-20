@@ -90,7 +90,7 @@ protected:
 	UPROPERTY()
 	USoulAttributeSet* AttributeSet;
 
-	bool bIsDead;
+	bool bIsDead, bIsDisabled;
 
 	UAnimMontage* DeathMontage;
 
@@ -118,19 +118,23 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	/////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////Input Block///////////////////////////////////////////////
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Default)
 	bool bMoveBlock;
 
 	bool CachedMoveBlock ,bCached;
+	
 	//Remember to call ResetBlockMove after this function is called
 	UFUNCTION(BlueprintCallable)
 	void TemporaryBlockMove() { CachedMoveBlock = bMoveBlock; bMoveBlock = true;  bCached = true; }
+	
 	UFUNCTION(BlueprintCallable)
 	void ResetBlockMove()
 	{
 		bMoveBlock = false;
+		bCached = false;
 	}
+	
 	UFUNCTION(BlueprintCallable)
 	void ResetBlockMove_UseCache(bool& Succeed) 
 	{
@@ -139,7 +143,25 @@ public:
 		Succeed = bCached;
 		bCached = false; 
 	}
-	/////////////////////////////////////////////////////////////////////////////////////
+
+	UFUNCTION(BlueprintCallable)
+	bool IsDisabled() const { return bIsDisabled; }
+
+	UFUNCTION(BlueprintCallable)
+	virtual void SetDisabled(bool bEnable)
+	{ 
+		bIsDisabled = bEnable;
+
+		if (bIsDisabled) 
+		{
+			TemporaryBlockMove();
+		}
+		else 
+		{
+			ResetBlockMove();
+		}
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EActorFaction Faction;
 

@@ -47,4 +47,6 @@ public:
 	bool GetIsTargetingEnabled() const;
 
 	virtual void GetWeapon_Implementation(AWeaponActor*& OutWeaponActor) override;
+
+	virtual void SetDisabled(bool bEnable) override;
 };

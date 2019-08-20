@@ -89,3 +89,8 @@ void AMobController::AISenseUpdateMessage(AActor* Actor, FAIStimulus Stimulus)
 		}
 	}
 }
+
+void AMobController::SetAIEnabled_Implementation(bool Enable)
+{
+
+}

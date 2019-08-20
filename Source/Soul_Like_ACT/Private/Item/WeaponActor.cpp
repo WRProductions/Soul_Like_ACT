@@ -92,12 +92,13 @@ void AWeaponActor::DrawTrace(FVector prevVec_, FVector currVec_, bool bDrawTrace
 	}
 }
 
-void AWeaponActor::StartSwing(EMeleeTraceType MeleeTraceType, const float InDmgMulti /*= 1.f*/, const float InAreaMulti /*= 100.f*/)
+void AWeaponActor::StartSwing(EMeleeTraceType MeleeTraceType, const float InDmgMulti /*= 1.f*/, const float InAreaMulti /*= 100.f*/, bool InHeavyAttack /*= false*/)
 {
 	bIsTracingCollision = 1;
 
 	DmgMultiplier = InDmgMulti;
 	TraceType = MeleeTraceType;
+	bHeavyAttack = InHeavyAttack;
 
 	CurrVecs.Reset();
 	MyTargets.Empty();

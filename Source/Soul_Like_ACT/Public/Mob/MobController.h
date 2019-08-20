@@ -45,10 +45,13 @@ public:
 	* AI usages
 	*/
 	UFUNCTION(BlueprintCallable)
-		void GainRageOnHit(AActor* SourceActor, AActor* TargetActor, const FHitResult HitResult);
+	void GainRageOnHit(AActor* SourceActor, AActor* TargetActor, const FHitResult HitResult);
 
 	UFUNCTION(BlueprintCallable)
 	void AISenseUpdateMessage(AActor* Actor, FAIStimulus Stimulus);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void SetAIEnabled(bool Enable);
 
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;

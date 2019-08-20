@@ -89,3 +89,10 @@ void AMobBasic::GetWeapon_Implementation(AWeaponActor*& OutWeaponActor)
 {
 	OutWeaponActor = Weapon;
 }
+
+void AMobBasic::SetDisabled(bool bEnable)
+{
+	Super::SetDisabled(bEnable);
+
+	Cast<AMobController>(GetController())->SetAIEnabled(bEnable);
+}
