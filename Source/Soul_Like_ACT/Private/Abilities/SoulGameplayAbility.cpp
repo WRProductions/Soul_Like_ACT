@@ -112,7 +112,6 @@ void USoulModifierGameplayAbility::RemoveEffectsFromSelf()
 		{
 			//ApplyGameplayEffectToOwner()
 			LocalActiveEffect.GetOwningAbilitySystemComponent()->RemoveActiveGameplayEffect(LocalActiveEffect);
-			LOG_FUNC_NORMAL("1");
 		}
 	}
 }

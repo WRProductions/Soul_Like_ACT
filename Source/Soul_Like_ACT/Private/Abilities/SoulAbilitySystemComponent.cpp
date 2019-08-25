@@ -7,6 +7,14 @@
   #include "AbilitySystemGlobals.h"
 
 
+bool USoulAbilitySystemComponent::SetAttribute(FGameplayAttribute TargetAttribute, float ValueToChange, TEnumAsByte<EGameplayModOp::Type> ModifierOp)
+{
+	if (!HasAttributeSetForAttribute(TargetAttribute)) return false;
+
+	ApplyModToAttribute(TargetAttribute, ModifierOp, ValueToChange);
+	return true;
+}
+
 void USoulAbilitySystemComponent::GetActiveAbilitiesWithTags(const FGameplayTagContainer & GameplayTagContainer, TArray<USoulGameplayAbility*>& ActiveAbilities)
 {
 	TArray<FGameplayAbilitySpec*> AbilitiesToActivate;

@@ -18,6 +18,9 @@ public:
 	// Constructors and overrides
 	USoulAbilitySystemComponent() {}
 
+	UFUNCTION(BlueprintCallable)
+	bool SetAttribute(FGameplayAttribute TargetAttribute, float ValueToChange, TEnumAsByte<EGameplayModOp::Type> ModifierOp);
+
 	/** Returns a list of currently active ability instances that match the tags */
 	void GetActiveAbilitiesWithTags(const FGameplayTagContainer& GameplayTagContainer, TArray<USoulGameplayAbility*>& ActiveAbilities);
 

@@ -99,7 +99,7 @@ void ASoulCharacterBase::HandlePostureDamage(float PostureDamageAmount, bool IsC
 	OnPostureDamaged(PostureDamageAmount, IsCriticaled, HitInfo, DamageTags, InstigatorCharacter, DamageCauser);
 }
 
-void ASoulCharacterBase::ResetPerilousStatus()
+void ASoulCharacterBase::ResetPerilousStatus_Implementation()
 {
 	LOG_FUNC_FAIL();
 }

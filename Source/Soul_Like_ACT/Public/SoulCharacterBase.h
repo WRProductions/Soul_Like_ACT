@@ -92,6 +92,9 @@ protected:
 
 	bool bIsDead, bIsDisabled;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Perilous)
+	bool bIsPerilous;
+
 	UAnimMontage* DeathMontage;
 
 	FTimerHandle Handle_SlowMotion, Handler_SlowMotionDelay;
@@ -289,6 +292,7 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnPostureDamaged(float PostureDamage, bool IsCriticaled, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, ASoulCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 
+#pragma region ATTRIBUTE_DELEGATES
 	UPROPERTY(BlueprintAssignable)
 	FOnChanged OnHealthChanged;
 	UPROPERTY(BlueprintAssignable)
@@ -313,7 +317,9 @@ protected:
 	FOnChanged OnCriticalStrikeChanged;
 	UPROPERTY(BlueprintAssignable)
 	FOnChanged OnCriticalMultiChanged;
+#pragma endregion
 
+#pragma region ON_TRIGGER_DELEGATES
 	//On_XXX trigger
 	UPROPERTY(BlueprintAssignable)
 	FTrigger_ThreeParams OnMeleeAttack;
@@ -327,11 +333,12 @@ protected:
 	FTrigger_ThreeParams OnParrySucced;
 	UPROPERTY(BlueprintAssignable)
 	FTrigger_ThreeParams OnParryNormal;
+#pragma endregion
 
 	UFUNCTION(BlueprintNativeEvent)
 	void MakeStepDecelAndSound();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void ResetPerilousStatus();
 
 	UFUNCTION(BlueprintCallable)

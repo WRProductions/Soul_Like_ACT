@@ -203,13 +203,13 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		//Handle damage notifications
 		if (TargetCharacter)
 		{
-			FGameplayTagContainer LocalContainer;
-			Data.EffectSpec.GetAllAssetTags(LocalContainer);
+			FGameplayTagContainer GE_TagContainer;
+			Data.EffectSpec.GetAllAssetTags(GE_TagContainer);
 
 			//Get Hit results for HitEvents
 			bool bIsCritic, bIsStun;
 			EParryResult ParryResult;
-			GetHitEventFromTagContainer(LocalContainer, ParryResult, bIsCritic, bIsStun);
+			GetHitEventFromTagContainer(GE_TagContainer, ParryResult, bIsCritic, bIsStun);
 
 			if (ParryResult == EParryResult::Normal)
 			{
@@ -228,7 +228,7 @@ void USoulAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 					TargetCharacter->OnParryFailed.Broadcast(SourceActor, TargetActor, HitResult);
 			}
 
-			if (LocalContainer.HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Damage.Dot" }, true)))
+			if (GE_TagContainer.HasTagExact(FGameplayTag::RequestGameplayTag(FName{ "Damage.Dot" }, true)))
 			{
 				TargetCharacter->HandleDotDamage(LocalDamageDone, bIsCritic, bIsStun, HitResult, SourceTags, SourceCharacter, SourceActor);
 			}
