@@ -111,8 +111,10 @@ protected:
 	//SaveItem to GameData converters
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly))
 	void MakeSaveData();
+
 	UFUNCTION(BlueprintCallable)
 	void MakeSoulItemSaveData(FSoulItemData InItemData, FSoulSaveItemData &OutSaveItemData);
+
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly))
 	void MakeSoulItemData(UObject* InItemBase, TArray<UObject*> InJewels, FSoulItemData &OutItemData, int32 InItemCount = 1, int32 InItemLevel = 1);
 
