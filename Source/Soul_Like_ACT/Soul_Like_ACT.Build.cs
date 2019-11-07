@@ -20,7 +20,6 @@ public class Soul_Like_ACT : ModuleRules
             "GameplayTasks",
             "UMG",
             "NavigationSystem",
-            "UFSM"
         });
 	}
 }
