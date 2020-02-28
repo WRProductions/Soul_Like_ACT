@@ -70,21 +70,21 @@ protected:
 	void BindOnAttributesChanged();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class UWidgetComponent *TargetIcon;
+	class UWidgetComponent *TargetIcon;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class UActorFXManager *FXManager;
+	class UActorFXManager *FXManager;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class USoulModifierManager* ModifierManager;
+	class USoulModifierManager* ModifierManager;
 
 	/** The component used to handle ability system interactions */
 	UPROPERTY(BlueprintReadOnly)
-		class USoulAbilitySystemComponent *AbilitySystemComponent;
+	class USoulAbilitySystemComponent *AbilitySystemComponent;
 
 	/** List of attributes modified by the ability system */
 	UPROPERTY()
-		USoulAttributeSet* AttributeSet;
+	USoulAttributeSet* AttributeSet;
 
 	bool bIsDead;
 

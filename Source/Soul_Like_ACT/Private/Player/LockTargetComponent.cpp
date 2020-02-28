@@ -79,7 +79,7 @@ void ULockTargetComponent::ForceUsingFacingOffset(bool bHaveTarget)
 
 void ULockTargetComponent::InitComponent(class UArrowComponent *ArrowComponentRef)
 {
-	ArrowComponentRef->bAbsoluteRotation = 1;
+	ArrowComponentRef->SetUsingAbsoluteRotation(1);
 	PlayerArrow = ArrowComponentRef;
 
 	check(PlayerArrow);

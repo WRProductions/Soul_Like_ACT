@@ -59,7 +59,7 @@ ASoul_Like_ACTCharacter::ASoul_Like_ACTCharacter()
 	// Arrow Component for Target Lock Component
 	TargetLockArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("TargetLockArrow"));
 	TargetLockArrow->SetupAttachment(RootComponent);
-	TargetLockArrow->bAbsoluteRotation = 1;
+	TargetLockArrow->SetUsingAbsoluteRotation(1);
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
@@ -143,7 +143,7 @@ AWeaponActor * ASoul_Like_ACTCharacter::EquipGear(TSubclassOf<AWeaponActor> Weap
 
 
 	AWeaponActor *LocalWeapon = Cast<AWeaponActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), WeaponClassRef, FTransform::Identity, ESpawnActorCollisionHandlingMethod::AlwaysSpawn, this));
-	LocalWeapon->Instigator = this;
+	LocalWeapon->SetInstigator(this);
 	LocalWeapon->SetOwner(this);
 	LocalWeapon->bEnableDrawTraceLine = bShowTracelines;
 	InventoryManager->EquipGear(LocalWeapon);

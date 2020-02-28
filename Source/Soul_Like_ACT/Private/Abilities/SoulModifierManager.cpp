@@ -50,7 +50,7 @@ void USoulModifierManager::AddStartupGameplayAbilities()
 
 	GetOwnerGameplayAbilityComponent()->InitAbilityActorInfo(GetOwner(), GetOwner());
 
-	if (!(GetOwner()->Role == ROLE_Authority))
+	if (!(GetOwner()->GetLocalRole() == ROLE_Authority))
 	{
 		return;
 	}
